@@ -712,7 +712,7 @@
         <div style="font-size:22px; font-weight:800; color:var(--text-color); margin-bottom:20px;">التطبيق مقفل</div>
         <div style="font-size:14px; color:var(--muted-text); margin-bottom:30px;">أدخل الرمز الرباعي</div>
         <div id="pin_display" style="font-size:40px; letter-spacing:20px; text-align:center; margin-bottom:30px; color:var(--text-color); font-weight:bold; min-height:50px;">____</div>
-        <div style="display:grid; grid-template-columns:repeat(3,70px); gap:10px; justify-content:center; margin-bottom:20px;">
+        <div style="display:grid; grid-template-columns:repeat(3,70px); gap:10px; justify-content:center; margin-bottom:20px; direction:ltr;">
             <button onclick="addPinDigit('1')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">1</button>
             <button onclick="addPinDigit('2')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">2</button>
             <button onclick="addPinDigit('3')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">3</button>
@@ -722,8 +722,8 @@
             <button onclick="addPinDigit('7')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">7</button>
             <button onclick="addPinDigit('8')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">8</button>
             <button onclick="addPinDigit('9')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">9</button>
-            <button onclick="addPinDigit('0')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">0</button>
             <button onclick="clearPin()" style="padding:20px; font-size:14px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">حذف</button>
+            <button onclick="addPinDigit('0')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">0</button>
             <button onclick="submitPin()" style="padding:20px; font-size:14px; font-weight:bold; border:none; border-radius:8px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); cursor:pointer; font-weight:bold;">✓ تم</button>
         </div>
         <div id="pin_error" style="color:var(--danger-color); font-size:13px; font-weight:bold; min-height:20px;"></div>
@@ -3986,10 +3986,19 @@ ${_advisorSnapshotText}`;
 
     // ===== تسجيل Service Worker لتفعيل العمل بدون إنترنت (PWA) =====
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => {
-                console.warn('Service worker registration failed:', err);
-            });
+        // تسجيل فوري (بدون انتظار load كامل) لسرعة أكبر
+        navigator.serviceWorker.register('sw.js').then(reg => {
+            console.log('SW registered:', reg.scope);
+        }).catch(err => {
+            console.warn('Service worker registration failed:', err);
+        });
+        
+        // تحديث الصفحة عند تثبيت SW جديد
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!window.__sw_first_install) {
+                window.__sw_first_install = true;
+                window.location.reload();
+            }
         });
     }
 

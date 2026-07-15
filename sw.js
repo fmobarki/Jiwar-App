@@ -1,6 +1,6 @@
 // Jiwar — Service Worker
 // نسخة الكاش: رفعها عند كل تحديث جوهري بالملفات لإجبار المتصفح على تنزيل نسخة جديدة
-const CACHE_VERSION = 'jiwar-v1.0.0';
+const CACHE_VERSION = 'jiwar-v1.0.2';
 const APP_SHELL = [
     './',
     './index.html',
@@ -11,11 +11,20 @@ const APP_SHELL = [
     './apple-touch-icon.png'
 ];
 
-// تثبيت: تخزين هيكل التطبيق الأساسي مسبقًا
+// تثبيت: تخزين هيكل التطبيق الأساسي مسبقًا (fetch بدون كاش HTTP لضمان نسخة طازجة فعلاً)
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_VERSION).then((cache) => cache.addAll(APP_SHELL))
+        caches.open(CACHE_VERSION).then((cache) =>
+            Promise.all(
+                APP_SHELL.map((url) =>
+                    fetch(url, { cache: 'reload' })
+                        .then((response) => cache.put(url, response))
+                        .catch((err) => console.warn('Failed to cache', url, err))
+                )
+            )
+        )
     );
+    // تفعيل فوري بدون انتظار
     self.skipWaiting();
 });
 
@@ -28,6 +37,7 @@ self.addEventListener('activate', (event) => {
             )
         )
     );
+    // استيلاء فوري على الصفحات الحالية
     self.clients.claim();
 });
 
@@ -37,32 +47,37 @@ self.addEventListener('fetch', (event) => {
     const isGoogleFonts = url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com');
 
     if (isGoogleFonts) {
+        // خطوط: حاول الشبكة أولاً ثم الكاش
         event.respondWith(
             caches.open(CACHE_VERSION).then((cache) =>
                 fetch(event.request)
                     .then((response) => {
-                        cache.put(event.request, response.clone());
+                        if (response.ok) cache.put(event.request, response.clone());
                         return response;
                     })
-                    .catch(() => cache.match(event.request))
+                    .catch(() => cache.match(event.request) || new Response('Offline'))
             )
         );
         return;
     }
 
+    // الملفات المحلية: كاش-أولاً
     event.respondWith(
         caches.match(event.request).then((cached) => {
             if (cached) return cached;
+            
             return fetch(event.request).then((response) => {
-                // نخزّن نسخة من أي طلب GET ناجح لنفس الأصل (index.html وما شابه)
+                // خزّن نسخة من أي طلب GET ناجح لنفس الأصل
                 if (event.request.method === 'GET' && response.ok && url.origin === self.location.origin) {
                     const clone = response.clone();
                     caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, clone));
                 }
                 return response;
             }).catch(() => {
-                // خارج الاتصال ولا يوجد كاش — رجّع صفحة index.html كحل أخير لطلبات التصفح
-                if (event.request.mode === 'navigate') return caches.match('./index.html');
+                // خارج الاتصال ولا يوجد كاش — رجّع index.html لطلبات التصفح
+                if (event.request.mode === 'navigate') {
+                    return caches.match('./index.html') || new Response('Offline');
+                }
             });
         })
     );
