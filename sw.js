@@ -1,6 +1,6 @@
 // Jiwar — Service Worker
 // نسخة الكاش: رفعها عند كل تحديث جوهري بالملفات لإجبار المتصفح على تنزيل نسخة جديدة
-const CACHE_VERSION = 'jiwar-v1.0.2';
+const CACHE_VERSION = 'jiwar-v1.0.3';
 const APP_SHELL = [
     './',
     './index.html',
