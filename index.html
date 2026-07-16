@@ -2,21 +2,8 @@
 <html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Jiwar — إدارة العقارات</title>
-    <meta name="description" content="Jiwar: نظام محلي لإدارة الميزانية المالية الشهرية والسنوية للعمارات السكنية">
-
-    <!-- PWA: Manifest + Icons + Theme -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0a0e1a">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Jiwar">
-    <meta name="mobile-web-app-capable" content="yes">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الميزانية المالية الشهرية والسنوية لإدارة عمارة 169</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -662,6 +649,23 @@
         }
         .setup-wizard-btn:active { transform: scale(0.98); }
     </style>
+    <!-- ========== حقوق الملكية الفكرية ========== -->
+    <meta name="creator" content="Fahad Mobarki">
+    <meta name="copyright" content="© Fahad Mobarki 2026. All Rights Reserved.">
+    <meta name="license" content="Proprietary License - See LICENSE.md">
+    <link rel="license" href="LICENSE.md">
+    <!-- ========================================== -->
+
+    <!-- ========== الأيقونة و PWA ========== -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <!-- شاشات البداية لـ iOS (JIWAR wordmark) -->
+    <link rel="apple-touch-startup-image" href="icons/splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1536x2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
+    <!-- ===================================== -->
 </head>
 <body>
 
@@ -712,19 +716,18 @@
         <div style="font-size:22px; font-weight:800; color:var(--text-color); margin-bottom:20px;">التطبيق مقفل</div>
         <div style="font-size:14px; color:var(--muted-text); margin-bottom:30px;">أدخل الرمز الرباعي</div>
         <div id="pin_display" style="font-size:40px; letter-spacing:20px; text-align:center; margin-bottom:30px; color:var(--text-color); font-weight:bold; min-height:50px;">____</div>
-        <div style="display:grid; grid-template-columns:repeat(3,70px); gap:10px; justify-content:center; margin-bottom:20px; direction:ltr;">
-            <button onclick="addPinDigit('3')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">3</button>
-            <button onclick="addPinDigit('2')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">2</button>
+        <div style="display:grid; grid-template-columns:repeat(3,70px); gap:10px; justify-content:center; margin-bottom:20px;">
             <button onclick="addPinDigit('1')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">1</button>
-            <button onclick="addPinDigit('6')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">6</button>
-            <button onclick="addPinDigit('5')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">5</button>
+            <button onclick="addPinDigit('2')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">2</button>
+            <button onclick="addPinDigit('3')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">3</button>
             <button onclick="addPinDigit('4')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">4</button>
-            <button onclick="addPinDigit('9')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">9</button>
-            <button onclick="addPinDigit('8')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">8</button>
+            <button onclick="addPinDigit('5')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">5</button>
+            <button onclick="addPinDigit('6')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">6</button>
             <button onclick="addPinDigit('7')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">7</button>
+            <button onclick="addPinDigit('8')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">8</button>
+            <button onclick="addPinDigit('9')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">9</button>
             <button onclick="addPinDigit('0')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">0</button>
             <button onclick="clearPin()" style="padding:20px; font-size:14px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">حذف</button>
-            <button onclick="addPinDigit('0')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">0</button>
             <button onclick="submitPin()" style="padding:20px; font-size:14px; font-weight:bold; border:none; border-radius:8px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); cursor:pointer; font-weight:bold;">✓ تم</button>
         </div>
         <div id="pin_error" style="color:var(--danger-color); font-size:13px; font-weight:bold; min-height:20px;"></div>
@@ -736,8 +739,7 @@
         <button type="button" id="theme_toggle_btn" onclick="toggleTheme()">🌙 داكن</button>
     </div>
     <header>
-        <h1 style="margin:0; font-size:26px; letter-spacing:0.5px; color:var(--primary-color);">Jiwar</h1>
-        <p id="app_header_title" style="margin:6px 0 0 0; font-size:13.5px; font-weight:600; opacity:0.85;">الميزانية المالية الشهرية والسنوية لإدارة عمارة 169</p>
+        <h1 id="app_header_title">الميزانية المالية الشهرية والسنوية لإدارة عمارة 169</h1>
     </header>
 
     <div class="bottom-nav">
@@ -1025,6 +1027,14 @@
                 <input type="file" id="import_file_input" accept=".json" style="display:none;" onchange="importAllData(event)">
                 <p id="import_export_status" style="font-size:12px; color:var(--muted-text); margin-top:8px;"></p>
             </div>
+
+            <!-- ========== تذييل الحقوق (يظهر داخل الإعدادات فقط) ========== -->
+            <footer style="margin-top:20px; padding:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; color:var(--muted-text); font-size:12px; text-align:center; direction:rtl;">
+                <div style="margin-bottom:10px;"><strong>© Jiwar 2026 | جميع الحقوق محفوظة</strong><br>Developed by <strong>Fahad Mobarki</strong></div>
+                <div style="margin-bottom:10px; color:var(--muted-text);">📧 <a href="mailto:Fmobarki@gmail.com" style="color:var(--primary-color); text-decoration:none;">Fmobarki@gmail.com</a></div>
+                <div style="background:var(--field-bg); padding:8px; border-radius:6px;">🔒 <strong>الخصوصية:</strong> كل البيانات تُحفظ محليًا على جهازك — لا تُرسل لخادم خارجي</div>
+            </footer>
+            <!-- ================================ -->
             </div>
         </div>
     </div>
@@ -1272,7 +1282,7 @@
         const name = getPropertyName();
         const headerEl = document.getElementById('app_header_title');
         if (headerEl) headerEl.innerText = `الميزانية المالية الشهرية والسنوية لإدارة ${name}`;
-        document.title = `Jiwar — ${name}`;
+        document.title = `الميزانية المالية الشهرية والسنوية لإدارة ${name}`;
     }
 
     function onPropertyIdentityChange() {
@@ -3985,27 +3995,9 @@ ${_advisorSnapshotText}`;
     })();
     // ===== نهاية مركز الوكلاء الذكي المحلي =====
 
-    // ===== تسجيل Service Worker لتفعيل العمل بدون إنترنت (PWA) =====
-    if ('serviceWorker' in navigator) {
-        // تسجيل فوري (بدون انتظار load كامل) لسرعة أكبر
-        navigator.serviceWorker.register('sw.js').then(reg => {
-            console.log('SW registered:', reg.scope);
-        }).catch(err => {
-            console.warn('Service worker registration failed:', err);
-        });
-        
-        // تحديث الصفحة عند تثبيت SW جديد
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!window.__sw_first_install) {
-                window.__sw_first_install = true;
-                window.location.reload();
-            }
-        });
-    }
-
 </script>
-
 
 
 </body>
 </html>
+
