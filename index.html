@@ -709,6 +709,12 @@
     </div>
 </div>
 
+<!-- بانر تحديث احترافي (Play Store style) -->
+<div id="update_banner" style="display:none; position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:10000; background:linear-gradient(135deg, var(--primary-color), var(--primary-color-light)); color:#1a1200; padding:12px 16px; border-radius:14px; box-shadow:0 8px 26px rgba(0,0,0,0.4); align-items:center; gap:12px; direction:rtl; max-width:92vw; font-family:inherit;">
+    <span style="font-weight:800; font-size:13.5px; white-space:nowrap;">🚀 يتوفر إصدار جديد من Jiwar</span>
+    <button id="update_banner_btn" type="button" style="background:#1a1200; color:var(--primary-color); border:none; padding:9px 18px; border-radius:10px; font-weight:800; font-size:13px; cursor:pointer; white-space:nowrap;">تحديث الآن</button>
+</div>
+
 <!-- شاشة قفل PIN -->
 <div id="pin_lock_screen" style="position:fixed; inset:0; z-index:9999; background:var(--bg-color); background-image:var(--bg-glow); display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px; direction:rtl;">
     <div style="max-width:300px; text-align:center;">
@@ -716,7 +722,8 @@
         <div style="font-size:22px; font-weight:800; color:var(--text-color); margin-bottom:20px;">التطبيق مقفل</div>
         <div style="font-size:14px; color:var(--muted-text); margin-bottom:30px;">أدخل الرمز الرباعي</div>
         <div id="pin_display" style="font-size:40px; letter-spacing:20px; text-align:center; margin-bottom:30px; color:var(--text-color); font-weight:bold; min-height:50px;">____</div>
-        <div style="display:grid; grid-template-columns:repeat(3,70px); gap:10px; justify-content:center; margin-bottom:20px;">
+<div style="display:grid; grid-template-columns:repeat(3,70px); gap:10px; justify-content:center; margin-bottom:20px; direction:ltr;">
+
             <button onclick="addPinDigit('1')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">1</button>
             <button onclick="addPinDigit('2')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">2</button>
             <button onclick="addPinDigit('3')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">3</button>
@@ -726,7 +733,8 @@
             <button onclick="addPinDigit('7')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">7</button>
             <button onclick="addPinDigit('8')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">8</button>
             <button onclick="addPinDigit('9')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">9</button>
-            <button onclick="addPinDigit('0')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">0</button>
+<button onclick="addPinDigit('0')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">0</button>
+
             <button onclick="clearPin()" style="padding:20px; font-size:14px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">حذف</button>
             <button onclick="submitPin()" style="padding:20px; font-size:14px; font-weight:bold; border:none; border-radius:8px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); cursor:pointer; font-weight:bold;">✓ تم</button>
         </div>
@@ -3149,6 +3157,7 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             sessionStorage.setItem('pin_unlocked', 'yes');
             document.getElementById('pin_lock_screen').style.display = 'none';
             _pinEntry = '';
+            initAppAfterUnlock(); // حمّل كل البيانات فورًا — بدون حاجة لتحديث الصفحة يدويًا
         } else {
             document.getElementById('pin_error').innerText = '❌ رمز خاطئ';
             _pinEntry = '';
@@ -3226,26 +3235,7 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
     }
 
     function initAppAfterUnlock() {
-        // هذا يُدعى فقط بعد فك القفل (أو عدم وجود قفل أصلاً)
-    }
-
-    // ========== نهاية نظام PIN ==========
-
-    // التشغيل التلقائي المبدئي
-    window.onload = function() {
-        applyThemeButtonLabel(document.documentElement.getAttribute('data-theme') || 'dark');
-        
-        // فحص PIN: إذا كان هناك قفل ولم يُفتح بعد
-        const hasPIN = !!localStorage.getItem('app_pin_code');
-        const isUnlocked = sessionStorage.getItem('pin_unlocked') === 'yes';
-        
-        if (hasPIN && !isUnlocked) {
-            document.getElementById('pin_lock_screen').style.display = 'flex';
-            refreshPinUI(); // تحديث الواجهة (في الإعدادات)
-            return; // توقف هنا ولا تستمر في التحميل
-        }
-
-        // بدء التحميل العادي
+        // هذا يُدعى إما مباشرة (لو ما فيه قفل) أو فور نجاح إدخال الرمز الصحيح
         showSetupWizardIfNeeded();
         applyThemeButtonLabel(document.documentElement.getAttribute('data-theme') || 'dark');
         // قرار ثابت: كل فتح جديد للتطبيق يبدأ من "الرئيسية" دائمًا — بغض النظر عن آخر تبويب
@@ -3293,10 +3283,28 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         });
         document.getElementById('guard_salary').addEventListener('input', saveFixedSettings);
 
-
-        
         // تحديث واجهة PIN في الإعدادات
         refreshPinUI();
+    }
+
+    // ========== نهاية نظام PIN ==========
+
+    // التشغيل التلقائي المبدئي
+    window.onload = function() {
+        applyThemeButtonLabel(document.documentElement.getAttribute('data-theme') || 'dark');
+        
+        // فحص PIN: إذا كان هناك قفل ولم يُفتح بعد
+        const hasPIN = !!localStorage.getItem('app_pin_code');
+        const isUnlocked = sessionStorage.getItem('pin_unlocked') === 'yes';
+        
+        if (hasPIN && !isUnlocked) {
+            document.getElementById('pin_lock_screen').style.display = 'flex';
+            refreshPinUI(); // تحديث الواجهة (في الإعدادات)
+            return; // توقف هنا لين يدخل الرمز الصحيح — checkPin() تستدعي initAppAfterUnlock() بنفسها
+        }
+
+        // بدء التحميل العادي (ما فيه قفل أصلاً)
+        initAppAfterUnlock();
     };
 
     function updateElevatorLiveDisplay() {
@@ -3994,6 +4002,67 @@ ${_advisorSnapshotText}`;
         }
     })();
     // ===== نهاية مركز الوكلاء الذكي المحلي =====
+
+    // ===== تسجيل Service Worker + نظام التحديث الذكي (Auto Update بأسلوب متاجر التطبيقات) =====
+    (function setupSmartAutoUpdate() {
+        if (!('serviceWorker' in navigator)) return;
+
+        let refreshing = false;
+        let waitingWorker = null;
+
+        function showUpdateBanner(worker) {
+            waitingWorker = worker;
+            const banner = document.getElementById('update_banner');
+            if (banner) banner.style.display = 'flex';
+        }
+
+        navigator.serviceWorker.register('sw.js').then((reg) => {
+            console.log('SW registered:', reg.scope);
+
+            // حالة نادرة: فيه نسخة منتظرة أصلاً من قبل ما نوصل هالسطر
+            if (reg.waiting && navigator.serviceWorker.controller) {
+                showUpdateBanner(reg.waiting);
+            }
+
+            // ترقب أي تحديث جديد يبدأ تثبيته بالخلفية
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                if (!newWorker) return;
+                newWorker.addEventListener('statechange', () => {
+                    // "installed" + وجود controller حالي = فعلاً تحديث لنسخة موجودة (مو أول تثبيت)
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        showUpdateBanner(newWorker);
+                    }
+                });
+            });
+
+            // فحص فوري عن وجود تحديث عند كل فتح للتطبيق
+            reg.update().catch(() => {});
+            // وفحص كل مرة يرجع فيها المستخدم للتطبيق (من الخلفية مثلاً)
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') reg.update().catch(() => {});
+            });
+        }).catch((err) => {
+            console.warn('Service worker registration failed:', err);
+        });
+
+        // بعد تفعيل النسخة الجديدة فعليًا (بعد ضغط المستخدم) أعد تحميل الصفحة مرة وحدة بس
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+        });
+
+        // زر "تحديث الآن" بالبانر — يأمر النسخة الجديدة تتفعّل فورًا
+        const btn = document.getElementById('update_banner_btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                if (waitingWorker) waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+                const banner = document.getElementById('update_banner');
+                if (banner) banner.style.display = 'none';
+            });
+        }
+    })();
 
 </script>
 
