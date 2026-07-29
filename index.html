@@ -731,6 +731,20 @@
             <button onclick="submitPin()" style="padding:20px; font-size:14px; font-weight:bold; border:none; border-radius:8px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); cursor:pointer; font-weight:bold;">✓ تم</button>
         </div>
         <div id="pin_error" style="color:var(--danger-color); font-size:13px; font-weight:bold; min-height:20px;"></div>
+        <div style="margin-top:10px;">
+            <a href="#" onclick="showRecoveryPanel(); return false;" style="color:var(--primary-color); font-size:13px; text-decoration:underline;">نسيت الرمز؟</a>
+        </div>
+
+        <div id="pin_recovery_panel" style="display:none; margin-top:20px; padding:16px; background:var(--field-bg); border-radius:10px; border:1px solid var(--border-soft); text-align:right;">
+            <label style="font-size:13px; font-weight:bold; color:var(--text-color); display:block; margin-bottom:8px;">اكتب عبارة الاسترجاع التي اخترتها:</label>
+            <input type="text" id="recovery_code_input" lang="ar" dir="rtl" style="width:100%; box-sizing:border-box; padding:10px; font-size:16px; border-radius:6px; border:1px solid var(--border-soft); background:var(--card); color:var(--text-color); margin-bottom:10px;" placeholder="عبارة الاسترجاع">
+            <div style="display:flex; gap:8px;">
+                <button type="button" onclick="submitRecoveryCode()" style="flex:1; padding:10px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); border:none; border-radius:6px; font-weight:bold; cursor:pointer;">فك القفل</button>
+                <button type="button" onclick="hideRecoveryPanel()" style="flex:1; padding:10px; background:var(--card); color:var(--text-color); border:1px solid var(--border-soft); border-radius:6px; cursor:pointer;">إلغاء</button>
+            </div>
+            <div id="recovery_error" style="color:var(--danger-color); font-size:12px; font-weight:bold; min-height:18px; margin-top:8px;"></div>
+            <p style="font-size:11px; color:var(--muted-text); margin-top:6px;">لو نجحت العبارة، تُزال حماية PIN تمامًا ويُفتح التطبيق مباشرة — تقدر تفعّل رمزًا جديدًا من الإعدادات بعدها.</p>
+        </div>
     </div>
 </div>
 
@@ -771,6 +785,16 @@
         <p id="backup_reminder_text" style="margin:0 0 10px 0; font-weight:bold; color:var(--warn-soft-text);"></p>
         <button type="button" onclick="shareBackupData()" style="background:#25D366; color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer; margin-left:8px;">📤 مشاركة نسخة احتياطية الآن</button>
         <button type="button" onclick="dismissBackupReminder()" style="background:#78909c; color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer;">لاحقًا</button>
+    </div>
+
+    <div id="monthly_entry_reminder_banner" class="no-print" style="display:none; background:var(--warn-soft-bg); border:1px solid var(--warning-color); border-radius:8px; padding:14px; margin-bottom:20px;">
+        <p id="monthly_entry_reminder_text" style="margin:0 0 10px 0; font-weight:bold; color:var(--warn-soft-text);"></p>
+        <button type="button" onclick="goToQuickEntryTab()" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer; margin-left:8px;">📝 سجّل البيانات الآن</button>
+        <button type="button" onclick="dismissMonthlyEntryReminder()" style="background:#78909c; color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer;">لاحقًا</button>
+    </div>
+
+    <div id="emergency_fund_low_banner" class="no-print" style="display:none; background:var(--danger-soft-bg); border:2px solid var(--danger-color); border-radius:8px; padding:14px; margin-bottom:20px;">
+        <p id="emergency_fund_low_text" style="margin:0; font-weight:bold; color:var(--danger-soft-text);"></p>
     </div>
 
     <div class="grid">
@@ -960,6 +984,11 @@
                     <input type="number" id="emergency_reserve_ratio_pct" value="40" min="1" max="90" step="1" lang="en" dir="ltr" inputmode="numeric" oninput="onEmergencyRatioChange()">
                     <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">من كل فائض تشغيلي شهري (بعد خصم حصة المصعد)، هذي النسبة تُحوَّل تلقائيًا لصندوق الطوارئ التراكمي. الافتراضي 40%. يسمح بين 1% و90%.</p>
                 </div>
+                <div class="form-group">
+                    <label style="color: var(--primary-color);">تنبيه إذا رصيد صندوق الطوارئ أقل من (ريال):</label>
+                    <input type="number" id="emergency_fund_min_threshold_input" placeholder="مثال: 3000 (اتركه فارغًا لتعطيل التنبيه)" lang="en" dir="ltr" inputmode="decimal" oninput="onEmergencyThresholdChange()">
+                    <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">لو رصيد الصندوق نزل تحت هذا المبلغ، يظهر تنبيه بالأعلى فورًا. اتركه فارغًا أو صفر لتعطيل التنبيه.</p>
+                </div>
             </div>
 
             <div class="card">
@@ -987,6 +1016,11 @@
                     <div class="form-group">
                         <label>أنشئ رمز رباعي (4 أرقام):</label>
                         <input type="password" id="new_pin_input" maxlength="4" inputmode="numeric" lang="en" dir="ltr" style="direction:ltr; text-align:center; letter-spacing:8px; font-size:24px;" placeholder="0000">
+                    </div>
+                    <div class="form-group">
+                        <label>عبارة استرجاع تتذكرها أنت (لو نسيت الرمز):</label>
+                        <input type="text" id="new_recovery_phrase_input" maxlength="40" placeholder="مثال: اسم أول عمارة أدرتها">
+                        <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">اختر شيء تتذكره بسهولة أنت بس — يُستخدم بدل الرمز لو نسيته لاحقًا. لا يقل عن 3 أحرف.</p>
                     </div>
                     <button type="button" class="btn" onclick="setupPin()" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:white;">🔒 تفعيل الحماية</button>
                 </div>
@@ -1257,7 +1291,7 @@
 
     function applyFixedSettings() {
         const settings = getFixedSettings();
-        if (!settings) { applyPropertyIdentityToPage(); loadEmergencyRatioToUI(); return; }
+        if (!settings) { applyPropertyIdentityToPage(); loadEmergencyRatioToUI(); loadEmergencyThresholdToUI(); return; }
         if (settings.guard !== undefined) {
             document.getElementById('guard_salary').value = settings.guard;
             const guardSettingsEl = document.getElementById('guard_salary_settings');
@@ -1276,6 +1310,7 @@
         if (defaultFeeEl && settings.defaultAptFee) defaultFeeEl.value = settings.defaultAptFee;
         applyPropertyIdentityToPage();
         loadEmergencyRatioToUI();
+        loadEmergencyThresholdToUI();
     }
 
     // يحمّل نسبة صندوق الطوارئ المحفوظة إلى حقل الإعدادات عند بدء التطبيق
@@ -1792,6 +1827,7 @@
         alert(`✅ تم الاعتماد والحفظ التلقائي بنجاح لتقرير شهر (${currentMonth} ${currentYear}) في السجل التاريخي للعقار.`);
         setLoadedMonthContext(currentMonth, currentYear);
         checkBackupReminder(); // تذكير ذكي: أفضل توقيت لتذكير المستخدم بالنسخ الاحتياطي هو مباشرة بعد اعتماد بيانات جديدة
+        checkEmergencyFundThreshold(); // رصيد الصندوق تغيّر بعد هذا الاعتماد، لازم يُعاد فحصه فورًا
     }
 
     function getSelectedYear() {
@@ -2376,6 +2412,86 @@
         }
     }
     // ===== نهاية نظام التذكير =====
+
+    // ===== نظام تذكير: لم تُسجَّل بيانات الشهر الحالي بعد =====
+    // يقارن الشهر/السنة الفعليين (تاريخ اليوم الحقيقي) مع سجل property_history،
+    // لا علاقة له بالشهر المعروض حاليًا بشاشة الإدخال (قد يكون المستخدم يستعرض شهرًا قديمًا).
+    function goToQuickEntryTab() {
+        switchTab('quick');
+    }
+
+    function dismissMonthlyEntryReminder() {
+        const now = new Date();
+        const key = `monthly_entry_snoozed_${now.getFullYear()}_${now.getMonth()}`;
+        localStorage.setItem(key, (Date.now() + 3 * 24 * 60 * 60 * 1000).toString());
+        const banner = document.getElementById('monthly_entry_reminder_banner');
+        if (banner) banner.style.display = 'none';
+    }
+
+    function checkMonthlyEntryReminder() {
+        const banner = document.getElementById('monthly_entry_reminder_banner');
+        const text = document.getElementById('monthly_entry_reminder_text');
+        if (!banner || !text) return;
+
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonthName = MONTHS_ORDER[now.getMonth()];
+        const dayOfMonth = now.getDate();
+
+        // لا نزعج المستخدم بأول نص الشهر — ننتظر لليوم 15 فأكثر قبل التذكير
+        if (dayOfMonth < 15) { banner.style.display = 'none'; return; }
+
+        const snoozeKey = `monthly_entry_snoozed_${currentYear}_${now.getMonth()}`;
+        const snoozedUntil = parseInt(localStorage.getItem(snoozeKey)) || 0;
+        if (Date.now() < snoozedUntil) { banner.style.display = 'none'; return; }
+
+        const history = readHistory();
+        const alreadyEntered = history.some(r => r.month === currentMonthName && r.year === currentYear);
+        if (alreadyEntered) { banner.style.display = 'none'; return; }
+
+        text.innerText = `📆 لسا ما سجّلت بيانات شهر ${currentMonthName} ${currentYear} — سجّلها الآن قبل ما تنسى التفاصيل.`;
+        banner.style.display = 'block';
+    }
+    // ===== نهاية نظام تذكير الشهر الحالي =====
+
+    // ===== نظام تنبيه: رصيد صندوق الطوارئ أقل من الحد الأدنى =====
+    function getEmergencyFundMinThreshold() {
+        const stored = localStorage.getItem('emergency_fund_min_threshold');
+        const val = stored !== null ? parseFloat(stored) : 0;
+        return isFinite(val) && val > 0 ? val : 0;
+    }
+
+    function onEmergencyThresholdChange() {
+        const el = document.getElementById('emergency_fund_min_threshold_input');
+        if (!el) return;
+        const val = parseFloat(el.value);
+        localStorage.setItem('emergency_fund_min_threshold', isFinite(val) ? String(val) : '0');
+        checkEmergencyFundThreshold();
+    }
+
+    function loadEmergencyThresholdToUI() {
+        const el = document.getElementById('emergency_fund_min_threshold_input');
+        if (!el) return;
+        el.value = getEmergencyFundMinThreshold() || '';
+    }
+
+    function checkEmergencyFundThreshold() {
+        const banner = document.getElementById('emergency_fund_low_banner');
+        const text = document.getElementById('emergency_fund_low_text');
+        if (!banner || !text) return;
+
+        const threshold = getEmergencyFundMinThreshold();
+        if (threshold <= 0) { banner.style.display = 'none'; return; } // الميزة معطّلة ما لم يحدد المستخدم حداً
+
+        const fundState = computeEmergencyFundState();
+        if (fundState.balance < threshold) {
+            text.innerText = `🚨 رصيد صندوق الطوارئ الحالي (${fundState.balance.toFixed(2)} ر.س) أقل من الحد الأدنى المحدد (${threshold.toFixed(2)} ر.س).`;
+            banner.style.display = 'block';
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+    // ===== نهاية نظام تنبيه الحد الأدنى =====
 
     // يفحص كل دفعات المصعد المحفوظة حاليًا (مو بس وقت الاستيراد) ويحذف أي تكرار بنفس المبلغ ونفس
     // التاريخ الفعلي — يصلح أي تلوث سابق صار قبل إصلاح منطق الدمج، بضغطة وحدة وبدون فقدان أي دفعة حقيقية.
@@ -3196,6 +3312,48 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
     // ========== نظام حماية PIN (بسيط وموثوق) ==========
     let _pinEntry = ''; // الرمز الذي يدخله المستخدم الآن
 
+    // ----- رمز الاسترجاع: عبارة يختارها المستخدم بنفسه عند إنشاء/تغيير PIN -----
+    function showRecoveryPanel() {
+        const panel = document.getElementById('pin_recovery_panel');
+        const input = document.getElementById('recovery_code_input');
+        const err = document.getElementById('recovery_error');
+        if (panel) panel.style.display = 'block';
+        if (input) { input.value = ''; input.focus(); }
+        if (err) err.innerText = '';
+    }
+
+    function hideRecoveryPanel() {
+        const panel = document.getElementById('pin_recovery_panel');
+        if (panel) panel.style.display = 'none';
+    }
+
+    function submitRecoveryCode() {
+        const input = document.getElementById('recovery_code_input');
+        const err = document.getElementById('recovery_error');
+        if (!input) return;
+        const entered = input.value.trim().toLowerCase();
+        const storedCode = localStorage.getItem('app_pin_recovery_code');
+
+        if (!storedCode) {
+            if (err) err.innerText = '⚠️ ما فيه عبارة استرجاع محفوظة لهذا الجهاز.';
+            return;
+        }
+        if (!entered || entered !== storedCode) {
+            if (err) err.innerText = '❌ عبارة الاسترجاع غير صحيحة.';
+            return;
+        }
+
+        // نجح رمز الاسترجاع: إزالة الحماية بالكامل (لا يوجد تشفير فعلي للبيانات، فقط حاجز واجهة)
+        localStorage.removeItem('app_pin_code');
+        localStorage.removeItem('app_pin_recovery_code');
+        sessionStorage.setItem('pin_unlocked', 'yes');
+        hideRecoveryPanel();
+        document.getElementById('pin_lock_screen').style.display = 'none';
+        alert('🔓 تم فتح التطبيق وإزالة رمز PIN القديم. يُنصح بتفعيل رمز جديد من الإعدادات فورًا.');
+        if (typeof refreshPinUI === 'function') refreshPinUI();
+    }
+    // ----- نهاية نظام رمز الاسترجاع -----
+
     function addPinDigit(digit) {
         if (_pinEntry.length < 4) {
             _pinEntry += digit;
@@ -3246,15 +3404,22 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
 
     function setupPin() {
         const pin = document.getElementById('new_pin_input').value.trim();
+        const recoveryPhrase = document.getElementById('new_recovery_phrase_input').value.trim();
         const msg = document.getElementById('pin_message');
         if (!/^\d{4}$/.test(pin)) {
             msg.innerText = '⚠️ الرمز يجب أن يكون 4 أرقام بالضبط';
             return;
         }
+        if (recoveryPhrase.length < 3) {
+            msg.innerText = '⚠️ اكتب عبارة استرجاع لا تقل عن 3 أحرف';
+            return;
+        }
         localStorage.setItem('app_pin_code', pin);
+        localStorage.setItem('app_pin_recovery_code', recoveryPhrase.toLowerCase());
         msg.style.color = 'var(--success-color)';
-        msg.innerText = '✅ تم تفعيل الحماية بنجاح';
+        msg.innerText = '✅ تم تفعيل الحماية بنجاح — تذكّر عبارة الاسترجاع اللي كتبتها';
         document.getElementById('new_pin_input').value = '';
+        document.getElementById('new_recovery_phrase_input').value = '';
         refreshPinUI();
     }
 
@@ -3265,13 +3430,20 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             alert('⚠️ الرمز يجب أن يكون 4 أرقام بالضبط');
             return;
         }
+        let recoveryPhrase = prompt('اكتب عبارة استرجاع تتذكرها أنت (لو نسيت الرمز مستقبلًا):');
+        while (recoveryPhrase !== null && recoveryPhrase.trim().length < 3) {
+            recoveryPhrase = prompt('⚠️ لازم 3 أحرف على الأقل. اكتب عبارة استرجاع:');
+        }
+        if (recoveryPhrase === null) return; // المستخدم ألغى — لا نغيّر شي بدون عبارة استرجاع صالحة
         localStorage.setItem('app_pin_code', newPin);
-        alert('✅ تم تحديث الرمز');
+        localStorage.setItem('app_pin_recovery_code', recoveryPhrase.trim().toLowerCase());
+        alert('✅ تم تحديث الرمز وعبارة الاسترجاع');
     }
 
     function disablePin() {
         if (confirm('هل أنت متأكد من إزالة الحماية؟')) {
             localStorage.removeItem('app_pin_code');
+            localStorage.removeItem('app_pin_recovery_code');
             alert('🔓 تم إزالة الحماية');
             refreshPinUI();
         }
@@ -3342,6 +3514,8 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         renderOpeningBalanceStatus();
         updateLastBackupStatusDisplay();
         checkBackupReminder();
+        checkMonthlyEntryReminder(); // هل الشهر الحالي الفعلي مسجّل بعد؟
+        checkEmergencyFundThreshold(); // هل رصيد الصندوق تحت الحد الأدنى المحدد؟
         checkForDuplicateElevatorPaymentsSilently(); // فحص مالي حرج: يعمل دائمًا بدون أي اعتماد على ذاكرة المستخدم
 
         // فحص تلقائي عند فتح التطبيق نفسه (مو بس عند تبديل الشهر يدويًا):

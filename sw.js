@@ -4,14 +4,18 @@
 // هذا يجبر كل المستخدمين على استلام آخر نسخة تلقائياً
 // ============================================================
 
-const CACHE_VERSION = 'jiwar-v3';   // ⬅️ غيّر هذا الرقم مع كل تحديث فعلي (v3, v4, ...)
+const CACHE_VERSION = 'jiwar-v3';   // ⬅️ غيّر هذا الرقم مع كل تحديث فعلي (v4, v5, ...)
 const CACHE_NAME = CACHE_VERSION;
 
 const CORE_ASSETS = [
     './',
     './index.html',
     './manifest.json',
-    './favicon.ico'
+    './favicon.ico',
+    './icons/icon-192.png',
+    './icons/icon-512.png',
+    './icons/icon-512-maskable.png',
+    './icons/apple-touch-icon.png'
 ];
 
 // عند التثبيت: خزّن الملفات الأساسية فوراً بدون انتظار
