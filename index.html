@@ -3,65 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الميزانية المالية الشهرية والسنوية لإدارة عمارة 169</title>
+    <title>جوار — إدارة ميزانية العمارة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * , *::before, *::after { box-sizing: border-box; }
 
+        /* ===== رموز التصميم (Design Tokens) — المرحلة 1 من إعادة التصميم =====
+           القاعدة: ألوان الخلفيات الصلبة (أزرار بنص أبيض) منفصلة عن ألوان النصوص (‎*-text)،
+           حتى يحقق كل استخدام تباين WCAG 4.5:1 في الوضعين. الذهبي للتمييز فقط، لا للزخرفة. */
         :root {
-            --primary-color: #d4a94a;     /* ذهبي فاخر — ثابت بكل السمتين */
-            --primary-color-light: #e8c877;
-            --secondary-color: #3b82c4;   /* أزرق سفير هادئ */
-            --success-color: #1f9d7c;
-            --danger-color: #e2544a;
-            --warning-color: #d99a3d;
+            --secondary-color: #2a62a0;   /* أزرق — خلفية أزرار بنص أبيض */
+            --success-color: #17876a;     /* أخضر — خلفية أزرار بنص أبيض */
+            --danger-color: #c93a30;      /* أحمر — خلفية أزرار بنص أبيض */
+            --radius-field: 12px;
+            --radius-card: 16px;
+            --tap-min: 44px;
         }
 
         html[data-theme="dark"] {
-            --bg-color: #0a0e1a;
-            --card-bg: #131829;
-            --text-color: #eef0f7;
-            --muted-text: #9099b8;
-            --field-bg: #1a2036;
-            --border-soft: #2a3150;
-            --bg-glow: radial-gradient(circle at 15% 8%, rgba(212,169,74,0.08), transparent 42%),
-                       radial-gradient(circle at 88% 92%, rgba(59,130,196,0.10), transparent 42%);
-            --header-grad: linear-gradient(135deg, #0a0e1a, #1a2140 55%, #232a4d);
-            --info-bg: rgba(217,154,61,0.14); --info-text: #f0c674;
-            --success-soft-bg: rgba(31,157,124,0.14); --success-soft-text: #6fe3c4;
-            --danger-soft-bg: rgba(226,84,74,0.14); --danger-soft-text: #ff9d94;
-            --warn-soft-bg: rgba(217,154,61,0.12); --warn-soft-text: #f0c674;
+            --primary-color: #d4a94a;          /* ذهبي العلامة: خلفية الزر الأساسي + نص على الداكن */
+            --primary-color-light: #e8c877;
+            --brand-text: #e8c877;
+            --on-brand: #1a1200;
+            --warning-color: #f0c674;          /* يُستخدم كنص على الداكن */
+            --bg-color: #0b0f19;
+            --card-bg: #141a2a;
+            --text-color: #eceef4;
+            --muted-text: #a3abc2;
+            --field-bg: #1c2335;
+            --border-soft: #2a3249;
+            --bg-glow: none;
+            --header-grad: none;
+            --info-bg: rgba(240,198,116,0.10); --info-text: #f0c674;
+            --success-soft-bg: rgba(60,203,159,0.12); --success-soft-text: #3ccb9f;
+            --danger-soft-bg: rgba(255,138,128,0.12); --danger-soft-text: #ff8a80;
+            --warn-soft-bg: rgba(240,198,116,0.10); --warn-soft-text: #f0c674;
+            --info-blue-text: #7fb2e8;
             --paid-bg: rgba(255,255,255,0.03); --paid-text: var(--muted-text);
-            --historical-bg: rgba(120,135,165,0.15); --historical-text: #c2cbe0; --historical-border: #78879f;
-            --pending-bg: rgba(217,154,61,0.14); --pending-text: #f0c674;
+            --historical-bg: rgba(127,178,232,0.10); --historical-text: #c2cbe0; --historical-border: #4a5470;
+            --pending-bg: rgba(240,198,116,0.10); --pending-text: #f0c674;
             --th-text: #1a1200;
             --row-alt: rgba(255,255,255,0.025);
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 0 1px rgba(212,169,74,0.05) inset;
+            --card-shadow: none;
         }
 
         html[data-theme="light"] {
-            --bg-color: #f6f5f0;
+            --primary-color: #9a6f1e;          /* ذهبي أغمق: يحقق 4.5:1 كنص على الأبيض */
+            --primary-color-light: #b8892b;
+            --brand-text: #7a5a14;
+            --on-brand: #ffffff;
+            --warning-color: #8a5a00;
+            --bg-color: #f7f6f2;
             --card-bg: #ffffff;
-            --text-color: #1e2333;
-            --muted-text: #6b7186;
-            --field-bg: #faf8f2;
-            --border-soft: #e5decb;
-            --bg-glow: radial-gradient(circle at 15% 8%, rgba(212,169,74,0.08), transparent 42%),
-                       radial-gradient(circle at 88% 92%, rgba(59,130,196,0.06), transparent 42%);
-            --header-grad: linear-gradient(135deg, #1a2140, #2f3a63 55%, #3b82c4);
+            --text-color: #1b2030;
+            --muted-text: #5e6478;
+            --field-bg: #f1efe8;
+            --border-soft: #e4dfd2;
+            --bg-glow: none;
+            --header-grad: none;
             --info-bg: #fbf1dd; --info-text: #8a5a00;
             --success-soft-bg: #e4f5ef; --success-soft-text: #10614c;
             --danger-soft-bg: #fbe9e7; --danger-soft-text: #942a22;
             --warn-soft-bg: #fbf1dd; --warn-soft-text: #6b4a1a;
-            --paid-bg: #f2f1ec; --paid-text: #999;
-            --historical-bg: #ece9e0; --historical-text: #6b7186; --historical-border: #c2bca8;
+            --info-blue-text: #2a62a0;
+            --paid-bg: #f2f1ec; --paid-text: #5e6478;
+            --historical-bg: #ece9e0; --historical-text: #5e6478; --historical-border: #c2bca8;
             --pending-bg: #fbf1dd; --pending-text: #8a5a00;
-            --th-text: #1a1200;
+            --th-text: #ffffff;
             --row-alt: #faf8f2;
-            --card-shadow: 0 8px 24px rgba(30,35,51,0.08), 0 0 0 1px rgba(212,169,74,0.06) inset;
+            --card-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
         }
+
+        /* أسماء قديمة مستخدمة داخل وسوم الصفحة ولم تكن معرّفة أصلًا */
+        html { --card: var(--card-bg); --border: var(--border-soft); }
 
         html { overflow-x: hidden; }
         body {
@@ -70,54 +86,203 @@
             background-image: var(--bg-glow);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
-            padding-bottom: 80px; /* مساحة كافية حتى لا يغطي شريط التنقل الثابت آخر محتوى بالصفحة */
+            padding: 16px;
+            padding-bottom: calc(96px + env(safe-area-inset-bottom)); /* مساحة حتى لا يغطي شريط التنقل الثابت آخر محتوى */
             overflow-x: hidden;
+            font-size: 15px;
+            line-height: 1.6;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 760px; margin: 0 auto; }
 
         .bottom-nav {
             position: fixed; bottom: 0; right: 0; left: 0; z-index: 100;
             display: flex; align-items: center; justify-content: space-between;
             background: var(--card-bg); border-top: 1px solid var(--border-soft);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.25);
-            padding: 6px 14px; max-width: 1400px; margin: 0 auto;
+            padding: 6px 8px calc(8px + env(safe-area-inset-bottom)) 8px; margin: 0 auto;
         }
         .bottom-nav-btn {
             flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
-            background: none; border: none; color: var(--muted-text); font-size: 11px; font-weight: bold;
-            padding: 6px 2px; cursor: pointer; transition: 0.2s;
+            min-height: var(--tap-min);
+            background: none; border: none; color: var(--muted-text); font-size: 12px; font-weight: 600;
+            padding: 6px 2px; cursor: pointer; transition: color 0.2s;
             font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
         }
-        .bottom-nav-btn.active { color: var(--primary-color); }
-        .bottom-nav-icon { font-size: 20px; }
+        .bottom-nav-btn.active { color: var(--brand-text); font-weight: 700; }
+        .bottom-nav-icon { font-size: 22px; line-height: 1; }
 
         /* الزر المركزي المرتفع (FAB) — "العمليات"، أهم إجراء متكرر بالتطبيق */
         .nav-fab-wrap {
             position: relative; display: flex; flex-direction: column; align-items: center;
-            flex: 1; max-width: 90px; margin-top: -30px;
+            flex: 1; max-width: 90px; margin-top: -24px;
         }
         .nav-fab {
-            width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer;
-            background: linear-gradient(135deg, var(--primary-color-light), var(--primary-color));
-            box-shadow:
-                0 0 0 5px var(--bg-color),
-                0 6px 18px rgba(212,169,74,0.45),
-                0 0 26px rgba(212,169,74,0.35);
+            width: 56px; height: 56px; border-radius: 18px; border: none; cursor: pointer;
+            background: var(--primary-color);
+            box-shadow: 0 0 0 4px var(--bg-color), 0 6px 16px rgba(0,0,0,0.3);
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s ease;
-            animation: navFabPulse 3s ease-in-out infinite;
         }
-        @keyframes navFabPulse {
-            0%, 100% { box-shadow: 0 0 0 5px var(--bg-color), 0 6px 18px rgba(212,169,74,0.45), 0 0 26px rgba(212,169,74,0.35); }
-            50% { box-shadow: 0 0 0 5px var(--bg-color), 0 8px 24px rgba(212,169,74,0.6), 0 0 36px rgba(212,169,74,0.5); }
+        .nav-fab:active { transform: scale(0.94); }
+        .nav-fab-icon { font-size: 26px; color: var(--on-brand); line-height: 1; }
+        .nav-fab-lbl { font-size: 12px; font-weight: 700; color: var(--brand-text); margin-top: 4px; }
+        .bottom-nav-btn .icon { width: 24px; height: 24px; }
+        .nav-fab .icon { width: 26px; height: 26px; stroke-width: 2.25; color: var(--on-brand); }
+
+        /* ===== المرحلة 2: أيقونات خطية (SVG) بدل الإيموجي — شكل واحد على iOS وأندرويد ===== */
+        .icon {
+            width: 20px; height: 20px; flex: 0 0 auto; vertical-align: middle;
+            fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
         }
-        .nav-fab:active { transform: scale(0.92); }
-        .nav-fab.active { transform: scale(1.06); }
-        .nav-fab-icon { font-size: 26px; color: #1a1200; line-height: 1; }
-        .nav-fab-lbl { font-size: 10px; font-weight: 700; color: var(--primary-color); margin-top: 5px; letter-spacing: 0.3px; }
+        .card h2 { display: flex; align-items: center; gap: 8px; }
+
+        /* أنواع الأزرار الموحّدة: أساسي، ثانوي بإطار، خطِر، واتساب — تُضاف مع .btn */
+        /* (.btn.x بدل .x وحدها: قاعدة .btn الأساسية تأتي لاحقًا في الملف وكانت ستغلبها) */
+        .btn.btn-primary { background: var(--primary-color); color: var(--on-brand); }
+        .btn.btn-outline { background: var(--card-bg); color: var(--brand-text); border: 1px solid var(--border-soft); }
+        .btn.btn-outline:hover { border-color: var(--primary-color); filter: none; }
+        .btn.btn-danger { background: var(--danger-color); color: #fff; }
+        .btn.btn-whatsapp { background: #128c4a; color: #fff; }
+        /* زر صغير بعرض محتواه (للتنبيهات والأشرطة) */
+        .btn.btn-sm { width: auto; min-height: 44px; padding: 8px 16px; font-size: 14px; margin-top: 0; }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-danger-text {
+            display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 4px;
+            background: none; border: none; color: var(--danger-soft-text); font-size: 14px; font-weight: 700;
+            cursor: pointer; font-family: 'Cairo', sans-serif;
+        }
+        .banner {
+            border-radius: var(--radius-card); padding: 14px 16px; margin-bottom: 12px;
+            background: var(--warn-soft-bg); border: 1px solid var(--warn-soft-text);
+        }
+        .banner p { margin: 0 0 10px 0; font-weight: 700; color: var(--warn-soft-text); line-height: 1.6; }
+        .banner.danger { background: var(--danger-soft-bg); border-color: var(--danger-soft-text); }
+        .banner.danger p { color: var(--danger-soft-text); }
+        .section-note { font-size: 13px; color: var(--muted-text); margin: 0 0 12px 0; line-height: 1.6; }
+
+        /* ===== المرحلة 3: الرئيسية ===== */
+        .app-header-sub { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted-text); }
+        .hero-card {
+            background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: var(--radius-card);
+            padding: 18px 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .hero-label { font-size: 14px; font-weight: 600; color: var(--muted-text); }
+        .hero-amount { display: flex; align-items: baseline; gap: 8px; }
+        .hero-amount .num { font-size: 40px; line-height: 44px; font-weight: 800; color: var(--brand-text); font-variant-numeric: tabular-nums; direction: ltr; }
+        .hero-amount .cur { font-size: 15px; font-weight: 700; color: var(--brand-text); }
+        .hero-card.risk .num, .hero-card.risk .cur { color: var(--danger-soft-text); }
+        .hero-card.risk { border-color: var(--danger-soft-text); background: var(--danger-soft-bg); }
+        .split-bar { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: var(--field-bg); }
+        .split-bar span { display: block; height: 100%; transition: width 0.3s; }
+        .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; font-weight: 600; color: var(--muted-text); }
+        .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-left: 6px; vertical-align: middle; }
+        .c-free { background: var(--primary-color); }
+        .c-emergency { background: var(--success-soft-text); }
+        .c-elevator { background: var(--info-blue-text); }
+        .hero-detail { font-size: 12px; color: var(--muted-text); }
+
+        .month-card .row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+        .month-card .title { font-size: 17px; font-weight: 700; }
+        .pill { font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+        .pill.warn { color: var(--warn-soft-text); background: var(--warn-soft-bg); }
+        .pill.ok { color: var(--success-soft-text); background: var(--success-soft-bg); }
+        .progress { height: 8px; border-radius: 999px; background: var(--field-bg); overflow: hidden; margin: 10px 0 2px 0; }
+        .progress span { display: block; height: 100%; background: var(--success-soft-text); border-radius: 999px; transition: width 0.3s; }
+        .muted { color: var(--muted-text); font-size: 14px; font-weight: 600; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .stat-tile {
+            background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 14px;
+            padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+        }
+        .stat-tile .lbl { font-size: 12px; font-weight: 600; color: var(--muted-text); }
+        .stat-tile .val { font-size: 17px; font-weight: 800; direction: ltr; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+        .stat-tile.risk { border-color: var(--danger-soft-text); background: var(--danger-soft-bg); }
+        .stat-tile.risk .val { color: var(--danger-soft-text); }
+        .link-row {
+            width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            min-height: 52px; padding: 10px 14px; border-radius: var(--radius-card); border: 1px solid var(--border-soft);
+            background: var(--card-bg); color: var(--brand-text); font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700;
+            cursor: pointer; margin-bottom: 12px; text-align: right;
+        }
+        .link-row .start { display: flex; align-items: center; gap: 8px; }
+        details.card > summary { cursor: pointer; font-weight: 700; font-size: 15px; min-height: 28px; list-style: none; }
+        /* شريط تنبيه واحد فقط بالأعلى: الأقل أولوية يُخفى حتى يختفي الأعلى منه */
+        .banner-suppressed { display: none !important; }
+        /* تذكير "سجّل الشهر" أصبح بطاقة الشهر في الرئيسية — لا حاجة لشريط مكرر */
+        #monthly_entry_reminder_banner { display: none !important; }
+
+        /* ===== المرحلة 4: معالج تسجيل الشهر ===== */
+        .wizard-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .icon-btn {
+            width: 44px; height: 44px; flex: 0 0 auto; border-radius: 12px; border: 1px solid var(--border-soft);
+            background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+        }
+        .wizard-kicker { font-size: 13px; font-weight: 600; color: var(--muted-text); }
+        .wizard-title { font-size: 20px; font-weight: 800; line-height: 28px; }
+        .stepper { list-style: none; margin: 0 0 12px 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+        .stepper li { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: var(--muted-text); cursor: pointer; }
+        .stepper li::before { content: ""; display: block; height: 4px; border-radius: 999px; background: var(--border-soft); }
+        .stepper li.done::before { background: var(--success-soft-text); }
+        .stepper li.current { color: var(--brand-text); font-weight: 800; }
+        .stepper li.current::before { background: var(--primary-color); }
+        .wizard-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+        .wizard-footer { display: none; }
+        body.wizard-mode .wizard-footer {
+            display: flex; position: fixed; bottom: 0; right: 0; left: 0; z-index: 100; align-items: center; gap: 8px;
+            background: var(--card-bg); border-top: 1px solid var(--border-soft);
+            padding: 12px 16px calc(16px + env(safe-area-inset-bottom)) 16px;
+        }
+        body.wizard-mode .bottom-nav, body.wizard-mode header, body.wizard-mode .banner { display: none !important; }
+        .wizard-footer .total { display: flex; flex-direction: column; min-width: 0; margin-left: auto; }
+        .wizard-footer .total small { font-size: 12px; font-weight: 600; color: var(--muted-text); }
+        .wizard-footer .total strong { font-size: 18px; font-weight: 800; white-space: nowrap; }
+        .wizard-footer .btn { margin-top: 0; width: auto; }
+        .wizard-footer #wizard_next { flex: 1 1 auto; max-width: 240px; }
+        .apt-tile.partial { background: var(--warn-soft-bg); border: 1px solid var(--warn-soft-text); }
+        .apt-tile.partial .apt-tile-amount { color: var(--warn-soft-text); }
+        .review-list { display: flex; flex-direction: column; }
+        .review-row { display: flex; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border-soft); font-size: 15px; }
+        .review-row .v { direction: ltr; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .review-row.total { border-bottom: none; font-size: 17px; font-weight: 800; }
+        .review-row.total .v.pos { color: var(--success-soft-text); }
+        .review-row.total .v.neg { color: var(--danger-soft-text); }
+
+        /* ===== المرحلة 5: السجل بطاقات + "المزيد" مجمّع ===== */
+        .history-item {
+            display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border-soft);
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-item .main { flex: 1; min-width: 0; }
+        .history-item .t { font-size: 16px; font-weight: 700; }
+        .history-item .s { font-size: 13px; color: var(--muted-text); }
+        .history-item .net { font-size: 16px; font-weight: 800; direction: ltr; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .history-item .net.pos { color: var(--success-soft-text); }
+        .history-item .net.neg { color: var(--danger-soft-text); }
+        .history-year { font-size: 13px; font-weight: 700; color: var(--muted-text); margin: 14px 0 0 0; }
+        .group-title { margin: 20px 4px 8px 4px; font-size: 13px; font-weight: 700; color: var(--muted-text); }
+        .group-title:first-child { margin-top: 0; }
+
+        /* ===== المرحلة 6: رسائل قصيرة (Toast) بدل نوافذ alert ===== */
+        #toast_host {
+            position: fixed; left: 16px; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 10000;
+            display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto; max-width: 520px; width: 100%; display: flex; align-items: center; gap: 10px;
+            background: #1c2335; color: #eceef4; border: 1px solid #2a3249; border-radius: 14px;
+            padding: 12px 14px; font-size: 14px; font-weight: 600; line-height: 1.6; white-space: pre-line;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35); animation: toastIn 0.2s ease-out;
+        }
+        .toast.error { border-color: #ff8a80; }
+        .toast.success { border-color: #3ccb9f; }
+        .toast .msg { flex: 1; }
+        .toast button {
+            flex: 0 0 auto; min-height: 40px; padding: 6px 12px; border-radius: 10px; border: 1px solid #d4a94a;
+            background: transparent; color: #e8c877; font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 14px; cursor: pointer;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
         /* Bottom Sheet عام: نموذج تعديل عائم ينزلق من أسفل الشاشة، يحل محل النوافذ المنبثقة التقليدية */
         .bottom-sheet-backdrop {
@@ -127,7 +292,7 @@
         .bottom-sheet-backdrop.open { opacity: 1; pointer-events: auto; }
         .bottom-sheet {
             position: fixed; bottom: 0; right: 0; left: 0; z-index: 200; max-width: 1400px; margin: 0 auto;
-            background: var(--card-bg); border-radius: 18px 18px 0 0; padding: 8px 20px 24px 20px;
+            background: var(--card-bg); border-radius: 24px 24px 0 0; padding: 8px 20px calc(24px + env(safe-area-inset-bottom)) 20px;
             box-shadow: 0 -6px 24px rgba(0,0,0,0.4);
             transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
             max-height: 80vh; overflow-y: auto;
@@ -140,26 +305,22 @@
         .theme-toggle-wrap { display: flex; justify-content: flex-end; margin-bottom: 8px; }
         #theme_toggle_btn {
             background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-soft);
-            border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: bold; cursor: pointer;
-            transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
+            border-radius: 999px; padding: 6px 16px; min-height: 40px; font-size: 13px; font-weight: 700; cursor: pointer;
+            font-family: 'Cairo', sans-serif; transition: border-color 0.2s;
         }
         #theme_toggle_btn:hover { border-color: var(--primary-color); }
 
         header {
-            text-align: center;
-            background: var(--header-grad);
-            color: #fff;
-            padding: 22px 20px;
-            border-radius: 16px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 28px rgba(0,0,0,0.4);
-            border: 1px solid var(--border-soft);
-            border-bottom: 3px solid transparent;
-            border-image: linear-gradient(90deg, var(--primary-color), var(--primary-color-light), var(--primary-color)) 1;
+            text-align: right;
+            background: transparent;
+            color: var(--text-color);
+            padding: 4px 4px 0 4px;
+            margin-bottom: 16px;
         }
 
-        h1 { margin: 0; font-size: 24px; }
-        p.subtitle { margin: 5px 0 0 0; opacity: 0.9; }
+        h1 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 800; }
+        p.subtitle { margin: 4px 0 0 0; color: var(--muted-text); font-size: 13px; }
 
         .grid { display: block; }
         .grid > * { min-width: 0; }
@@ -167,251 +328,55 @@
         .table-scroll-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .table-scroll-wrap table { min-width: 650px; }
 
-        /* ========== جدول الاستجابة الكامل للأجهزة ==========  */
-        /* Desktop: 1200px+ */
-        @media (max-width: 1200px) {
-            .container { max-width: 100%; }
-        }
-
-        /* Tablet: 768px - 1199px */
+        /* ========== الاستجابة للأجهزة ==========
+           المرحلة 1: الشاشات الصغيرة لا تصغّر الخطوط بعد الآن (كانت تنزل إلى 8–10px).
+           الحد الأدنى: 12px للتسميات، 15px للنصوص، 16px داخل الحقول (يمنع تكبير iOS التلقائي). */
         @media (max-width: 768px) {
-            body { padding: 12px; padding-bottom: 90px; }
-            .container { max-width: 100%; }
-            header { padding: 16px; margin-bottom: 20px; }
-            h1 { font-size: 20px; }
-            .card { padding: 14px; margin-bottom: 15px; }
-            .card h2 { font-size: 16px; }
-            
+            body { padding: 12px; padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+            .card { padding: 16px; margin-bottom: 12px; }
             .grid { display: block; }
-            
-            .sidebar,
-            .main-content {
-                width: 100% !important;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                margin-bottom: 15px;
-            }
-            
-            .metric-box {
-                padding: 12px;
-                font-size: 13px;
-            }
-            
-            .apartments-grid:not(.apt-tiles-grid) {
-                grid-template-columns: 1fr;
-                max-height: 300px;
-            }
-            
-            .apt-tiles-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            
-            .payment-log-item {
-                flex-wrap: wrap;
-                row-gap: 8px;
-                padding: 10px;
-                font-size: 12px;
-            }
-            
-            .table-scroll-wrap table {
-                font-size: 12px;
-                min-width: 100%;
-            }
-            
-            .btn {
-                padding: 12px;
-                font-size: 14px;
-                margin-top: 12px;
-            }
-            
-            .form-group input, .form-group select {
-                padding: 10px;
-                font-size: 16px;
-            }
-            
-            /* تحسينات الأداء: اجعل العناصر التفاعلية في النماذج أكبر على الهواتف
-               (مقصورة على حقول النماذج والأزرار الرئيسية — لا تشمل شريط التنقل ولا بلاطات الشقق) */
-            .form-group input, .form-group select, .btn {
-                min-height: 44px; /* معيار Apple للعناصر التفاعلية */
-            }
-            
-            /* تحسين الجداول على الهواتف الصغيرة */
-            .table-scroll-wrap {
-                border-radius: 8px;
-                overflow: hidden;
-                -webkit-overflow-scrolling: touch;
-            }
+            .sidebar, .main-content { width: 100% !important; }
+            .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+            .apartments-grid:not(.apt-tiles-grid) { grid-template-columns: 1fr; max-height: 300px; }
+            .apt-tiles-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+            .payment-log-item { flex-wrap: wrap; row-gap: 8px; }
+            .table-scroll-wrap table { min-width: 100%; }
+            .form-group input, .form-group select { font-size: 16px; }
         }
 
-        /* Mobile Large: 481px - 767px */
-        @media (max-width: 767px) {
-            body { padding: 10px; padding-bottom: 90px; }
-            header { padding: 14px; margin-bottom: 18px; }
-            h1 { font-size: 18px; }
-            h2 { font-size: 15px !important; }
-            .card { padding: 12px; }
-            
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-            
-            .metric-box {
-                padding: 10px;
-                font-size: 12px;
-            }
-            
-            .apt-tiles-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
-            }
-            
-            .apt-tile {
-                padding: 8px 3px;
-                border-radius: 12px;
-            }
-            
-            .apt-tile-number { font-size: 11px; }
-            .apt-tile-amount { font-size: 16px; }
-            
-            .table-scroll-wrap table {
-                font-size: 11px;
-            }
-            
-            .btn {
-                padding: 10px;
-                font-size: 13px;
-                margin-top: 10px;
-            }
-            
-            .bottom-nav-btn { font-size: 10px; }
-            .bottom-nav-icon { font-size: 18px; }
-        }
-
-        /* Mobile Small: 320px - 480px */
-        @media (max-width: 480px) {
-            body { padding: 8px; padding-bottom: 85px; font-size: 14px; }
-            header { padding: 12px; margin-bottom: 15px; }
-            h1 { font-size: 16px; }
-            h2 { font-size: 14px !important; }
-            h3 { font-size: 13px !important; }
-            .card { padding: 10px; margin-bottom: 12px; }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            
-            .metric-box {
-                padding: 10px;
-                font-size: 11px;
-            }
-            
-            .apt-tiles-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 5px;
-            }
-            
-            .apt-tile {
-                padding: 6px 2px;
-                border-radius: 8px;
-                border: 1px solid var(--border-soft);
-            }
-            
-            .apt-tile-number { font-size: 10px; }
-            .apt-tile-amount { font-size: 14px; margin-top: 2px; }
-            
-            .table-scroll-wrap {
-                -webkit-overflow-scrolling: touch;
-                overflow-x: auto;
-            }
-            
-            .table-scroll-wrap table {
-                font-size: 10px;
-                min-width: 100%;
-            }
-            
-            .table-scroll-wrap th, .table-scroll-wrap td {
-                padding: 6px 4px;
-            }
-            
-            .btn {
-                padding: 10px;
-                font-size: 12px;
-                margin-top: 8px;
-                width: 100%;
-            }
-            
-            .form-group {
-                margin-bottom: 10px;
-            }
-            
-            .form-group label {
-                font-size: 12px;
-                margin-bottom: 4px;
-            }
-            
-            .form-group input, .form-group select {
-                padding: 10px;
-                font-size: 16px;
-                border-radius: 4px;
-            }
-            
-            .bottom-nav {
-                padding: 4px 8px;
-            }
-            
-            .bottom-nav-btn {
-                font-size: 9px;
-                padding: 4px 2px;
-            }
-            
-            .bottom-nav-icon { font-size: 16px; }
-            
-            .nav-fab {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .nav-fab-icon { font-size: 22px; }
-            .nav-fab-lbl { font-size: 8px; margin-top: 3px; }
-            
-            /* إخفاء العناصر غير الضرورية على الهواتف الصغيرة */
-            .hide-on-mobile { display: none !important; }
-            
-            /* جعل الأعمدة الإضافية مخفية وإضافة scroll للجداول */
-            .table-scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        @media (max-width: 380px) {
+            .apt-tiles-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .metrics-grid { grid-template-columns: 1fr; }
         }
 
         .card {
             background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: var(--card-shadow, 0 10px 30px rgba(0,0,0,0.35));
-            margin-bottom: 20px;
+            padding: 16px;
+            border-radius: var(--radius-card);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 12px;
             border: 1px solid var(--border-soft);
         }
 
         .card h2 {
             margin-top: 0;
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 0.3px;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--border-soft);
-            padding-bottom: 10px;
+            font-size: 17px;
+            line-height: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 12px;
         }
 
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: var(--text-color); }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--muted-text); }
         .form-group input, .form-group select {
-            width: 100%; padding: 8px 12px; border: 1px solid var(--border-soft); border-radius: 5px;
-            box-sizing: border-box; font-size: 14px; background: var(--field-bg); color: var(--text-color);
+            width: 100%; min-height: 48px; padding: 10px 14px; border: 1px solid var(--border-soft); border-radius: var(--radius-field);
+            box-sizing: border-box; font-size: 16px; background: var(--field-bg); color: var(--text-color);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
         }
+        .form-group input:focus, .form-group select:focus { outline: 2px solid var(--primary-color); outline-offset: 1px; border-color: transparent; }
         .form-group input::placeholder { color: var(--muted-text); }
         .form-group select option { background: var(--field-bg); color: var(--text-color); }
 
@@ -432,87 +397,88 @@
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-height: none; overflow: visible;
         }
         .apt-tile {
-            position: relative; border-radius: 16px; padding: 10px 4px; text-align: center;
+            position: relative; border-radius: 14px; min-height: 72px; padding: 10px 4px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation;
-            border: 2px solid var(--border-soft); background: var(--field-bg); transition: 0.2s;
+            border: 1px dashed var(--border-soft); background: var(--card-bg); color: var(--text-color); transition: transform 0.15s;
         }
         .apt-tile.paid {
-            background: rgba(38,166,154,0.18); border-color: var(--success-color); color: var(--text-color);
+            background: var(--success-soft-bg); border: 1px solid var(--success-soft-text);
         }
+        .apt-tile.paid .apt-tile-amount { color: var(--success-soft-text); }
+        /* غير مدفوعة: محايدة متقطعة بدل الأحمر — بداية الشهر ليست إنذارًا */
         .apt-tile.unpaid {
-            background: rgba(255,92,92,0.14); border-color: var(--danger-color); color: var(--text-color);
+            background: var(--card-bg); border: 1px dashed var(--muted-text);
         }
-        .apt-tile:active { transform: scale(0.95); }
-        .apt-tile-number { font-size: 12px; font-weight: bold; opacity: 0.85; }
-        .apt-tile-amount { font-size: 18px; font-weight: bold; margin-top: 2px; direction: ltr; }
+        .apt-tile.unpaid .apt-tile-amount { color: var(--muted-text); }
+        .apt-tile:active { transform: scale(0.96); }
+        .apt-tile-number { font-size: 12px; font-weight: 600; color: var(--muted-text); }
+        .apt-tile-amount { font-size: 17px; font-weight: 800; margin-top: 2px; direction: ltr; font-variant-numeric: tabular-nums; }
 
         /* المحرر المشترك: مكان ثابت واحد أسفل الشبكة بالتدفق الطبيعي — لا يتداخل مع أي بلاطة إطلاقًا */
         .apt-editor-panel {
             flex-direction: column; gap: 8px; margin-top: 12px; padding: 12px;
-            background: var(--field-bg); border: 2px solid var(--primary-color); border-radius: 10px;
+            background: var(--field-bg); border: 1px solid var(--primary-color); border-radius: var(--radius-field);
             animation: editorFadeIn 0.2s ease-out;
         }
         @keyframes editorFadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .apt-editor-panel select, .apt-editor-panel input {
-            padding: 8px; text-align: center; width: 100%; box-sizing: border-box;
-            background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-soft); border-radius: 5px;
+            min-height: 48px; padding: 8px; text-align: center; width: 100%; box-sizing: border-box; font-size: 16px;
+            background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-soft); border-radius: var(--radius-field);
+            font-family: 'Cairo', sans-serif;
         }
 
+        /* ثلاثة أنواع أزرار فقط: أساسي (ذهبي)، ثانوي (إطار)، خطِر (أحمر) — بدون رفع أو توهج عند المرور */
         .btn {
-            width: 100%; border: none; padding: 14px; font-size: 16px; font-weight: 700; border-radius: 10px; cursor: pointer; transition: 0.25s; margin-top: 15px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; min-height: 52px; border: none; padding: 12px 16px; font-size: 15px; font-weight: 800;
+            border-radius: var(--radius-field); cursor: pointer; transition: filter 0.2s, transform 0.1s; margin-top: 14px;
             font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
         }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
-        .btn:active { transform: translateY(0); }
-        .btn-auto-save { 
-            background: linear-gradient(135deg, var(--success-color), #147a5f); 
-            color: white; 
-            box-shadow: 0 6px 16px rgba(31,157,124,0.28);
+        .btn:hover { filter: brightness(1.05); }
+        .btn:active { transform: scale(0.99); }
+        .btn-auto-save {
+            background: var(--primary-color);
+            color: var(--on-brand);
         }
-        .btn-auto-save:hover { box-shadow: 0 8px 20px rgba(31,157,124,0.38); }
 
         .btn-secondary-small {
-            display: inline-block; width: auto; border: 1px solid var(--primary-color);
-            padding: 6px 12px; border-radius: 8px; background: transparent; color: var(--primary-color);
-            font-size: 11px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; width: auto; min-height: 40px;
+            border: 1px solid var(--border-soft); padding: 6px 14px; border-radius: var(--radius-field);
+            background: var(--card-bg); color: var(--brand-text);
+            font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 10px; transition: border-color 0.2s;
+            font-family: 'Cairo', sans-serif;
         }
-        .btn-secondary-small:hover { background: var(--primary-color); color: #1b1030; }
+        .btn-secondary-small:hover { border-color: var(--primary-color); }
 
         details.card summary::-webkit-details-marker { display: none; }
         details.card summary::before { content: "▶ "; font-size: 13px; }
         details.card[open] summary::before { content: "▼ "; }
 
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .metric-box { padding: 15px; border-radius: 10px; text-align: center; color: white; font-weight: bold; transition: 0.3s; box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
-        /* الإيرادات: أزرق سفير — لون واحد ثابت لكل "الداخل من المال" */
-        .metric-box.revenue { background: linear-gradient(150deg, #3b82c4, #2a5f92); }
-        /* عائلة المصاريف: برونزي/نحاسي دافئ متدرج حسب الأهمية — كلها "تنفق"، بس بدرجات */
-        .metric-box.base-expenses { background: linear-gradient(150deg, #7a5a3a, #5c4128); }
-        .metric-box.expenses { background: linear-gradient(150deg, #b8722e, #8f5620); }
-        .metric-box.other-expenses { background: linear-gradient(150deg, #6b5540, #4f3d2c); }
-        /* الطوارئ الفعلية: قريبة من الخطر — تنبيه بصري إنها صرف حساس */
-        .metric-box.emergency { background: linear-gradient(150deg, var(--warning-color), #a8701f); }
-        .metric-box.elevator-commitment {
-            background-color: var(--field-bg); color: var(--primary-color);
-            border: 2px dashed var(--primary-color);
+        /* الصناديق الرقمية: سطح محايد واحد للجميع، واللون يدل على الحالة فقط (في الرقم نفسه)
+           — بدل 8 تدرجات لونية مختلفة كانت تتنافس على انتباه العين */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-bottom: 16px; }
+        .metric-box {
+            padding: 12px 14px; border-radius: 14px; text-align: right; color: var(--muted-text);
+            font-size: 13px; font-weight: 600; line-height: 1.5;
+            background: var(--field-bg); border: 1px solid var(--border-soft);
         }
-        /* الفائض والاحتياطي: عائلة زمردية/تركوازية — كلها "توفير وأمان مالي" */
-        .metric-box.surplus { background: linear-gradient(150deg, var(--success-color), #147a5f); }
-        .metric-box.surplus.risk { background: linear-gradient(150deg, var(--danger-color), #a8332a); }
-        .metric-box.annual-surplus-gross { background: linear-gradient(150deg, #3d4566, #2a3150); }
-        /* الرقم الأهم بالشاشة كلها: الذهبي وحده، بلا منازع */
-        .metric-box.annual-surplus { background: linear-gradient(150deg, var(--primary-color-light), var(--primary-color)); color: #1a1200; box-shadow: 0 0 18px rgba(212,169,74,0.4), 0 6px 16px rgba(0,0,0,0.25); }
-        .metric-box.annual-surplus.risk { background: linear-gradient(150deg, var(--danger-color), #a8332a); color: white; box-shadow: 0 0 18px rgba(226,84,74,0.4), 0 6px 16px rgba(0,0,0,0.25); }
-        .metric-box.emergency-reserve { background: linear-gradient(150deg, #1f6b5c, #124840); box-shadow: 0 0 16px rgba(31,157,124,0.3), 0 6px 16px rgba(0,0,0,0.25); }
-        .metric-box.emergency-reserve.risk { background: linear-gradient(150deg, var(--danger-color), #a8332a); box-shadow: 0 0 16px rgba(226,84,74,0.35), 0 6px 16px rgba(0,0,0,0.25); }
-        /* المصعد: عائلة برونزية-كحلية محايدة — التزام "آلي" مو مصروف يومي */
-        .metric-box.elevator-cumulative { background: linear-gradient(150deg, #4a5578, #333c58); }
-        .metric-box.elevator-cumulative.due { background: linear-gradient(150deg, var(--warning-color), #a8701f); }
-        .metric-box.reserved-funds { background-color: var(--field-bg); border: 2px solid var(--primary-color); color: var(--text-color); }
+        .metric-box span { display: block; font-size: 20px; font-weight: 800; margin-top: 4px; direction: ltr; text-align: right; color: var(--text-color); font-variant-numeric: tabular-nums; }
+        .metric-box.revenue span { color: var(--info-blue-text); }
+        .metric-box.surplus span, .metric-box.emergency-reserve span { color: var(--success-soft-text); }
+        .metric-box.emergency span, .metric-box.elevator-cumulative.due span { color: var(--warn-soft-text); }
+        .metric-box.elevator-cumulative span { color: var(--info-blue-text); }
+        .metric-box.elevator-commitment { border-style: dashed; }
+        /* الرقم الأهم في الملخص: الفائض السنوي — بإطار ذهبي ورقم ذهبي */
+        .metric-box.annual-surplus { background: var(--card-bg); border: 1px solid var(--primary-color); }
+        .metric-box.annual-surplus span { color: var(--brand-text); font-size: 24px; }
+        .metric-box.reserved-funds { background: var(--card-bg); border: 1px solid var(--primary-color); }
+        /* حالة خطر: خلفية حمراء خفيفة ورقم أحمر */
+        .metric-box.risk { background: var(--danger-soft-bg); border-color: var(--danger-soft-text); }
+        .metric-box.risk span { color: var(--danger-soft-text); }
 
-        .metric-box span { display: block; font-size: 20px; margin-top: 5px; direction: ltr; }
-        .withdrawal-note { display: block; font-size: 11px; font-weight: normal; margin-top: 4px; }
+        .withdrawal-note { display: block; font-size: 12px; font-weight: 600; margin-top: 4px; color: var(--danger-soft-text); }
 
         .gauge-wrap { margin-top: 20px; }
         .gauge-bar {
@@ -529,55 +495,49 @@
         .gauge-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted-text); margin-top: 6px; }
 
         .payment-log-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; font-size: 13px;
-            background-color: var(--field-bg); color: var(--text-color);
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
+            padding: 10px 14px; border-radius: var(--radius-field); margin-bottom: 8px; font-size: 14px;
+            background-color: var(--field-bg); color: var(--text-color); border: 1px solid var(--border-soft);
         }
-        .payment-log-item .amount { direction: ltr; font-weight: bold; }
-        .payment-actions { display: flex; gap: 4px; margin-right: 8px; }
+        .payment-log-item .amount { direction: ltr; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .payment-actions { display: flex; gap: 6px; margin-right: 8px; }
         .payment-actions button {
-            border: none; background: rgba(255,255,255,0.08); color: var(--text-color); border-radius: 4px;
-            padding: 2px 6px; font-size: 13px; cursor: pointer;
+            width: 40px; height: 40px; border: 1px solid var(--border-soft); background: var(--card-bg); color: var(--text-color);
+            border-radius: 10px; padding: 0; font-size: 16px; cursor: pointer;
         }
-        .payment-actions button:hover { background: rgba(255,255,255,0.18); }
+        .payment-actions button:hover { border-color: var(--primary-color); }
         .payment-log-item.paid {
             background-color: var(--paid-bg); color: var(--paid-text);
-            opacity: 0.75;
         }
         .payment-log-item.historical {
             background-color: var(--historical-bg); color: var(--historical-text);
             opacity: 0.85; font-style: italic; border: 1px dashed var(--historical-border);
         }
         .payment-log-item.pending {
-            background-color: var(--pending-bg); color: var(--pending-text); font-weight: bold;
-            border: 1px solid #ffca28;
-            animation: pulseGlow 1.6s ease-in-out infinite alternate;
-        }
-        @keyframes pulseGlow {
-            from { box-shadow: 0 0 4px 1px rgba(255, 193, 7, 0.4); }
-            to { box-shadow: 0 0 14px 4px rgba(255, 193, 7, 0.85); }
+            background-color: var(--pending-bg); color: var(--pending-text); font-weight: 700;
+            border: 1px solid var(--pending-text);
         }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-        th, td { padding: 8px; text-align: center; border: 1px solid var(--border-soft); color: var(--text-color); }
-        th { background-color: var(--primary-color); color: var(--th-text); }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+        th, td { padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--border-soft); color: var(--text-color); }
+        th { background-color: var(--field-bg); color: var(--muted-text); font-size: 12px; font-weight: 700; }
         tr:nth-child(even) { background-color: var(--row-alt); }
 
         /* ========== تخطيط التبويبات: كل قسم يعرض بعرض كامل (التنقل عبر الشريط السفلي) ========== */
         .grid { display: block; }
         .sidebar, .main-content { width: 100%; }
 
+        /* "النقد الحر": الرقم الأهم بالتطبيق — بطاقة هادئة بإطار ذهبي، بدون توهج */
         .emergency-suggestion {
-            background-color: var(--success-soft-bg); color: var(--success-soft-text); padding: 14px; border-radius: 10px;
-            border: 1px solid var(--success-color); border-right: 5px solid var(--success-color); font-weight: bold; margin-bottom: 15px; transition: 0.3s;
-            box-shadow: 0 0 0 1px rgba(31,157,124,0.25), 0 0 22px rgba(31,157,124,0.35), 0 6px 18px rgba(0,0,0,0.3);
+            background-color: var(--card-bg); color: var(--brand-text); padding: 16px; border-radius: var(--radius-card);
+            border: 1px solid var(--primary-color); font-weight: 700; margin-bottom: 12px; transition: background-color 0.3s;
         }
         .emergency-suggestion.risk {
-            background-color: var(--danger-soft-bg); color: var(--danger-soft-text); border-color: var(--danger-color); border-right: 5px solid var(--danger-color);
-            box-shadow: 0 0 0 1px rgba(226,84,74,0.3), 0 0 22px rgba(226,84,74,0.4), 0 6px 18px rgba(0,0,0,0.3);
+            background-color: var(--danger-soft-bg); color: var(--danger-soft-text); border-color: var(--danger-soft-text);
         }
 
-        #btn_send_whatsapp:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(37, 211, 102, 0.3); }
+        /* أخضر واتساب الداكن: الأبيض عليه يحقق التباين (الأخضر الفاتح #25D366 كان ~2:1) */
+        #btn_send_whatsapp, [style*="#25D366"], [style*="#25d366"] { background: #128c4a !important; }
 
         #print_report_area { display: none; }
 
@@ -621,10 +581,8 @@
             width: 84px; height: 84px; margin: 0 auto 18px auto;
             display: flex; align-items: center; justify-content: center;
             border-radius: 20px;
-            background: linear-gradient(145deg, #131829, #1a2140);
-            box-shadow: 0 0 0 1px rgba(212,169,74,0.25) inset,
-                        0 8px 24px rgba(0,0,0,0.35),
-                        0 0 22px rgba(212,169,74,0.28);
+            background: #141a2a;
+            box-shadow: 0 0 0 1px rgba(212,169,74,0.35) inset;
         }
         .setup-wizard-logo svg { width: 50px; height: 50px; }
         .setup-wizard-title {
@@ -632,7 +590,7 @@
             margin-bottom: 6px;
         }
         .setup-wizard-subtitle {
-            font-size: 14.5px; color: var(--primary-color); font-weight: 700;
+            font-size: 15px; color: var(--muted-text); font-weight: 600;
             margin-bottom: 24px;
         }
         .setup-wizard-field { text-align: right; margin-bottom: 16px; }
@@ -643,8 +601,8 @@
         .setup-wizard-field input {
             width: 100%; box-sizing: border-box;
             background: var(--field-bg); color: var(--text-color);
-            border: 1px solid var(--border-soft); border-radius: 10px;
-            padding: 11px 14px; font-size: 15px; font-family: 'Cairo', sans-serif;
+            border: 1px solid var(--border-soft); border-radius: var(--radius-field);
+            min-height: 48px; padding: 11px 14px; font-size: 16px; font-family: 'Cairo', sans-serif;
         }
         .setup-wizard-field input:focus {
             outline: none; border-color: var(--primary-color);
@@ -655,11 +613,10 @@
         }
         .setup-wizard-btn {
             width: 100%; margin-top: 8px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-color-light));
-            color: #1a1200; border: none; border-radius: 12px;
-            padding: 14px; font-size: 16px; font-weight: 800;
+            background: var(--primary-color);
+            color: var(--on-brand); border: none; border-radius: var(--radius-field);
+            min-height: 52px; padding: 14px; font-size: 16px; font-weight: 800;
             font-family: 'Cairo', sans-serif; cursor: pointer;
-            box-shadow: 0 6px 18px rgba(212,169,74,0.35);
         }
         .setup-wizard-btn:active { transform: scale(0.98); }
     </style>
@@ -731,7 +688,7 @@
 <!-- شاشة قفل PIN -->
 <div id="pin_lock_screen" style="position:fixed; inset:0; z-index:9999; background:var(--bg-color); background-image:var(--bg-glow); display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px; direction:rtl;">
     <div style="max-width:300px; text-align:center;">
-        <div style="font-size:60px; margin-bottom:20px;">🔒</div>
+        <div style="margin-bottom:20px; color:var(--brand-text);"><svg class="icon" aria-hidden="true" style="width:56px; height:56px; stroke-width:1.5;"><use href="#i-lock"/></svg></div>
         <div style="font-size:22px; font-weight:800; color:var(--text-color); margin-bottom:20px;">التطبيق مقفل</div>
         <div style="font-size:14px; color:var(--muted-text); margin-bottom:30px;">أدخل الرمز الرباعي</div>
         <div id="pin_display" style="font-size:40px; letter-spacing:20px; text-align:center; margin-bottom:30px; color:var(--text-color); font-weight:bold; min-height:50px;">____</div>
@@ -747,7 +704,7 @@
             <button onclick="addPinDigit('9')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">9</button>
             <button onclick="addPinDigit('0')" style="padding:20px; font-size:18px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">0</button>
             <button onclick="clearPin()" style="padding:20px; font-size:14px; font-weight:bold; border:1px solid var(--border-soft); border-radius:8px; background:var(--field-bg); color:var(--text-color); cursor:pointer;">حذف</button>
-            <button onclick="submitPin()" style="padding:20px; font-size:14px; font-weight:bold; border:none; border-radius:8px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); cursor:pointer; font-weight:bold;">✓ تم</button>
+            <button onclick="submitPin()" style="padding:20px; font-size:14px; font-weight:bold; border:none; border-radius:8px; background:var(--primary-color); color:var(--on-brand); cursor:pointer;">تم</button>
         </div>
         <div id="pin_error" style="color:var(--danger-color); font-size:13px; font-weight:bold; min-height:20px;"></div>
         <div style="margin-top:10px;">
@@ -758,8 +715,8 @@
             <label style="font-size:13px; font-weight:bold; color:var(--text-color); display:block; margin-bottom:8px;">اكتب عبارة الاسترجاع التي اخترتها:</label>
             <input type="text" id="recovery_code_input" lang="ar" dir="rtl" style="width:100%; box-sizing:border-box; padding:10px; font-size:16px; border-radius:6px; border:1px solid var(--border-soft); background:var(--card); color:var(--text-color); margin-bottom:10px;" placeholder="عبارة الاسترجاع">
             <div style="display:flex; gap:8px;">
-                <button type="button" onclick="submitRecoveryCode()" style="flex:1; padding:10px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); border:none; border-radius:6px; font-weight:bold; cursor:pointer;">فك القفل</button>
-                <button type="button" onclick="hideRecoveryPanel()" style="flex:1; padding:10px; background:var(--card); color:var(--text-color); border:1px solid var(--border-soft); border-radius:6px; cursor:pointer;">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="submitRecoveryCode()" style="flex:1; margin-top:0;">فك القفل</button>
+                <button type="button" class="btn btn-outline" onclick="hideRecoveryPanel()" style="flex:1; margin-top:0;">إلغاء</button>
             </div>
             <div id="recovery_error" style="color:var(--danger-color); font-size:12px; font-weight:bold; min-height:18px; margin-top:8px;"></div>
             <p style="font-size:11px; color:var(--muted-text); margin-top:6px;">لو نجحت العبارة، تُزال حماية PIN تمامًا ويُفتح التطبيق مباشرة — تقدر تفعّل رمزًا جديدًا من الإعدادات بعدها.</p>
@@ -767,137 +724,232 @@
     </div>
 </div>
 
+<!-- مكتبة الأيقونات الخطية: كل أيقونة تُستخدم عبر <svg class="icon"><use href="#i-..."/></svg> -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.25"/><circle cx="12" cy="12" r="1.25"/><circle cx="19" cy="12" r="1.25"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.9 4.9l1.4 1.4"/><path d="M17.7 17.7l1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.9 19.1l1.4-1.4"/><path d="M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></symbol>
+    <symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-council" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="i-chevron-r" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+    <symbol id="i-check-all" viewBox="0 0 24 24"><path d="M18 7L9.5 15.5 6 12"/><path d="M22 7l-8.5 8.5"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></symbol>
+</svg>
+
 <div class="container">
-    <div class="theme-toggle-wrap">
-        <button type="button" id="theme_toggle_btn" onclick="toggleTheme()">🌙 داكن</button>
-    </div>
     <header>
-        <h1 id="app_header_title">الميزانية المالية الشهرية والسنوية لإدارة عمارة 169</h1>
+        <p class="app-header-sub" id="app_header_title">عمارة 169</p>
+        <h1 id="app_header_month">—</h1>
     </header>
 
-    <div class="bottom-nav">
-        <div class="nav-fab-wrap">
-            <button type="button" class="nav-fab" id="navbtn_quick" onclick="switchTab('quick')">
-                <span class="nav-fab-icon">➕</span>
-            </button>
-            <span class="nav-fab-lbl">العمليات</span>
-        </div>
+    <!-- الترتيب (من اليمين): الرئيسية، السجل، زر التسجيل في المنتصف، التقارير، المزيد -->
+    <nav class="bottom-nav" aria-label="التنقل الرئيسي">
         <button type="button" class="bottom-nav-btn active" id="navbtn_dashboard" onclick="switchTab('dashboard')">
-            <span class="bottom-nav-icon">🏠</span><span>الرئيسية</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-home"/></svg><span>الرئيسية</span>
         </button>
         <button type="button" class="bottom-nav-btn" id="navbtn_history" onclick="switchTab('history')">
-            <span class="bottom-nav-icon">📜</span><span>السجل</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>السجل</span>
+        </button>
+        <div class="nav-fab-wrap">
+            <button type="button" class="nav-fab" id="navbtn_quick" onclick="switchTab('quick')" aria-label="تسجيل شهر">
+                <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+            </button>
+            <span class="nav-fab-lbl">تسجيل</span>
+        </div>
+        <button type="button" class="bottom-nav-btn" id="navbtn_reports" onclick="switchTab('reports')">
+            <svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span>التقارير</span>
         </button>
         <button type="button" class="bottom-nav-btn" id="navbtn_settings" onclick="switchTab('settings')">
-            <span class="bottom-nav-icon">⚙️</span><span>الإعدادات</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-more"/></svg><span>المزيد</span>
         </button>
+    </nav>
+
+
+
+    <div id="duplicate_payment_banner" class="no-print banner danger" style="display:none;">
+        <p id="duplicate_payment_text"></p>
+        <button type="button" class="btn btn-danger btn-sm" onclick="cleanupDuplicateElevatorPayments()"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg> نظّف التكرار الآن</button>
     </div>
 
-
-
-    <div id="duplicate_payment_banner" class="no-print" style="display:none; background:var(--danger-soft-bg); border:2px solid var(--danger-color); border-radius:8px; padding:14px; margin-bottom:20px;">
-        <p id="duplicate_payment_text" style="margin:0 0 10px 0; font-weight:bold; color:var(--danger-soft-text);"></p>
-        <button type="button" onclick="cleanupDuplicateElevatorPayments()" style="background:var(--danger-color); color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; font-weight:bold; cursor:pointer;">🧹 نظّف التكرار الآن</button>
+    <div id="backup_reminder_banner" class="no-print banner" style="display:none;">
+        <p id="backup_reminder_text"></p>
+        <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-sm" onclick="shareBackupData()"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg> نسخة احتياطية الآن</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="dismissBackupReminder()">لاحقًا</button>
+        </div>
     </div>
 
-    <div id="backup_reminder_banner" class="no-print" style="display:none; background:var(--warn-soft-bg); border:1px solid var(--warning-color); border-radius:8px; padding:14px; margin-bottom:20px;">
-        <p id="backup_reminder_text" style="margin:0 0 10px 0; font-weight:bold; color:var(--warn-soft-text);"></p>
-        <button type="button" onclick="shareBackupData()" style="background:#25D366; color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer; margin-left:8px;">📤 مشاركة نسخة احتياطية الآن</button>
-        <button type="button" onclick="dismissBackupReminder()" style="background:#78909c; color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer;">لاحقًا</button>
+    <div id="monthly_entry_reminder_banner" class="no-print banner" style="display:none;">
+        <p id="monthly_entry_reminder_text"></p>
+        <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-sm" onclick="goToQuickEntryTab()"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> سجّل الشهر الآن</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="dismissMonthlyEntryReminder()">لاحقًا</button>
+        </div>
     </div>
 
-    <div id="monthly_entry_reminder_banner" class="no-print" style="display:none; background:var(--warn-soft-bg); border:1px solid var(--warning-color); border-radius:8px; padding:14px; margin-bottom:20px;">
-        <p id="monthly_entry_reminder_text" style="margin:0 0 10px 0; font-weight:bold; color:var(--warn-soft-text);"></p>
-        <button type="button" onclick="goToQuickEntryTab()" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer; margin-left:8px;">📝 سجّل البيانات الآن</button>
-        <button type="button" onclick="dismissMonthlyEntryReminder()" style="background:#78909c; color:white; border:none; border-radius:5px; padding:8px 16px; font-size:13px; cursor:pointer;">لاحقًا</button>
-    </div>
-
-    <div id="emergency_fund_low_banner" class="no-print" style="display:none; background:var(--danger-soft-bg); border:2px solid var(--danger-color); border-radius:8px; padding:14px; margin-bottom:20px;">
-        <p id="emergency_fund_low_text" style="margin:0; font-weight:bold; color:var(--danger-soft-text);"></p>
+    <div id="emergency_fund_low_banner" class="no-print banner danger" style="display:none;">
+        <p id="emergency_fund_low_text" style="margin:0;"></p>
     </div>
 
     <div class="grid">
         <div class="sidebar" id="tab_quick" style="display:none;">
-            <div class="card">
-                <h2>1. اختيار الشهر والسنة والتحصيل الفعلي</h2>
-                <p id="month_context_status" style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0; background:var(--field-bg); padding:8px; border-radius:5px;">📝 <strong id="month_context_label">—</strong></p>
-                <button type="button" onclick="clearForNewMonth()" class="btn-secondary-small">🧹 تصفير يدوي (لإعادة إدخال شهر من الصفر عمدًا)</button>
+            <div class="wizard-head">
+                <button type="button" class="icon-btn" onclick="exitWizard()" aria-label="إغلاق"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+                <div>
+                    <div class="wizard-kicker">تسجيل شهر</div>
+                    <div class="wizard-title" id="wizard_title">—</div>
+                </div>
+            </div>
+            <ol class="stepper" id="wizard_stepper" aria-label="خطوات التسجيل">
+                <li data-step="1" onclick="wizardGo(1)">الشهر</li>
+                <li data-step="2" onclick="wizardGo(2)">التحصيل</li>
+                <li data-step="3" onclick="wizardGo(3)">المصاريف</li>
+                <li data-step="4" onclick="wizardGo(4)">المراجعة</li>
+            </ol>
+
+            <!-- الخطوة 1: الشهر -->
+            <div class="card wizard-step" data-step="1">
+                <h2>أي شهر تسجّل؟</h2>
+                <p id="month_context_status" style="font-size:13px; color:var(--muted-text); margin:0 0 12px 0; background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field);"><strong id="month_context_label">—</strong></p>
                 <div class="form-group">
-                    <label>تحديد الشهر المراد تسجيله:</label>
+                    <label for="budget_month">الشهر</label>
                     <select id="budget_month">
                         <option value="يناير">يناير</option><option value="فبراير">فبراير</option>
                         <option value="مارس">مارس</option><option value="أبريل">أبريل</option>
-                        <option value="مايو" selected>مايو</option><option value="يونيو">يونيو</option>
+                        <option value="مايو">مايو</option><option value="يونيو">يونيو</option>
                         <option value="يوليو">يوليو</option><option value="أغسطس">أغسطس</option>
                         <option value="سبتمبر">سبتمبر</option><option value="أكتوبر">أكتوبر</option>
                         <option value="نوفمبر">نوفمبر</option><option value="ديسمبر">ديسمبر</option>
                     </select>
                 </div>
-                <p style="font-size:11px; color:var(--muted-text); margin:0 0 8px 0; text-align:center;">💡 اضغط على أي شقة لتحديد مبلغ سدادها.</p>
-                <div class="apartments-grid" id="apartments_container"></div>
-
-                <div id="apt_editor_panel" class="apt-editor-panel" style="display:none;">
-                    <label id="apt_editor_label" style="font-weight:bold; color:var(--primary-color);"></label>
-                    <select id="apt_editor_select" lang="en" dir="ltr" onchange="onAptEditorSelectChange()"></select>
-                    <input type="number" id="apt_editor_custom" style="display:none;" placeholder="أدخل المبلغ" lang="en" dir="ltr" inputmode="decimal" oninput="onAptEditorCustomInput()">
-                    <button type="button" class="btn" onclick="closeAptEditor()" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color:white; margin-top:0;">✅ تم</button>
+                <div class="form-group">
+                    <label for="budget_year">السنة</label>
+                    <input type="number" id="budget_year" lang="en" dir="ltr" inputmode="numeric" min="2020" max="2100">
                 </div>
-
+                <button type="button" onclick="clearForNewMonth()" class="btn-secondary-small"><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg> تصفير الشهر يدويًا</button>
             </div>
 
-            <div class="card">
-                <h2>2. المصاريف التشغيلية والطارئة</h2>
+            <!-- الخطوة 2: التحصيل -->
+            <div class="card wizard-step" data-step="2">
+                <div class="wizard-toolbar">
+                    <span style="font-size:15px; font-weight:700;" id="wizard_paid_count">—</span>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="markAllAptsPaid()"><svg class="icon" aria-hidden="true"><use href="#i-check-all"/></svg> تحديد الكل كمدفوع</button>
+                </div>
+                <div class="apartments-grid" id="apartments_container"></div>
+                <p style="font-size:13px; color:var(--muted-text); margin:10px 0 0 0;">ضغطة تبدّل مدفوعة / لم تدفع — ضغطة مطوّلة لمبلغ مختلف.</p>
+
+                <div id="apt_editor_panel" class="apt-editor-panel" style="display:none;">
+                    <label id="apt_editor_label" style="font-weight:bold; color:var(--brand-text);"></label>
+                    <select id="apt_editor_select" lang="en" dir="ltr" onchange="onAptEditorSelectChange()"></select>
+                    <input type="number" id="apt_editor_custom" style="display:none;" placeholder="أدخل المبلغ" lang="en" dir="ltr" inputmode="decimal" oninput="onAptEditorCustomInput()">
+                    <button type="button" class="btn btn-primary" onclick="closeAptEditor()" style="margin-top:0;"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> تم</button>
+                </div>
+            </div>
+
+            <!-- الخطوة 3: المصاريف -->
+            <div class="card wizard-step" data-step="3">
+                <h2>مصاريف الشهر</h2>
                 <input type="hidden" id="guard_salary" value="800">
                 <input type="hidden" id="elevator_annual_contract" value="6900">
-                <div class="form-group" style="background:var(--field-bg); padding:8px; border-radius:5px;">
-                    <label style="color: var(--primary-color); margin-bottom:4px;">🔔 الحصة الشهرية (العقد ÷ 12) — غير محتسبة في المصروف الشهري:</label>
+                <div class="form-group" style="background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field);">
+                    <label style="color: var(--brand-text); margin-bottom:4px;">حصة المصعد الشهرية (العقد ÷ 12) — تُحجز ولا تُحتسب ضمن المصروف:</label>
                     <div id="elevator_monthly_display" style="font-weight:bold; direction:ltr; text-align:center; padding:6px;">0.00 ر.س</div>
-                    <div style="font-size:12px; color:var(--muted-text); margin-top:4px; text-align:center;">💵 الدفعة المستحقة كل 3 أشهر: <span id="elevator_quarterly_display" style="direction:ltr; display:inline-block;">0.00</span> ر.س</div>
+                    <div style="font-size:13px; color:var(--muted-text); margin-top:4px; text-align:center;">الدفعة المستحقة كل 3 أشهر: <span id="elevator_quarterly_display" style="direction:ltr; display:inline-block;">0.00</span> ر.س</div>
                 </div>
-                <div class="form-group"><label>فاتورة الكهرباء:</label><input type="number" id="avg_elec" value="510.37" lang="en" dir="ltr" inputmode="decimal"></div>
-                <div class="form-group"><label>فاتورة المياه:</label><input type="number" id="avg_water" value="100" lang="en" dir="ltr" inputmode="decimal"></div>
-                <div class="form-group"><label>مواد النظافة:</label><input type="number" id="avg_clean" value="40" lang="en" dir="ltr" inputmode="decimal"></div>
+                <div class="form-group"><label for="avg_elec">فاتورة الكهرباء</label><input type="number" id="avg_elec" value="0" lang="en" dir="ltr" inputmode="decimal"></div>
+                <div class="form-group"><label for="avg_water">فاتورة المياه</label><input type="number" id="avg_water" value="0" lang="en" dir="ltr" inputmode="decimal"></div>
+                <div class="form-group"><label for="avg_clean">مواد النظافة</label><input type="number" id="avg_clean" value="0" lang="en" dir="ltr" inputmode="decimal"></div>
                 <div class="form-group">
-                    <label style="color: var(--danger-color);">مصاريف الطوارئ الفعلية لهذا الشهر:</label>
-                    <input type="number" id="emergency_spent" value="0" lang="en" dir="ltr" inputmode="decimal" style="border-color: var(--danger-color);">
+                    <label for="emergency_spent" style="color: var(--danger-soft-text);">مصاريف الطوارئ الفعلية</label>
+                    <input type="number" id="emergency_spent" value="0" lang="en" dir="ltr" inputmode="decimal">
                 </div>
-
-                <div class="form-group" style="border-top:1px dashed #ccc; padding-top:12px; margin-top:4px;">
-                    <label style="color:#6d4c41;">📋 مصاريف أخرى (غير طوارئ) — أي بند إضافي هذا الشهر (صيانة، رسوم، شراء أدوات...):</label>
+                <div class="form-group" style="border-top:1px dashed var(--border-soft); padding-top:12px; margin-top:4px;">
+                    <label>مصاريف أخرى (غير طوارئ) — صيانة، رسوم، شراء أدوات...</label>
                     <div id="other_expenses_container"></div>
-                    <button type="button" class="btn" onclick="addOtherExpenseRow()" style="background:#8d6e63; color:white; margin-top:8px;">➕ إضافة بند مصروف</button>
-                    <div style="font-size:12px; color:var(--muted-text); margin-top:6px; text-align:left; direction:ltr;">الإجمالي: <span id="other_expenses_total">0.00</span> ر.س</div>
+                    <button type="button" class="btn btn-outline" onclick="addOtherExpenseRow()" style="margin-top:8px;"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> إضافة بند مصروف</button>
+                    <div style="font-size:13px; color:var(--muted-text); margin-top:6px;">الإجمالي: <span id="other_expenses_total" style="direction:ltr; display:inline-block;">0.00</span> ر.س</div>
                 </div>
-                
-                <button class="btn btn-auto-save" onclick="calculateAndSaveBudget()">حساب واعتماد التقرير الشهري في السجل 💾</button>
+            </div>
 
-                <div style="border-top: 2px dashed var(--danger-color); margin-top:20px; padding-top:15px;">
-                    <p style="font-size:12px; color:var(--danger-color); font-weight:bold; margin:0 0 8px 0;">⚠️ إجراء منفصل ونادر (كل 3 أشهر فقط) — يخصم من الفائض السنوي:</p>
-                    <button type="button" class="btn" id="btn_elevator_paid" onclick="markElevatorPaid()" style="background: linear-gradient(135deg, #147a5f, var(--success-color)); color:white; margin-top:0;">✅ تم دفع دفعة المصعد (تصفير التراكم)</button>
+            <!-- الخطوة 4: المراجعة والاعتماد -->
+            <div class="card wizard-step" data-step="4">
+                <h2>مراجعة قبل الاعتماد</h2>
+                <div class="review-list" id="wizard_review"></div>
+                <p class="section-note" id="wizard_review_unpaid" style="margin-top:12px;"></p>
+            </div>
+
+            <div class="wizard-footer">
+                <button type="button" class="btn btn-outline" id="wizard_back" onclick="wizardBack()" aria-label="الخطوة السابقة"><svg class="icon" aria-hidden="true"><use href="#i-chevron-r"/></svg></button>
+                <div class="total">
+                    <small id="wizard_total_label">إجمالي التحصيل</small>
+                    <strong><span id="wizard_total" style="direction:ltr; display:inline-block;">0</span> ر.س</strong>
                 </div>
+                <button type="button" class="btn btn-primary" id="wizard_next" onclick="wizardNext()">التالي</button>
             </div>
         </div>
 
         <div class="main-content">
             <div id="tab_dashboard">
-            <div class="emergency-suggestion" id="emergency_advice">
-                🟢 النقد الحر (المتاح للصرف بأمان): <span id="allowed_emergency_limit" style="direction:ltr; display:inline-block;">0.00</span> ريال
-                <br><span id="free_cash_detail" style="font-size:11px; font-weight:normal; opacity:0.85; direction:rtl;"></span>
-            </div>
+            <section class="hero-card" id="home_hero" aria-label="المتاح للصرف">
+                <span class="hero-label">المتاح للصرف بأمان</span>
+                <div class="hero-amount"><span class="num" id="home_free_cash">0</span><span class="cur">ر.س</span></div>
+                <div class="split-bar" aria-hidden="true">
+                    <span class="c-free" id="home_bar_free" style="width:0%"></span>
+                    <span class="c-emergency" id="home_bar_emergency" style="width:0%"></span>
+                    <span class="c-elevator" id="home_bar_elevator" style="width:0%"></span>
+                </div>
+                <div class="legend"><span><i class="c-free"></i>متاح</span><span><i class="c-emergency"></i>صندوق الطوارئ</span><span><i class="c-elevator"></i>حصة المصعد</span></div>
+            </section>
 
-            <div class="card" id="local_agents_card" style="border:1px solid var(--primary-color); box-shadow:0 0 0 1px rgba(212,169,74,0.12), var(--card-shadow);">
-                <h2>🏛️ مجلس المستشارين الماليين</h2>
-                <div id="local_agents_badge" style="font-size:12.5px; font-weight:bold; text-align:center; padding:9px; border-radius:8px; margin-bottom:10px; background:var(--field-bg); color:var(--muted-text); border:1px solid var(--border-soft);">— جاهز للتشغيل —</div>
-                <button type="button" onclick="runLocalAgents()" style="width:100%; padding:12px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:var(--th-text); font-weight:800; font-size:14px; cursor:pointer;">
-                    🏛️ اعقد جلسة المجلس الآن
+            <section class="card month-card" aria-label="تسجيل الشهر الحالي">
+                <div class="row"><span class="title" id="home_month_title">—</span><span class="pill warn" id="home_month_status">غير مسجّل</span></div>
+                <div class="row" style="margin-top:8px;"><span class="muted" id="home_month_count">—</span><span style="font-weight:700; white-space:nowrap;"><span id="home_month_amount" style="direction:ltr; display:inline-block;">0</span> ر.س</span></div>
+                <div class="progress" aria-hidden="true"><span id="home_month_progress" style="width:0%"></span></div>
+                <button type="button" class="btn btn-primary" id="home_month_btn" onclick="openCurrentMonthEntry()">سجّل الشهر</button>
+            </section>
+
+            <section class="stat-grid" aria-label="الأرصدة">
+                <div class="stat-tile" id="home_tile_annual"><span class="lbl">الفائض السنوي</span><span class="val" id="home_annual">0</span></div>
+                <div class="stat-tile"><span class="lbl">صندوق الطوارئ</span><span class="val" id="home_emergency" style="color:var(--success-soft-text);">0</span></div>
+                <div class="stat-tile"><span class="lbl">المصعد المستحق</span><span class="val" id="home_elevator" style="color:var(--info-blue-text);">0</span></div>
+            </section>
+
+                <p id="elevator_payment_due_notice" style="display:none; background:var(--warn-soft-bg); color:var(--warn-soft-text); border:1px solid var(--warn-soft-text); border-radius:var(--radius-field); padding:10px 12px; font-size:13px; font-weight:700; margin-top:12px;"></p>
+
+            <div class="card" id="local_agents_card" style="padding:0; overflow:hidden;">
+                <button type="button" class="link-row" onclick="runLocalAgents()" style="border:none; margin:0; border-radius:0;">
+                    <span class="start"><svg class="icon" aria-hidden="true"><use href="#i-council"/></svg> اسأل مجلس المستشارين</span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
                 </button>
+                <div id="local_agents_badge" style="font-size:13px; font-weight:bold; text-align:center; padding:8px; margin:0 12px 12px 12px; border-radius:var(--radius-field); background:var(--field-bg); color:var(--muted-text); border:1px solid var(--border-soft);">— جاهز للتشغيل —</div>
             </div>
 
-            <!-- 🧠 بطاقة "المستشار المالي الذكي" (API) أُخفيت مؤقتًا بطلب المستخدم — مؤجّلة للتطوير القادم.
-                 كل دوالها (runSmartAdvisor / callAdvisorAPI / إعدادات المفتاح) باقية سليمة في الكود لإعادة تفعيلها لاحقًا بسهولة. -->
+            <details class="card" id="home_details">
+                <summary>تفاصيل الأرقام</summary>
+            <div class="emergency-suggestion" id="emergency_advice">
+                النقد الحر (المتاح للصرف بأمان): <span id="allowed_emergency_limit" style="direction:ltr; display:inline-block;">0.00</span> ر.س
+                <br><span id="free_cash_detail" style="font-size:12px; font-weight:600; color:var(--muted-text); direction:rtl;"></span>
+            </div>
 
-            <div class="card">
-                <h2>ملخص الأداء المالي المعتمد للشهر الحالي</h2>
+            <div>
+                <h2 style="font-size:15px; margin:16px 0 8px 0;">ملخص الشهر المعتمد</h2>
                 <p style="font-size:13px; font-weight:bold; color:var(--muted-text); margin:0 0 8px 0;">١) أرقام الشهر الحالي فقط</p>
                 <div class="metrics-grid">
                     <div class="metric-box revenue">مجموع الإيرادات<span id="m_revenue">0.00</span></div>
@@ -905,81 +957,68 @@
                     <div class="metric-box expenses" style="display:none;">المصاريف الكلية<span id="m_expenses">0.00</span></div>
                     <div class="metric-box emergency">صرف الطوارئ الفعلي<span id="m_emergency">0.00</span></div>
                     <div class="metric-box other-expenses">مصاريف أخرى (غير طوارئ)<span id="m_other_expenses">0.00</span></div>
-                    <div class="metric-box surplus" id="box_surplus">صافي الشهر<span id="m_surplus">0.00</span><span class="withdrawal-note" id="withdrawal_note" style="display:none;">⚠️ تم السحب من الاحتياطي هذا الشهر</span></div>
+                    <div class="metric-box surplus" id="box_surplus">صافي الشهر<span id="m_surplus">0.00</span><span class="withdrawal-note" id="withdrawal_note" style="display:none;">تم السحب من الاحتياطي هذا الشهر</span></div>
                 </div>
 
-                <div style="border-top:2px dashed #999; margin:22px 0 14px 0;"></div>
+                <div style="border-top:1px dashed var(--border-soft); margin:20px 0 14px 0;"></div>
                 <p style="font-size:13px; font-weight:bold; color:var(--muted-text); margin:0 0 8px 0;">٢) الإجماليات والاحتياطيات المتراكمة (عبر كل السنة)</p>
                 <div class="metrics-grid">
-                    <div class="metric-box annual-surplus" id="box_annual">💰 الفائض السنوي الصافي (بعد خصم حصة المصعد المدفوعة) (<span id="annual_year_label" style="display:inline">0</span>)<span id="m_annual_surplus">0.00</span></div>
-                    <div class="metric-box emergency-reserve" id="box_emergency_reserve">🛟 رصيد صندوق الطوارئ (تراكمي عبر كل السنوات)<span id="m_emergency_reserve">0.00</span><span class="withdrawal-note" id="emergency_overage_note" style="display:none;">⚠️ صرف الطوارئ هذا الشهر تجاوز رصيد الصندوق</span></div>
-                    <div class="metric-box elevator-cumulative" id="box_elevator_cumulative">🛗 الرصيد التراكمي لحصة المصعد<span id="m_elevator_cumulative">0.00</span></div>
+                    <div class="metric-box annual-surplus" id="box_annual">الفائض السنوي الصافي بعد دفعات المصعد (<span id="annual_year_label" style="display:inline">0</span>)<span id="m_annual_surplus">0.00</span></div>
+                    <div class="metric-box emergency-reserve" id="box_emergency_reserve">رصيد صندوق الطوارئ (تراكمي)<span id="m_emergency_reserve">0.00</span><span class="withdrawal-note" id="emergency_overage_note" style="display:none;">صرف الطوارئ هذا الشهر تجاوز رصيد الصندوق</span></div>
+                    <div class="metric-box elevator-cumulative" id="box_elevator_cumulative">الرصيد التراكمي لحصة المصعد<span id="m_elevator_cumulative">0.00</span></div>
                 </div>
-                <p style="font-size:12px; color:var(--warn-soft-text); background:var(--warn-soft-bg); border:1px solid #ffe082; border-radius:6px; padding:10px; margin-top:10px; font-weight:bold; text-align:center;">
-                    ⚠️ هام لمدير العقار: إجمالي الأموال المحجوزة حاليًا (مصعد + طوارئ مجموعين) = <span id="m_reserved_funds" style="direction:ltr; display:inline-block;">0.00</span> ر.س — رقم توعوي فقط، <u>لا يُخصم مرة ثانية</u> من الفائض الصافي أعلاه لأنه محتسب أصلاً ضمنه. اعتبره تذكير بكم من الفائض الظاهر أعلاه هو فعليًا "محجوز" ومو متاح للصرف الحر.
+                <p style="font-size:13px; color:var(--warn-soft-text); background:var(--warn-soft-bg); border:1px solid var(--warn-soft-text); border-radius:var(--radius-field); padding:10px 12px; margin-top:10px; font-weight:600; line-height:1.7;">
+                    هام لمدير العقار: إجمالي الأموال المحجوزة حاليًا (مصعد + طوارئ مجموعين) = <span id="m_reserved_funds" style="direction:ltr; display:inline-block;">0.00</span> ر.س — رقم توعوي فقط، <u>لا يُخصم مرة ثانية</u> من الفائض الصافي أعلاه لأنه محتسب أصلاً ضمنه. اعتبره تذكير بكم من الفائض الظاهر أعلاه هو فعليًا "محجوز" ومو متاح للصرف الحر.
                 </p>
-                <p id="elevator_payment_due_notice" style="display:none; background:var(--warn-soft-bg); color:var(--warning-color); border:1px solid #ffb74d; border-radius:6px; padding:10px; font-size:13px; font-weight:bold; text-align:center; margin-top:12px;"></p>
             </div>
+            </details>
             </div>
 
             <div id="tab_history" style="display:none;">
             <div class="card">
-                <h2>📜 سجل دفعات صيانة المصعد</h2>
-                <div id="elevator_payments_log"></div>
+                <h2>السجل الشهري</h2>
+                <button onclick="clearHistory()" class="btn-danger-text" style="float: left;"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg> مسح السجل كاملًا</button>
+                <div id="history_rows" style="clear:both;"></div>
             </div>
 
             <div class="card">
-                <h2>📜 التقرير التاريخي المحفوظ تلقائياً للعقار</h2>
-                <button onclick="clearHistory()" style="background: none; border: none; color: var(--danger-color); cursor: pointer; float: left; font-size: 12px; font-weight: bold;">❌ مسح السجل التاريخي كاملاً</button>
-                <div class="table-scroll-wrap">
-                <table id="history_table">
-                    <thead>
-                        <tr>
-                            <th>السنة</th>
-                            <th>الشهر</th>
-                            <th>الإيرادات (ر.س)</th>
-                            <th>المصاريف الكلية (ر.س)</th>
-                            <th>الطوارئ الفعلي (ر.س)</th>
-                            <th>صافي الفائض للاحتياطي (ر.س)</th>
-                            <th>الإجمالي السنوي (ر.س)</th>
-                            <th>تعديل</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history_rows">
-                        </tbody>
-                </table>
-                </div>
+                <h2>دفعات صيانة المصعد</h2>
+                <div id="elevator_payments_log"></div>
+                <p style="font-size:13px; color:var(--warn-soft-text); font-weight:700; margin:12px 0 8px 0; display:flex; align-items:center; gap:6px;"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg> عند دفع الدفعة الربعية فعليًا (كل 3 أشهر):</p>
+                <button type="button" class="btn btn-outline" id="btn_elevator_paid" onclick="markElevatorPaid()" style="margin-top:0;">تم دفع دفعة المصعد (تصفير التراكم)</button>
+            </div>
             </div>
 
+            <div id="tab_reports" style="display:none;">
             <div class="card no-print">
-                <h2>📄 تقرير شهري تفصيلي (PDF + واتساب)</h2>
+                <h2>التقرير الشهري</h2>
                 <div class="form-group">
                     <label>اختر الشهر المراد إصدار تقريره التفصيلي:</label>
                     <select id="report_month_select" onchange="updateReportUnpaidAptsDisplay()"></select>
                 </div>
-                <div class="form-group" style="background:var(--field-bg); padding:8px; border-radius:5px;">
-                    <label style="color: var(--danger-color); margin-bottom:4px;">🔔 الشقق غير المدفوعة لهذا الشهر المحفوظ:</label>
-                    <div id="report_unpaid_apts_display" style="font-weight:bold; text-align:center; padding:6px; color:var(--success-color);">—</div>
+                <div class="form-group" style="background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field);">
+                    <label style="color: var(--danger-soft-text); margin-bottom:4px;">الشقق غير المدفوعة لهذا الشهر:</label>
+                    <div id="report_unpaid_apts_display" style="font-weight:bold; text-align:center; padding:6px; color:var(--success-soft-text);">—</div>
                 </div>
-                <button class="btn" id="btn_generate_pdf" onclick="generatePDFReport()" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color:white;">🖨️ إنشاء التقرير وحفظه PDF</button>
-                <button class="btn" id="btn_send_whatsapp" onclick="shareWhatsApp()" style="background:#25D366; color:white;">📲 إرسال ملخص عبر واتساب</button>
-                <button class="btn" id="btn_send_report_reminder" onclick="shareReportUnpaidReminder()" style="background:#25D366; color:white;">📲 إرسال تذكير سداد لهذا الشهر</button>
+                <button class="btn btn-primary" id="btn_generate_pdf" onclick="generatePDFReport()"><svg class="icon" aria-hidden="true"><use href="#i-printer"/></svg> إنشاء التقرير وحفظه PDF</button>
+                <button class="btn btn-whatsapp" id="btn_send_whatsapp" onclick="shareWhatsApp()"><svg class="icon" aria-hidden="true"><use href="#i-message"/></svg> إرسال ملخص عبر واتساب</button>
+                <button class="btn btn-outline" id="btn_send_report_reminder" onclick="shareReportUnpaidReminder()"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg> إرسال تذكير سداد لهذا الشهر</button>
                 <div id="individual_reminder_buttons_container" style="margin-top:8px;"></div>
-                <p style="font-size:12px; color:var(--muted-text); margin-top:10px; line-height:1.6;">
-                    💡 زر "إنشاء التقرير" يفتح نافذة طباعة المتصفح لحفظ نسخة PDF محلياً على جهازك.
-                    زر "إرسال عبر واتساب" يرسل نفس التقرير التفصيلي كاملاً كرسالة نصية جاهزة مباشرة، دون الحاجة لأي إرفاق يدوي.
+                <p class="section-note" style="margin-top:10px;">
+                    "إنشاء التقرير" يفتح نافذة الطباعة لحفظ نسخة PDF على جهازك.
+                    "واتساب" يرسل نفس التقرير كرسالة نصية جاهزة.
                 </p>
             </div>
 
             <div class="card no-print">
-                <h2>📊 تقرير سنوي شامل (كل شهور السنة)</h2>
+                <h2>التقرير السنوي</h2>
                 <div class="form-group">
                     <label>اختر السنة المراد إصدار تقريرها الشامل:</label>
                     <select id="annual_report_year"></select>
                 </div>
-                <button class="btn" id="btn_generate_annual_pdf" onclick="generateAnnualPDFReport()" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color:white;">🖨️ إنشاء التقرير السنوي وحفظه PDF</button>
-                <button class="btn" id="btn_send_annual_whatsapp" onclick="shareAnnualWhatsApp()" style="background:#25D366; color:white;">📲 إرسال ملخص سنوي عبر واتساب</button>
-                <p style="font-size:12px; color:var(--muted-text); margin-top:10px; line-height:1.6;">
+                <button class="btn btn-primary" id="btn_generate_annual_pdf" onclick="generateAnnualPDFReport()"><svg class="icon" aria-hidden="true"><use href="#i-printer"/></svg> إنشاء التقرير السنوي PDF</button>
+                <button class="btn btn-whatsapp" id="btn_send_annual_whatsapp" onclick="shareAnnualWhatsApp()"><svg class="icon" aria-hidden="true"><use href="#i-message"/></svg> إرسال ملخص سنوي عبر واتساب</button>
+                <p class="section-note" style="margin-top:10px;">
                     يجمع هذا التقرير كل الأشهر المعتمدة لسنة محددة، مع الفائض السنوي (شامل وصافي)، حالة التزام صيانة المصعد، والرصيد الافتتاحي إن وُجد — مناسب للاجتماع السنوي لجمعية الملاك.
                 </p>
             </div>
@@ -987,42 +1026,9 @@
             </div>
 
             <div id="tab_settings" style="display:none;">
+            <h2 class="group-title">العقار</h2>
             <div class="card">
-                <h2>💰 الإعدادات المالية</h2>
-                <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">قيم شبه دائمة يحددها مدير العقار حسب ظروف مبناه — تُحفظ تلقائيًا وتنطبق على كل الحسابات القادمة.</p>
-                <div class="form-group">
-                    <label style="color: var(--primary-color);">راتب الحارس الشهري (ريال):</label>
-                    <input type="number" id="guard_salary_settings" value="800" lang="en" dir="ltr" inputmode="decimal" oninput="onGuardSalarySettingsChange()">
-                </div>
-                <div class="form-group">
-                    <label style="color: var(--primary-color);">قيمة العقد السنوي لصيانة المصعد (ريال):</label>
-                    <input type="number" id="elevator_annual_contract_settings" value="6900" lang="en" dir="ltr" inputmode="decimal" oninput="onElevatorContractSettingsChange()">
-                </div>
-                <p style="font-size:11px; color:var(--muted-text); background:var(--field-bg); padding:8px; border-radius:6px; margin-top:4px;">🔒 هذي التزامات شهرية ثابتة على العقار (راتب الحارس + حصة عقد المصعد) — تتكرر كل شهر بنفس القيمة بغض النظر عن التحصيل، ولا تحتاج إعادة إدخال كل مرة.</p>
-                <div class="form-group">
-                    <label style="color: var(--primary-color);">نسبة تحويل الفائض لصندوق الطوارئ (%):</label>
-                    <input type="number" id="emergency_reserve_ratio_pct" value="40" min="1" max="90" step="1" lang="en" dir="ltr" inputmode="numeric" oninput="onEmergencyRatioChange()">
-                    <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">من كل فائض تشغيلي شهري (بعد خصم حصة المصعد)، هذي النسبة تُحوَّل تلقائيًا لصندوق الطوارئ التراكمي. الافتراضي 40%. يسمح بين 1% و90%.</p>
-                </div>
-                <div class="form-group">
-                    <label style="color: var(--primary-color);">تنبيه إذا رصيد صندوق الطوارئ أقل من (ريال):</label>
-                    <input type="number" id="emergency_fund_min_threshold_input" placeholder="مثال: 3000 (اتركه فارغًا لتعطيل التنبيه)" lang="en" dir="ltr" inputmode="decimal" oninput="onEmergencyThresholdChange()">
-                    <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">لو رصيد الصندوق نزل تحت هذا المبلغ، يظهر تنبيه بالأعلى فورًا. اتركه فارغًا أو صفر لتعطيل التنبيه.</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>📱 أرقام جوالات ملاك الشقق</h2>
-                <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">اختياري — لو أضفت رقم شقة معينة، تقدر ترسل له تذكير سداد واتساب مباشر وشخصي من تقرير الشهر، بدل الرسالة العامة.</p>
-                <button type="button" onclick="toggleAptPhoneNumbersSection()" id="btn_toggle_apt_phones" class="btn" style="background:var(--field-bg); color:var(--primary-color); border:1px solid var(--primary-color);">📱 إضافة / تعديل أرقام الجوالات</button>
-                <div id="apt_phone_numbers_section" style="display:none; margin-top:12px;">
-                    <div id="apt_phone_numbers_container"></div>
-                    <p style="font-size:11px; color:var(--muted-text); background:var(--field-bg); padding:8px; border-radius:6px; margin-top:8px;">🔒 الأرقام تُحفظ محليًا على جهازك فقط مثل باقي بيانات التطبيق، ولا تُرسل لأي خادم خارجي.</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🏢 معلومات العقار</h2>
+                <h2>معلومات العقار</h2>
                 <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">هذي البيانات تخصّص التطبيق كامل لعقارك — غيّرها لتستخدم نفس التطبيق لأي عمارة أخرى، بدون أي تعديل بالكود.</p>
                 <div class="form-group">
                     <label>اسم العقار (يظهر بالعنوان وكل التقارير):</label>
@@ -1036,7 +1042,87 @@
             </div>
 
             <div class="card">
-                <h2>🔒 حماية برمز PIN</h2>
+                <h2>توقيع مدير العقار</h2>
+                <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">يظهر تلقائيًا بنهاية كل التقارير ورسائل التذكير عبر واتساب (PDF والملخصات النصية).</p>
+                <div class="form-group">
+                    <label>الاسم الظاهر بالتوقيع:</label>
+                    <input type="text" id="manager_name" placeholder="مثال: فهد مباركي" oninput="saveFixedSettings()">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>جوالات ملاك الشقق</h2>
+                <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">اختياري — لو أضفت رقم شقة معينة، تقدر ترسل له تذكير سداد واتساب مباشر وشخصي من تقرير الشهر، بدل الرسالة العامة.</p>
+                <button type="button" onclick="toggleAptPhoneNumbersSection()" id="btn_toggle_apt_phones" class="btn btn-outline"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg> إضافة / تعديل أرقام الجوالات</button>
+                <div id="apt_phone_numbers_section" style="display:none; margin-top:12px;">
+                    <div id="apt_phone_numbers_container"></div>
+                    <p style="font-size:12px; color:var(--muted-text); background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field); margin-top:8px;">الأرقام تُحفظ محليًا على جهازك فقط مثل باقي بيانات التطبيق، ولا تُرسل لأي خادم خارجي.</p>
+                </div>
+            </div>
+
+            <h2 class="group-title">المالية</h2>
+            <div class="card">
+                <h2>الإعدادات المالية</h2>
+                <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">قيم شبه دائمة يحددها مدير العقار حسب ظروف مبناه — تُحفظ تلقائيًا وتنطبق على كل الحسابات القادمة.</p>
+                <div class="form-group">
+                    <label style="color: var(--primary-color);">راتب الحارس الشهري (ريال):</label>
+                    <input type="number" id="guard_salary_settings" value="800" lang="en" dir="ltr" inputmode="decimal" oninput="onGuardSalarySettingsChange()">
+                </div>
+                <div class="form-group">
+                    <label style="color: var(--primary-color);">قيمة العقد السنوي لصيانة المصعد (ريال):</label>
+                    <input type="number" id="elevator_annual_contract_settings" value="6900" lang="en" dir="ltr" inputmode="decimal" oninput="onElevatorContractSettingsChange()">
+                </div>
+                <p style="font-size:12px; color:var(--muted-text); background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field); margin-top:4px;">هذي التزامات شهرية ثابتة على العقار (راتب الحارس + حصة عقد المصعد) — تتكرر كل شهر بنفس القيمة بغض النظر عن التحصيل، ولا تحتاج إعادة إدخال كل مرة.</p>
+                <div class="form-group">
+                    <label style="color: var(--primary-color);">نسبة تحويل الفائض لصندوق الطوارئ (%):</label>
+                    <input type="number" id="emergency_reserve_ratio_pct" value="40" min="1" max="90" step="1" lang="en" dir="ltr" inputmode="numeric" oninput="onEmergencyRatioChange()">
+                    <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">من كل فائض تشغيلي شهري (بعد خصم حصة المصعد)، هذي النسبة تُحوَّل تلقائيًا لصندوق الطوارئ التراكمي. الافتراضي 40%. يسمح بين 1% و90%.</p>
+                </div>
+                <div class="form-group">
+                    <label style="color: var(--primary-color);">تنبيه إذا رصيد صندوق الطوارئ أقل من (ريال):</label>
+                    <input type="number" id="emergency_fund_min_threshold_input" placeholder="مثال: 3000 (اتركه فارغًا لتعطيل التنبيه)" lang="en" dir="ltr" inputmode="decimal" oninput="onEmergencyThresholdChange()">
+                    <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">لو رصيد الصندوق نزل تحت هذا المبلغ، يظهر تنبيه بالأعلى فورًا. اتركه فارغًا أو صفر لتعطيل التنبيه.</p>
+                </div>
+            </div>
+
+            <!-- 🧠 بطاقة "إعدادات المستشار المالي الذكي" (مفتاح Anthropic API) أُخفيت مؤقتًا — مرتبطة بالمستشار المؤجّل للتطوير القادم.
+                 الدوال المرتبطة (getAdvisorPersonalKey / saveAdvisorPersonalKey / clearAdvisorPersonalKey) باقية سليمة لإعادة التفعيل لاحقًا. -->
+
+            <details class="card" style="padding:0;">
+                <summary style="cursor:pointer; padding:16px; font-weight:700; color:var(--text-color); font-size:17px; list-style:none; min-height:44px;">الرصيد الافتتاحي</summary>
+                <div style="padding:0 20px 20px 20px;">
+                    <div>
+                        <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">يُدخل عادة <strong>مرة واحدة فقط</strong> عند بدء استخدام النظام لأول مرة — يمثل المبلغ الموجود فعليًا في حساب العقار قبل بدء التتبع الرقمي.</p>
+                        <div class="form-group">
+                            <label>مبلغ الرصيد الافتتاحي (ريال):</label>
+                            <input type="number" id="opening_balance_amount" value="0" lang="en" dir="ltr" inputmode="decimal">
+                        </div>
+                        <div class="form-group">
+                            <label>يُضاف إلى فائض سنة:</label>
+                            <input type="number" id="opening_balance_year" lang="en" dir="ltr" inputmode="numeric" min="2020" max="2100">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="saveOpeningBalance()"><svg class="icon" aria-hidden="true"><use href="#i-save"/></svg> حفظ الرصيد الافتتاحي</button>
+                        <p id="opening_balance_status" style="font-size:12px; color:var(--muted-text); margin-top:8px;"></p>
+                    </div>
+                </div>
+            </details>
+
+            <h2 class="group-title">الأمان والبيانات</h2>
+            <div class="card">
+                <h2>النسخ الاحتياطي والاسترداد</h2>
+                <p style="font-size:12px; color:var(--muted-text); margin:0 0 12px 0;">بما أن كل بيانات العقار محفوظة على هذا الجهاز فقط، يُنصح بتصدير نسخة احتياطية بشكل دوري لتفادي فقدانها عند مسح ذاكرة المتصفح أو تغيير الجهاز.</p>
+                <p id="last_backup_status" onclick="document.getElementById('import_file_input').click()" style="font-size:12px; font-weight:bold; color:var(--muted-text); margin:0 0 10px 0; background:var(--field-bg); padding:8px; border-radius:5px; cursor:pointer; border:1px dashed var(--border-soft);" title="اضغط لاستيراد نسخة احتياطية من ملف">—</p>
+                <div class="btn-row" style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr));">
+                    <button type="button" class="btn btn-primary" id="btn_share_backup" onclick="shareBackupData()" style="margin-top:0; padding:12px 8px; white-space:nowrap;"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg> نسخة احتياطية</button>
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('import_file_input').click()" style="margin-top:0; border-color:var(--primary-color); padding:12px 8px; white-space:nowrap;"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg> استرداد نسخة</button>
+                </div>
+                <p class="section-note" style="margin-top:8px;">انقل ملف النسخة بين أجهزتك (واتساب، البريد، Drive) ثم اضغط «استرداد نسخة» على الجهاز الآخر.</p>
+                <input type="file" id="import_file_input" accept=".json" style="display:none;" onchange="importAllData(event)">
+                <p id="import_export_status" style="font-size:12px; color:var(--muted-text); margin-top:8px;"></p>
+            </div>
+
+            <div class="card">
+                <h2>رمز القفل PIN</h2>
                 <p style="font-size:12px; color:var(--muted-text); margin:0 0 12px 0;">
                     رمز رباعي يُطلب عند كل فتح للتطبيق — لمنع أي شخص آخر من رؤية البيانات المالية.
                 </p>
@@ -1052,67 +1138,27 @@
                         <input type="text" id="new_recovery_phrase_input" maxlength="40" placeholder="مثال: اسم أول عمارة أدرتها">
                         <p style="font-size:11px; color:var(--muted-text); margin-top:4px;">اختر شيء تتذكره بسهولة أنت بس — يُستخدم بدل الرمز لو نسيته لاحقًا. لا يقل عن 3 أحرف.</p>
                     </div>
-                    <button type="button" class="btn" onclick="setupPin()" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-color-light)); color:white;">🔒 تفعيل الحماية</button>
+                    <button type="button" class="btn btn-primary" onclick="setupPin()"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg> تفعيل الحماية</button>
                 </div>
 
                 <div id="pin_manage_div" style="display:none;">
-                    <button type="button" class="btn" onclick="changePin()" style="background:#546e7a; color:white; margin-bottom:8px;">✏️ تغيير الرمز</button>
-                    <button type="button" class="btn" onclick="disablePin()" style="background:var(--danger-color); color:white;">🗑️ إزالة الحماية</button>
+                    <button type="button" class="btn btn-outline" onclick="changePin()" style="margin-bottom:8px;"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg> تغيير الرمز</button>
+                    <button type="button" class="btn btn-danger" onclick="disablePin()"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg> إزالة الحماية</button>
                 </div>
                 <p id="pin_message" style="font-size:12px; color:var(--danger-color); margin-top:8px;"></p>
             </div>
 
-            <div class="card">
-                <h2>✍️ توقيع مدير العقار</h2>
-                <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">يظهر تلقائيًا بنهاية كل التقارير ورسائل التذكير عبر واتساب (PDF والملخصات النصية).</p>
-                <div class="form-group">
-                    <label>الاسم الظاهر بالتوقيع:</label>
-                    <input type="text" id="manager_name" placeholder="مثال: فهد مباركي" oninput="saveFixedSettings()">
-                </div>
-            </div>
-
-            <!-- 🧠 بطاقة "إعدادات المستشار المالي الذكي" (مفتاح Anthropic API) أُخفيت مؤقتًا — مرتبطة بالمستشار المؤجّل للتطوير القادم.
-                 الدوال المرتبطة (getAdvisorPersonalKey / saveAdvisorPersonalKey / clearAdvisorPersonalKey) باقية سليمة لإعادة التفعيل لاحقًا. -->
-
-            <details class="card" style="padding:0;">
-                <summary style="cursor:pointer; padding:20px; font-weight:bold; color:var(--primary-color); font-size:16px; list-style:none;">⚙️ إعدادات متقدمة (سنة العمل + الرصيد الافتتاحي)</summary>
-                <div style="padding:0 20px 20px 20px;">
-                    <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">تُلمس نادرًا — السنة تُملأ تلقائيًا بالسنة الحالية عند كل فتح للتطبيق، وغيّرها هنا فقط لو تبي تسجّل شهرًا من سنة سابقة متأخرة.</p>
-                    <div class="form-group">
-                        <label>سنة العمل الحالية (تُطبَّق على أي شهر تحفظه بتبويب "العمليات"):</label>
-                        <input type="number" id="budget_year" lang="en" dir="ltr" inputmode="numeric" min="2020" max="2100">
-                    </div>
-                    <div style="border-top: 1px dashed var(--border-soft); margin:16px 0; padding-top:14px;">
-                        <p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">يُدخل عادة <strong>مرة واحدة فقط</strong> عند بدء استخدام النظام لأول مرة — يمثل المبلغ الموجود فعليًا في حساب العقار قبل بدء التتبع الرقمي.</p>
-                        <div class="form-group">
-                            <label>مبلغ الرصيد الافتتاحي (ريال):</label>
-                            <input type="number" id="opening_balance_amount" value="0" lang="en" dir="ltr" inputmode="decimal">
-                        </div>
-                        <div class="form-group">
-                            <label>يُضاف إلى فائض سنة:</label>
-                            <input type="number" id="opening_balance_year" lang="en" dir="ltr" inputmode="numeric" min="2020" max="2100">
-                        </div>
-                        <button type="button" class="btn" onclick="saveOpeningBalance()" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color:white;">💾 حفظ الرصيد الافتتاحي</button>
-                        <p id="opening_balance_status" style="font-size:12px; color:var(--muted-text); margin-top:8px;"></p>
-                    </div>
-                </div>
-            </details>
-
-            <div class="card">
-                <h2>💾 النسخ الاحتياطي للبيانات (تصدير واستيراد)</h2>
-                <p style="font-size:12px; color:var(--muted-text); margin:0 0 12px 0;">بما أن كل بيانات العقار محفوظة على هذا الجهاز فقط، يُنصح بتصدير نسخة احتياطية بشكل دوري لتفادي فقدانها عند مسح ذاكرة المتصفح أو تغيير الجهاز.</p>
-                <p id="last_backup_status" onclick="document.getElementById('import_file_input').click()" style="font-size:12px; font-weight:bold; color:var(--muted-text); margin:0 0 10px 0; background:var(--field-bg); padding:8px; border-radius:5px; cursor:pointer; border:1px dashed var(--border-soft);" title="اضغط لاستيراد نسخة احتياطية من ملف">—</p>
-                <button type="button" class="btn" id="btn_share_backup" onclick="shareBackupData()" style="background:#25D366; color:white;">📤 تصدير ومشاركة نسخة احتياطية</button>
-                <button type="button" class="btn" onclick="document.getElementById('import_file_input').click()" style="background:#546e7a; color:white;">📥 استيراد نسخة احتياطية</button>
-                <input type="file" id="import_file_input" accept=".json" style="display:none;" onchange="importAllData(event)">
-                <p id="import_export_status" style="font-size:12px; color:var(--muted-text); margin-top:8px;"></p>
+            <h2 class="group-title">المظهر</h2>
+            <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <span style="font-size:15px; font-weight:600;">الوضع الداكن / الفاتح</span>
+                <button type="button" id="theme_toggle_btn" onclick="toggleTheme()">داكن</button>
             </div>
 
             <!-- ========== تذييل الحقوق (يظهر داخل الإعدادات فقط) ========== -->
             <footer style="margin-top:20px; padding:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; color:var(--muted-text); font-size:12px; text-align:center; direction:rtl;">
                 <div style="margin-bottom:10px;"><strong>© Jiwar 2026 | جميع الحقوق محفوظة</strong><br>برمجة <strong>Fahad Mobarki</strong></div>
-                <div style="margin-bottom:10px; color:var(--muted-text);">📧 <a href="mailto:Fmobarki@gmail.com" style="color:var(--primary-color); text-decoration:none;">Fmobarki@gmail.com</a></div>
-                <div style="background:var(--field-bg); padding:8px; border-radius:6px;">🔒 <strong>الخصوصية:</strong> كل البيانات تُحفظ محليًا على جهازك — لا تُرسل لخادم خارجي</div>
+                <div style="margin-bottom:10px; color:var(--muted-text);"><a href="mailto:Fmobarki@gmail.com" style="color:var(--brand-text); text-decoration:none;">Fmobarki@gmail.com</a></div>
+                <div style="background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field);"><strong>الخصوصية:</strong> كل البيانات تُحفظ محليًا على جهازك — لا تُرسل لخادم خارجي</div>
             </footer>
             <!-- ================================ -->
             </div>
@@ -1127,13 +1173,17 @@
 </div>
 
 <div id="print_report_area"></div>
+<div id="toast_host" aria-live="polite"></div>
 
 <script>
     // ===== نظام تبديل السمة (داكن/فاتح) =====
     function applyThemeButtonLabel(theme) {
         const btn = document.getElementById('theme_toggle_btn');
         if (!btn) return;
-        btn.innerText = theme === 'dark' ? '🌙 داكن' : '☀️ فاتح';
+        // نص ثابت من الكود فقط (لا مدخلات مستخدم) — آمن داخل innerHTML
+        btn.innerHTML = theme === 'dark'
+            ? '<svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg> داكن'
+            : '<svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg> فاتح';
     }
 
     function toggleTheme() {
@@ -1155,7 +1205,7 @@
     // ===== نهاية نظام تبديل السمة =====
 
     // ===== نظام التبويبات الأربعة (Bottom Navigation) =====
-    const TAB_IDS = ['dashboard', 'quick', 'history', 'settings'];
+    const TAB_IDS = ['dashboard', 'quick', 'history', 'reports', 'settings'];
 
     function switchTab(tabName) {
         TAB_IDS.forEach(name => {
@@ -1166,7 +1216,261 @@
         });
         window.scrollTo({ top: 0, behavior: 'instant' });
         localStorage.setItem('ui_active_tab', tabName);
+        // تسجيل الشهر شاشة كاملة: يُخفى الشريط السفلي ويظهر شريط "التالي" الثابت بدلًا منه
+        document.body.classList.toggle('wizard-mode', tabName === 'quick');
+        if (tabName === 'quick' && typeof wizardGo === 'function') wizardGo(wizardStep);
     }
+
+    // ===== المرحلة 3: الرئيسية =====
+    function fmtMoney(n) {
+        const v = Math.round((Number(n) || 0) * 100) / 100;
+        return v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    // يعبّئ بطاقات الرئيسية من نفس دوال الحساب الأصلية (لا يقرأ من نصوص الصناديق القديمة)
+    function renderHome() {
+        const heroNum = document.getElementById('home_free_cash');
+        if (!heroNum || typeof getFreeCashBreakdown !== 'function') return;
+        const year = getSelectedYear();
+        const f = getFreeCashBreakdown(getCumulativeCashThroughYear(year));
+        heroNum.innerText = fmtMoney(f.free);
+        document.getElementById('home_hero').classList.toggle('risk', f.free < 0);
+        const parts = [Math.max(0, f.free), Math.max(0, f.emergency), Math.max(0, f.elevatorDue)];
+        const sum = parts.reduce((a, b) => a + b, 0);
+        ['home_bar_free', 'home_bar_emergency', 'home_bar_elevator'].forEach((id, k) => {
+            document.getElementById(id).style.width = sum > 0 ? (parts[k] / sum * 100).toFixed(1) + '%' : '0%';
+        });
+
+        // بطاقة الشهر الحالي الفعلي (تقويميًا)
+        const now = new Date();
+        const month = MONTHS_ORDER[now.getMonth()], y = now.getFullYear();
+        const rec = getHistoryRecordFor(month, y);
+        const count = getApartmentCount();
+        const paid = rec ? (rec.apts || []).filter(v => Number(v) > 0).length : 0;
+        document.getElementById('home_month_title').innerText = `تحصيل ${month}`;
+        const status = document.getElementById('home_month_status');
+        status.innerText = rec ? 'معتمد' : 'غير مسجّل';
+        status.className = 'pill ' + (rec ? 'ok' : 'warn');
+        document.getElementById('home_month_count').innerText = `${paid} من ${count} شقة دفعت`;
+        document.getElementById('home_month_amount').innerText = fmtMoney(rec ? rec.rev : 0);
+        document.getElementById('home_month_progress').style.width = (count ? paid / count * 100 : 0).toFixed(0) + '%';
+        document.getElementById('home_month_btn').innerText = rec ? 'تعديل الشهر' : 'سجّل الشهر';
+
+        const annual = getAnnualTotalForYear(year);
+        document.getElementById('home_annual').innerText = fmtMoney(annual);
+        document.getElementById('home_tile_annual').classList.toggle('risk', annual < 0);
+        document.getElementById('home_emergency').innerText = fmtMoney(computeEmergencyFundState().balance);
+        document.getElementById('home_elevator').innerText = fmtMoney(getElevatorCumulativeNow());
+        enforceSingleBanner();
+    }
+
+    // شريط تنبيه واحد فقط بالأعلى، حسب الأولوية: تكرار دفعات > صندوق طوارئ منخفض > نسخة احتياطية
+    function enforceSingleBanner() {
+        let shown = false;
+        ['duplicate_payment_banner', 'emergency_fund_low_banner', 'backup_reminder_banner'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const wanted = el.style.display !== 'none';
+            el.classList.toggle('banner-suppressed', wanted && shown);
+            if (wanted) shown = true;
+        });
+    }
+
+    // زر بطاقة الشهر: يفتح الشهر الحالي الفعلي مباشرة على خطوة التحصيل
+    function openCurrentMonthEntry() {
+        const now = new Date();
+        document.getElementById('budget_month').value = MONTHS_ORDER[now.getMonth()];
+        document.getElementById('budget_year').value = now.getFullYear();
+        handleMonthOrYearChange();
+        wizardStep = 2;
+        switchTab('quick');
+    }
+
+    // ===== المرحلة 4: معالج تسجيل الشهر (4 خطوات) =====
+    let wizardStep = 1;
+    const WIZARD_STEP_NAMES = ['الشهر', 'التحصيل', 'المصاريف', 'المراجعة'];
+
+    function wizardGo(step) {
+        wizardStep = Math.max(1, Math.min(4, Number(step) || 1));
+        document.querySelectorAll('#tab_quick .wizard-step').forEach(el => {
+            el.style.display = Number(el.dataset.step) === wizardStep ? '' : 'none';
+        });
+        document.querySelectorAll('#wizard_stepper li').forEach(li => {
+            const n = Number(li.dataset.step);
+            li.classList.toggle('done', n < wizardStep);
+            li.classList.toggle('current', n === wizardStep);
+            if (n === wizardStep) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+        });
+        document.getElementById('wizard_back').style.visibility = wizardStep === 1 ? 'hidden' : 'visible';
+        const next = document.getElementById('wizard_next');
+        next.innerText = wizardStep === 4 ? 'اعتماد وحفظ الشهر' : `التالي: ${WIZARD_STEP_NAMES[wizardStep]}`;
+        if (wizardStep !== 2) closeAptEditor();
+        if (wizardStep === 4) renderWizardReview();
+        updateWizardFooter();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    function wizardNext() {
+        if (wizardStep === 4) {
+            calculateAndSaveBudget();
+            wizardStep = 1;
+            switchTab('dashboard');
+            return;
+        }
+        wizardGo(wizardStep + 1);
+    }
+    function wizardBack() { wizardGo(wizardStep - 1); }
+    function exitWizard() { closeAptEditor(); wizardStep = 1; switchTab('dashboard'); }
+
+    function getAptValue(i) {
+        const select = document.getElementById(`apt_${i}`);
+        if (!select) return 0;
+        if (select.value === 'other') {
+            const v = parseFloat(document.getElementById(`apt_${i}_custom`).value) || 0;
+            return v < 0 ? 0 : v;
+        }
+        return parseFloat(select.value) || 0;
+    }
+
+    // نفس معادلات calculateAndSaveBudget، لكن للعرض اللحظي فقط بدون حفظ
+    function getWizardTotals() {
+        const n = getApartmentCount();
+        let revenue = 0, paidCount = 0;
+        const unpaid = [];
+        for (let i = 1; i <= n; i++) {
+            const v = getAptValue(i);
+            revenue += v;
+            if (v > 0) paidCount++; else unpaid.push(i);
+        }
+        const num = id => parseFloat(document.getElementById(id).value) || 0;
+        const guard = num('guard_salary'), elec = num('avg_elec'), water = num('avg_water'), clean = num('avg_clean');
+        const emergency = num('emergency_spent');
+        const other = getOtherExpenseItems().reduce((sum, it) => sum + it.amount, 0);
+        const elevatorMonthly = num('elevator_annual_contract') / 12;
+        const totalExpenses = guard + elec + water + clean + emergency + other;
+        return { n, revenue, paidCount, unpaid, guard, elec, water, clean, emergency, other, elevatorMonthly, totalExpenses, net: revenue - totalExpenses };
+    }
+
+    function updateWizardFooter() {
+        const label = document.getElementById('wizard_total_label');
+        if (!label) return;
+        const t = getWizardTotals();
+        const totalEl = document.getElementById('wizard_total');
+        if (wizardStep <= 2) {
+            label.innerText = 'إجمالي التحصيل';
+            totalEl.innerText = fmtMoney(t.revenue);
+            totalEl.style.color = '';
+        } else {
+            label.innerText = 'صافي الشهر';
+            totalEl.innerText = fmtMoney(t.net);
+            totalEl.style.color = t.net < 0 ? 'var(--danger-soft-text)' : 'var(--success-soft-text)';
+        }
+        document.getElementById('wizard_paid_count').innerText = `${t.paidCount} من ${t.n} مدفوعة`;
+        const month = document.getElementById('budget_month').value;
+        const year = document.getElementById('budget_year').value;
+        document.getElementById('wizard_title').innerText = `${month} ${year}`;
+    }
+
+    function renderWizardReview() {
+        const t = getWizardTotals();
+        const rows = [
+            ['إيرادات الشقق', t.revenue],
+            ['راتب الحارس', -t.guard],
+            ['الكهرباء', -t.elec],
+            ['المياه', -t.water],
+            ['النظافة', -t.clean],
+            ['الطوارئ', -t.emergency],
+            ['مصاريف أخرى', -t.other]
+        ];
+        // كل القيم أرقام محسوبة ونصوص ثابتة — لا مدخلات مستخدم نصية هنا
+        document.getElementById('wizard_review').innerHTML =
+            rows.map(([k, v]) => `<div class="review-row"><span>${k}</span><span class="v">${fmtMoney(v)}</span></div>`).join('') +
+            `<div class="review-row total"><span>صافي الشهر</span><span class="v ${t.net < 0 ? 'neg' : 'pos'}">${fmtMoney(t.net)} ر.س</span></div>`;
+        document.getElementById('wizard_review_unpaid').innerText =
+            (t.unpaid.length ? `لم تدفع: ${t.unpaid.map(n => 'شقة ' + n).join('، ')}. ` : 'كل الشقق دفعت. ') +
+            `حصة المصعد الشهرية (${fmtMoney(t.elevatorMonthly)} ر.س) تُحجز تلقائيًا ولا تُخصم من الصافي.`;
+    }
+
+    // ضغطة = تبديل مدفوعة/لم تدفع، ضغطة مطوّلة = مبلغ مختلف (المحرر المشترك)
+    function attachAptTileGestures(tile, i) {
+        let timer = null, longPressed = false;
+        const cancel = () => { clearTimeout(timer); timer = null; };
+        tile.addEventListener('pointerdown', () => {
+            longPressed = false;
+            cancel();
+            timer = setTimeout(() => {
+                longPressed = true;
+                openAptEditor(i);
+                if (navigator.vibrate) navigator.vibrate(15);
+            }, 500);
+        });
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => tile.addEventListener(ev, cancel));
+        tile.addEventListener('contextmenu', e => e.preventDefault());
+        tile.addEventListener('click', () => {
+            if (longPressed) { longPressed = false; return; }
+            toggleAptPaid(i);
+        });
+    }
+
+    function setAptValue(i, val) {
+        const select = document.getElementById(`apt_${i}`);
+        const customInput = document.getElementById(`apt_${i}_custom`);
+        if (!select) return;
+        const hasOption = Array.from(select.options).some(o => o.value === String(val));
+        if (hasOption) {
+            select.value = String(val);
+            customInput.value = '';
+        } else {
+            select.value = 'other';
+            customInput.value = val;
+        }
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        updateAptTileVisual(i);
+    }
+
+    function toggleAptPaid(i) {
+        if (currentEditingApt === i) closeAptEditor();
+        setAptValue(i, getAptValue(i) > 0 ? 0 : getDefaultAptFee());
+    }
+
+    // يحدد الشقق غير المدفوعة فقط بالرسم الافتراضي — المبالغ الخاصة المدخلة يدويًا تبقى كما هي
+    function markAllAptsPaid() {
+        const fee = getDefaultAptFee();
+        for (let i = 1; i <= getApartmentCount(); i++) {
+            if (getAptValue(i) <= 0) setAptValue(i, fee);
+        }
+    }
+
+    // ===== المرحلة 6: رسائل قصيرة (Toast) بدل alert، مع زر تراجع اختياري =====
+    function showToast(message, options) {
+        const host = document.getElementById('toast_host');
+        const text = String(message ?? '');
+        if (!host) { console.log(text); return; }
+        const opts = options || {};
+        const toast = document.createElement('div');
+        const isError = /^\s*(❌|⚠️|🚨|تعذر)/.test(text);
+        toast.className = 'toast' + (isError ? ' error' : (/^\s*✅/.test(text) ? ' success' : ''));
+        const msg = document.createElement('span');
+        msg.className = 'msg';
+        msg.textContent = text.replace(/^\s*(✅|❌|⚠️|🚨|🔓)\s*/, '');
+        toast.appendChild(msg);
+        let removed = false;
+        const remove = () => { if (removed) return; removed = true; toast.remove(); };
+        if (opts.actionLabel && typeof opts.onAction === 'function') {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = opts.actionLabel;
+            btn.addEventListener('click', () => { remove(); opts.onAction(); });
+            toast.appendChild(btn);
+        }
+        toast.addEventListener('click', e => { if (e.target === toast || e.target === msg) remove(); });
+        host.appendChild(toast);
+        // مدة العرض حسب طول الرسالة (أطول للرسائل الطويلة)، بحد أدنى 3.5 ثانية
+        const ms = opts.duration || Math.min(12000, Math.max(3500, text.length * 60));
+        setTimeout(remove, ms);
+    }
+    // كل استدعاءات alert القديمة تصبح رسائل قصيرة غير معطِّلة (نفس النص)
+    window.alert = function (message) { showToast(message); };
 
     (function restoreActiveTab() {
         // يُستدعى لاحقًا بنهاية window.onload بعد اكتمال بناء الصفحة، لتفادي عناصر غير موجودة بعد
@@ -1471,7 +1775,7 @@
         const section = document.getElementById('apt_phone_numbers_section');
         const isOpen = section && section.style.display !== 'none';
         const suffix = count > 0 ? ` (${count} محفوظ)` : '';
-        btn.innerText = (isOpen ? '📱 إخفاء أرقام الجوالات' : '📱 إضافة / تعديل أرقام الجوالات') + suffix;
+        btn.innerText = (isOpen ? 'إخفاء أرقام الجوالات' : 'إضافة / تعديل أرقام الجوالات') + suffix;
     }
 
     // اختيار الرقم من جهات اتصال الجوال (Contact Picker API) — مدعوم في Chrome على أندرويد فقط.
@@ -1574,8 +1878,10 @@
     function applyPropertyIdentityToPage() {
         const name = getPropertyName();
         const headerEl = document.getElementById('app_header_title');
-        if (headerEl) headerEl.innerText = `الميزانية المالية الشهرية والسنوية لإدارة ${name}`;
-        document.title = `الميزانية المالية الشهرية والسنوية لإدارة ${name}`;
+        if (headerEl) headerEl.innerText = name;
+        document.title = `جوار — ${name}`;
+        const monthEl = document.getElementById('app_header_month');
+        if (monthEl) monthEl.innerText = `${MONTHS_ORDER[new Date().getMonth()]} ${new Date().getFullYear()}`;
     }
 
     function onPropertyIdentityChange() {
@@ -1640,7 +1946,7 @@
 
         const selMonth = document.getElementById('budget_month').value;
         const selYear = parseInt(document.getElementById('budget_year').value) || new Date().getFullYear();
-        setLoadedMonthContext(selMonth, selYear, `🆕 حقول فارغة جاهزة لإدخال شهر: ${selMonth} ${selYear}`);
+        setLoadedMonthContext(selMonth, selYear, `حقول فارغة جاهزة لإدخال شهر: ${selMonth} ${selYear}`);
         if (!silent) alert('✅ تم تصفير الحقول. جاهز لإدخال بيانات شهر جديد.');
     }
 
@@ -1657,7 +1963,7 @@
         row.innerHTML = `
             <input type="text" class="other-expense-name" placeholder="اسم البند (مثال: صيانة سباكة)" value="${escapeHtml(name)}" style="flex:2; margin-left:4px; padding:6px;" oninput="updateOtherExpensesTotal()">
             <input type="number" class="other-expense-amount" placeholder="0" lang="en" dir="ltr" inputmode="decimal" value="${amount}" style="flex:1; padding:6px;" oninput="updateOtherExpensesTotal()">
-            <button type="button" onclick="removeOtherExpenseRow('${id}')" style="border:none; background:rgba(0,0,0,0.06); border-radius:4px; padding:4px 8px; margin-right:4px; cursor:pointer;">🗑️</button>
+            <button type="button" onclick="removeOtherExpenseRow('${id}')" aria-label="حذف البند" style="flex:0 0 auto; width:44px; height:44px; border:1px solid var(--border-soft); background:var(--card-bg); color:var(--danger-soft-text); border-radius:10px; margin-right:4px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg></button>
         `;
         container.appendChild(row);
         updateOtherExpensesTotal();
@@ -1756,7 +2062,7 @@
                 <select style="display:none;" id="apt_${i}" lang="en" dir="ltr">${options}</select>
                 <input type="number" style="display:none;" id="apt_${i}_custom" lang="en" dir="ltr" inputmode="decimal">`;
             container.appendChild(tile);
-            tile.addEventListener('click', () => openAptEditor(i));
+            attachAptTileGestures(tile, i);
             updateAptTileVisual(i);
         }
         closeAptEditor();
@@ -1773,7 +2079,7 @@
         const editorCustom = document.getElementById('apt_editor_custom');
         if (!panel || !select) return;
 
-        editorLabel.innerText = `✏️ تعديل شقة ${i}:`;
+        editorLabel.innerText = `تعديل شقة ${i}:`;
         editorSelect.value = select.value;
         if (select.value === 'other') {
             editorCustom.style.display = 'block';
@@ -1838,11 +2144,12 @@
             val = parseFloat(select.value) || 0;
         }
         amountEl.innerText = val > 0 ? val.toFixed(0) : '0';
-        if (val > 0) {
-            tile.classList.add('paid'); tile.classList.remove('unpaid');
-        } else {
-            tile.classList.add('unpaid'); tile.classList.remove('paid');
-        }
+        // جزئي = دفع أقل من الرسم الافتراضي (لون تحذيري بدل الأخضر)
+        const partial = val > 0 && val < getDefaultAptFee();
+        tile.classList.toggle('paid', val > 0 && !partial);
+        tile.classList.toggle('partial', partial);
+        tile.classList.toggle('unpaid', val <= 0);
+        if (typeof updateWizardFooter === 'function') updateWizardFooter();
     }
     // ===== نهاية المخطط المرئي للشقق =====
 
@@ -1890,6 +2197,7 @@
         if (detail) detail.innerText = `النقد المتوفر ${f.cash.toFixed(2)} − صندوق الطوارئ ${f.emergency.toFixed(2)} − حصة المصعد المستحقة ${f.elevatorDue.toFixed(2)}`;
         const box = document.getElementById('emergency_advice');
         if (box) box.classList.toggle('risk', f.free < 0);
+        renderHome();
         return f.free;
     }
 
@@ -2187,6 +2495,7 @@
 
     // خانة توعوية مجمّعة: رصيد المصعد + رصيد صندوق الطوارئ مع بعض — للعلم فقط، لا تُخصم مرة ثانية من أي إجمالي
     function updateReservedFundsBox() {
+        renderHome();
         const el = document.getElementById('m_reserved_funds');
         if (!el) return;
         const reserveText = document.getElementById('m_emergency_reserve');
@@ -2220,7 +2529,7 @@
         if (currentCumulative > 0) {
             html += `
                 <div class="payment-log-item pending">
-                    <span>⚡ الدورة الحالية — لم تُدفع بعد</span>
+                    <span>الدورة الحالية — لم تُدفع بعد</span>
                     <span class="amount">${currentCumulative.toFixed(2)} ر.س</span>
                 </div>`;
         }
@@ -2233,20 +2542,20 @@
 
                 const actions = `
                     <span class="payment-actions">
-                        <button type="button" onclick="editElevatorPayment('${safeJsId(p.id)}')" title="تعديل">✏️</button>
-                        <button type="button" onclick="deleteElevatorPayment('${safeJsId(p.id)}')" title="حذف">🗑️</button>
+                        <button type="button" onclick="editElevatorPayment('${safeJsId(p.id)}')" title="تعديل" aria-label="تعديل الدفعة"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                        <button type="button" onclick="deleteElevatorPayment('${safeJsId(p.id)}')" title="حذف" aria-label="حذف الدفعة"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg></button>
                     </span>`;
                 if (p.historical) {
                     html += `
                         <div class="payment-log-item historical">
-                            <span>📜 دفعة تاريخية (${dateStr}) — محتسبة ضمن الرصيد الافتتاحي، بدون خصم إضافي</span>
+                            <span>دفعة تاريخية (${dateStr}) — محتسبة ضمن الرصيد الافتتاحي، بدون خصم إضافي</span>
                             <span class="amount">${p.amount.toFixed(2)} ر.س</span>
                             ${actions}
                         </div>`;
                 } else {
                     html += `
                         <div class="payment-log-item paid">
-                            <span>✅ دفعة مسددة (${dateStr})</span>
+                            <span>دفعة مسددة (${dateStr})</span>
                             <span class="amount">${p.amount.toFixed(2)} ر.س</span>
                             ${actions}
                         </div>`;
@@ -2260,15 +2569,26 @@
     }
 
     function deleteElevatorPayment(id) {
-        if (!confirm('هل أنت متأكد من حذف هذه الدفعة من السجل؟ إذا لم تكن دفعة تاريخية توثيقية، سيتأثر الفائض السنوي فورًا.')) return;
-        let payments = getElevatorPayments();
-        payments = payments.filter(p => p.id !== id);
-        localStorage.setItem('elevator_payments', JSON.stringify(payments));
-
+        const payments = getElevatorPayments();
+        const removed = payments.find(p => p.id === id);
+        if (!removed) return;
+        localStorage.setItem('elevator_payments', JSON.stringify(payments.filter(p => p.id !== id)));
         renderElevatorPaymentsLog();
-        const history = readHistory();
-        updateAnnualSurplus(history);
-        alert('✅ تم حذف الدفعة وتحديث كل الأرقام المرتبطة.');
+        updateAnnualSurplus(readHistory());
+
+        // حذف فوري مع زر "تراجع" لمدة 8 ثوانٍ
+        showToast('تم حذف الدفعة وتحديث الأرقام المرتبطة.', {
+            actionLabel: 'تراجع',
+            duration: 8000,
+            onAction: () => {
+                const current = getElevatorPayments().filter(p => p.id !== id);
+                current.push(removed);
+                localStorage.setItem('elevator_payments', JSON.stringify(current));
+                renderElevatorPaymentsLog();
+                updateAnnualSurplus(readHistory());
+                showToast('✅ تمت استعادة الدفعة.');
+            }
+        });
     }
 
     function editElevatorPayment(id) {
@@ -2278,7 +2598,7 @@
 
         const dateInputVal = new Date(p.timestamp).toISOString().split('T')[0];
         openBottomSheet(`
-            <strong style="font-size:15px; color:var(--text-color); display:block; margin-bottom:12px;">✏️ تعديل الدفعة</strong>
+            <strong style="font-size:15px; color:var(--text-color); display:block; margin-bottom:12px;">تعديل الدفعة</strong>
             <div class="form-group">
                 <label>المبلغ (ريال):</label>
                 <input type="number" step="0.01" id="sheet_edit_amount" value="${Number(p.amount) || 0}" lang="en" dir="ltr">
@@ -2288,8 +2608,8 @@
                 <input type="date" id="sheet_edit_date" value="${dateInputVal}" lang="en" dir="ltr">
             </div>
             <div style="display:flex; gap:8px; margin-top:8px;">
-                <button type="button" class="btn" onclick="saveEditElevatorPayment('${safeJsId(id)}')" style="background:var(--success-color); color:white; margin-top:0;">✅ حفظ</button>
-                <button type="button" class="btn" onclick="closeBottomSheet()" style="background:#5a6178; color:white; margin-top:0;">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="saveEditElevatorPayment('${safeJsId(id)}')" style="margin-top:0;"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> حفظ</button>
+                <button type="button" class="btn btn-outline" onclick="closeBottomSheet()" style="margin-top:0;">إلغاء</button>
             </div>
         `);
     }
@@ -2349,11 +2669,11 @@
 
     function loadHistory() {
         const history = readHistory();
-        const tbody = document.getElementById('history_rows');
-        tbody.innerHTML = '';
-        
+        const list = document.getElementById('history_rows');
+        list.innerHTML = '';
+
         if(history.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" style="color:var(--muted-text);">لا توجد تقارير شهرية مخزنة حتى الآن. اضغط على الزر بالأعلى لاعتماد أول شهر.</td></tr>`;
+            list.innerHTML = `<p class="section-note" style="margin:8px 0 0 0;">لا توجد أشهر معتمدة حتى الآن. اضغط زر ＋ تسجيل لاعتماد أول شهر.</p>`;
             updateAnnualSurplus(history);
             renderElevatorPaymentsLog();
             return;
@@ -2375,26 +2695,36 @@
             item._annualRunning = yearRunningTotals[y];
         });
 
-        sortedHistory.forEach(item => {
-            // تحصين العرض: أي قيمة غير رقمية (بيانات قديمة تالفة) تُعرض كصفر بدل انهيار الجدول كاملًا
+        // العرض: الأحدث أولًا، مجمّع حسب السنة — بطاقة لكل شهر بدل جدول عريض يحتاج تمرير أفقي
+        let lastYear = null;
+        [...sortedHistory].reverse().forEach(item => {
+            // تحصين العرض: أي قيمة غير رقمية (بيانات قديمة تالفة) تُعرض كصفر بدل انهيار القائمة كاملة
             const rev = Number(item.rev) || 0, exp = Number(item.exp) || 0,
                   emerg = Number(item.emerg) || 0, surp = Number(item.surp) || 0,
                   running = Number(item._annualRunning) || 0;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="direction:ltr;">${escapeHtml(item.year || '—')}</td>
-                <td style="font-weight:bold; color:var(--primary-color);">${escapeHtml(item.month)}</td>
-                <td style="direction:ltr;">${rev.toFixed(2)}</td>
-                <td style="direction:ltr;">${exp.toFixed(2)}</td>
-                <td style="direction:ltr; color:${emerg > 0 ? 'var(--warning-color)' : '#333'}">${emerg.toFixed(2)}</td>
-                <td style="direction:ltr; font-weight:bold; color:${surp >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">${surp.toFixed(2)}</td>
-                <td style="direction:ltr; font-weight:bold; color:${running >= 0 ? 'var(--primary-color)' : 'var(--danger-color)'}">${running.toFixed(2)}</td>
-                <td>
-                    <button type="button" onclick="loadMonthForEdit('${safeMonth(item.month)}', ${Number(item.year) || new Date().getFullYear()})" style="background:var(--secondary-color); color:white; border:none; border-radius:4px; padding:5px 10px; font-size:12px; cursor:pointer; margin-left:4px;">✏️ تعديل</button>
-                    <button type="button" onclick="deleteMonthRecord('${safeMonth(item.month)}', ${Number(item.year) || new Date().getFullYear()})" style="background:var(--danger-color); color:white; border:none; border-radius:4px; padding:5px 10px; font-size:12px; cursor:pointer;">🗑️ حذف</button>
-                </td>
+            const year = Number(item.year) || new Date().getFullYear();
+            if (year !== lastYear) {
+                const h = document.createElement('p');
+                h.className = 'history-year';
+                h.textContent = String(year);
+                list.appendChild(h);
+                lastYear = year;
+            }
+            const row = document.createElement('div');
+            row.className = 'history-item';
+            row.innerHTML = `
+                <div class="main">
+                    <div class="t">${escapeHtml(item.month)}</div>
+                    <div class="s">إيرادات <span dir="ltr">${fmtMoney(rev)}</span> · مصاريف <span dir="ltr">${fmtMoney(exp)}</span>${emerg > 0 ? ` · طوارئ <span dir="ltr">${fmtMoney(emerg)}</span>` : ''}</div>
+                    <div class="s">تراكمي السنة: <span dir="ltr" style="color:${running >= 0 ? 'var(--text-color)' : 'var(--danger-soft-text)'}">${fmtMoney(running)}</span></div>
+                </div>
+                <span class="net ${surp >= 0 ? 'pos' : 'neg'}">${fmtMoney(surp)}</span>
+                <span class="payment-actions" style="margin-right:0;">
+                    <button type="button" onclick="loadMonthForEdit('${safeMonth(item.month)}', ${year})" aria-label="تعديل الشهر" title="تعديل"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                    <button type="button" onclick="deleteMonthRecord('${safeMonth(item.month)}', ${year})" aria-label="حذف الشهر" title="حذف" style="color:var(--danger-soft-text);"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg></button>
+                </span>
             `;
-            tbody.appendChild(tr);
+            list.appendChild(row);
         });
 
         updateAnnualSurplus(history);
@@ -2480,11 +2810,11 @@
         const el = document.getElementById('last_backup_status');
         if (!el) return;
         const ts = parseInt(localStorage.getItem('last_backup_at')) || 0;
-        const hint = ' 📥 (اضغط هنا للاستيراد)';
-        if (!ts) { el.innerText = '⚠️ لم يتم تصدير أي نسخة احتياطية بعد.' + hint; return; }
+        const hint = ' (اضغط هنا للاسترداد)';
+        if (!ts) { el.innerText = 'لم تُصدَّر أي نسخة احتياطية بعد.' + hint; return; }
         const days = Math.floor((Date.now() - ts) / (1000 * 60 * 60 * 24));
         const dateStr = new Date(ts).toLocaleDateString('ar-SA-u-ca-gregory');
-        el.innerText = (days === 0 ? `✅ آخر نسخة احتياطية: اليوم (${dateStr}).` : `📅 آخر نسخة احتياطية: قبل ${days} يوم (${dateStr}).`) + hint;
+        el.innerText = (days === 0 ? `آخر نسخة احتياطية: اليوم (${dateStr}).` : `آخر نسخة احتياطية: قبل ${days} يوم (${dateStr}).`) + hint;
     }
 
     function exportAllData() {
@@ -2588,12 +2918,12 @@
 
         const lastBackup = parseInt(localStorage.getItem('last_backup_at')) || 0;
         if (!lastBackup) {
-            showBackupReminderBanner('⚠️ ما سوّيت أي نسخة احتياطية بعد، وعندك بيانات محفوظة! خذ نسخة الآن قبل ما تنسى.');
+            showBackupReminderBanner('ما سوّيت أي نسخة احتياطية بعد، وعندك بيانات محفوظة! خذ نسخة الآن قبل ما تنسى.');
             return;
         }
         const days = Math.floor((Date.now() - lastBackup) / (1000 * 60 * 60 * 24));
         if (days >= BACKUP_REMINDER_DAYS) {
-            showBackupReminderBanner(`⚠️ مرّ ${days} يوم منذ آخر نسخة احتياطية — يُنصح بأخذ نسخة جديدة الآن.`);
+            showBackupReminderBanner(`مرّ ${days} يوم منذ آخر نسخة احتياطية — يُنصح بأخذ نسخة جديدة الآن.`);
         }
     }
     // ===== نهاية نظام التذكير =====
@@ -2602,7 +2932,7 @@
     // يقارن الشهر/السنة الفعليين (تاريخ اليوم الحقيقي) مع سجل property_history،
     // لا علاقة له بالشهر المعروض حاليًا بشاشة الإدخال (قد يكون المستخدم يستعرض شهرًا قديمًا).
     function goToQuickEntryTab() {
-        switchTab('quick');
+        openCurrentMonthEntry();
     }
 
     function dismissMonthlyEntryReminder() {
@@ -2634,7 +2964,7 @@
         const alreadyEntered = history.some(r => r.month === currentMonthName && r.year === currentYear);
         if (alreadyEntered) { banner.style.display = 'none'; return; }
 
-        text.innerText = `📆 لسا ما سجّلت بيانات شهر ${currentMonthName} ${currentYear} — سجّلها الآن قبل ما تنسى التفاصيل.`;
+        text.innerText = `لسا ما سجّلت بيانات شهر ${currentMonthName} ${currentYear} — سجّلها الآن قبل ما تنسى التفاصيل.`;
         banner.style.display = 'block';
     }
     // ===== نهاية نظام تذكير الشهر الحالي =====
@@ -2670,7 +3000,7 @@
 
         const fundState = computeEmergencyFundState();
         if (fundState.balance < threshold) {
-            text.innerText = `🚨 رصيد صندوق الطوارئ الحالي (${fundState.balance.toFixed(2)} ر.س) أقل من الحد الأدنى المحدد (${threshold.toFixed(2)} ر.س).`;
+            text.innerText = `رصيد صندوق الطوارئ الحالي (${fundState.balance.toFixed(2)} ر.س) أقل من الحد الأدنى المحدد (${threshold.toFixed(2)} ر.س).`;
             banner.style.display = 'block';
         } else {
             banner.style.display = 'none';
@@ -2723,7 +3053,7 @@
         if (!banner) return;
         if (removedCount > 0) {
             document.getElementById('duplicate_payment_text').innerText =
-                `🚨 لُقيت ${removedCount} دفعة مصعد مكررة فعليًا بسجلك (نفس المبلغ ونفس التاريخ) — هذا يؤثر على دقة كل أرقامك المالية. راجع وصحّح الآن قبل الاعتماد على أي تقرير.`;
+                `لُقيت ${removedCount} دفعة مصعد مكررة فعليًا بسجلك (نفس المبلغ ونفس التاريخ) — هذا يؤثر على دقة كل أرقامك المالية. راجع وصحّح الآن قبل الاعتماد على أي تقرير.`;
             banner.style.display = 'block';
         } else {
             banner.style.display = 'none';
@@ -2938,17 +3268,28 @@
         const record = history.find(r => r.month === month && (r.year || new Date().getFullYear()) === year);
         if (!record) { alert('تعذر إيجاد بيانات هذا الشهر.'); return; }
 
-        if (!confirm(`هل أنت متأكد من حذف شهر (${month} ${year}) نهائيًا من السجل؟\n\nالإيرادات: ${record.rev.toFixed(2)} ر.س | الصافي: ${record.surp.toFixed(2)} ر.س\n\nلا يمكن التراجع عن هذا الإجراء.`)) return;
-        if (!confirm(`تأكيد أخير: سيُحذف شهر (${month} ${year}) بشكل دائم ولن يظهر ضمن الفائض السنوي أو أي تقرير لاحقًا. متابعة؟`)) return;
-
+        // حذف فوري مع زر "تراجع" لمدة 8 ثوانٍ، بدل تأكيدين متتاليين قبل الحذف
         const updatedHistory = history.filter(r => !(r.month === month && (r.year || new Date().getFullYear()) === year));
         localStorage.setItem('property_history', JSON.stringify(updatedHistory));
+        refreshAfterHistoryChange();
 
+        showToast(`تم حذف شهر ${month} ${year} من السجل.`, {
+            actionLabel: 'تراجع',
+            duration: 8000,
+            onAction: () => {
+                const current = readHistory().filter(r => !(r.month === month && (r.year || new Date().getFullYear()) === year));
+                current.push(record);
+                localStorage.setItem('property_history', JSON.stringify(current));
+                refreshAfterHistoryChange();
+                showToast(`✅ تمت استعادة شهر ${month} ${year}.`);
+            }
+        });
+    }
+
+    function refreshAfterHistoryChange() {
         loadHistory();
         populateReportMonthSelect();
         populateAnnualReportYearSelect();
-
-        alert(`✅ تم حذف شهر (${month} ${year}) نهائيًا من السجل.`);
     }
 
     function loadMonthForEdit(month, year, options) {
@@ -2959,7 +3300,7 @@
         // لو الاستدعاء غير صامت (يعني من زر "✏️ تعديل" بجدول السجل تحديدًا)، ننقل المستخدم
         // فورًا لتبويب "العمليات" ليشوف البيانات المحمّلة أمامه مباشرة، بدل ما يبقى بتبويب
         // السجل بدون أي تغيير ظاهر ويحس إن الزر ما سوى شي.
-        if (!silent) switchTab('quick');
+        if (!silent) { wizardStep = 2; switchTab('quick'); }
 
         document.getElementById('budget_month').value = record.month;
         document.getElementById('budget_year').value = record.year || year;
@@ -2993,11 +3334,11 @@
         loadOtherExpenseItems(b.otherItems);
         updateElevatorLiveDisplay();
         updateSuggestedEmergencyLimit();
-        setLoadedMonthContext(record.month, record.year || year, `📂 تم تحميل بيانات محفوظة سابقًا لشهر: ${record.month} ${record.year || year}`);
+        setLoadedMonthContext(record.month, record.year || year, `تم تحميل بيانات محفوظة سابقًا لشهر: ${record.month} ${record.year || year}`);
 
         if (!silent) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            alert(`✅ تم تحميل بيانات شهر (${record.month} ${record.year || year}) للتعديل.\n\nعدّل ما تشاء ثم اضغط زر "حساب واعتماد التقرير الشهري" لحفظ التعديلات — سيُستبدل السجل القديم تلقائيًا لنفس الشهر والسنة، دون تكرار.`);
+            alert(`✅ تم فتح شهر ${record.month} ${record.year || year} للتعديل — الاعتماد يستبدل النسخة السابقة.`);
         }
     }
 
@@ -3235,14 +3576,14 @@
             return;
         }
         if (unpaid.length === 0) {
-            el.innerText = '✅ كل الشقق مسجَّل سدادها';
-            el.style.color = 'var(--success-color)';
+            el.innerText = 'كل الشقق مسجَّل سدادها';
+            el.style.color = 'var(--success-soft-text)';
             if (btnsContainer) btnsContainer.innerHTML = '';
             return;
         }
 
-        el.innerText = '🔴 ' + unpaid.map(n => `شقة ${n}`).join('، ');
-        el.style.color = 'var(--danger-color)';
+        el.innerText = unpaid.map(n => `شقة ${n}`).join('، ');
+        el.style.color = 'var(--danger-soft-text)';
 
         // أزرار تذكير فردية شخصية — فقط للشقق اللي عندها رقم جوال محفوظ بالإعدادات
         if (btnsContainer) {
@@ -3883,13 +4224,13 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         if (hasPIN) {
             statusBox.style.background = 'var(--success-soft-bg)';
             statusBox.style.color = 'var(--success-soft-text)';
-            statusBox.innerText = '🔒 الحماية مفعّلة — سيُطلب الرمز عند كل فتح';
+            statusBox.innerText = 'الحماية مفعّلة — سيُطلب الرمز عند كل فتح';
             setupDiv.style.display = 'none';
             manageDiv.style.display = 'block';
         } else {
             statusBox.style.background = 'var(--field-bg)';
             statusBox.style.color = 'var(--muted-text)';
-            statusBox.innerText = '🔓 الحماية معطّلة';
+            statusBox.innerText = 'الحماية معطّلة';
             setupDiv.style.display = 'block';
             manageDiv.style.display = 'none';
             document.getElementById('new_pin_input').value = '';
@@ -3968,6 +4309,9 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         document.getElementById('budget_year').addEventListener('change', handleMonthOrYearChange);
 
         document.getElementById('budget_month').addEventListener('change', handleMonthOrYearChange);
+        ['input', 'change'].forEach(ev => document.getElementById('tab_quick').addEventListener(ev, () => updateWizardFooter()));
+        wizardGo(1);
+        renderHome();
 
         document.getElementById('elevator_annual_contract').addEventListener('input', function() {
             updateElevatorLiveDisplay();
@@ -4006,7 +4350,7 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         if (quarterlyAmount > 0 && cumulative >= quarterlyAmount && paymentsThisYear < 4) {
             if (noticeEl) {
                 noticeEl.style.display = 'block';
-                noticeEl.innerText = `🔔 حان وقت دفع الدفعة رقم ${nextPaymentNumber} من أصل 4 لعقد صيانة المصعد لسنة ${selectedYear} — الرصيد التراكمي (${cumulative.toFixed(2)} ر.س) وصل قيمة الدفعة الربعية (${quarterlyAmount.toFixed(2)} ر.س).`;
+                noticeEl.innerText = `حان وقت دفع الدفعة رقم ${nextPaymentNumber} من أصل 4 لعقد صيانة المصعد لسنة ${selectedYear} — الرصيد التراكمي (${cumulative.toFixed(2)} ر.س) وصل قيمة الدفعة الربعية (${quarterlyAmount.toFixed(2)} ر.س).`;
             }
             if (cumBox) cumBox.classList.add('due');
         } else {
@@ -4282,7 +4626,7 @@ ${_advisorSnapshotText}`;
 
     // -------------------- الوكيل ١: المحلل المالي --------------------
     const FinancialAnalystAgent = {
-        icon: '💰', name: 'المحلل المالي',
+        icon: '<svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>', name: 'المحلل المالي',
         run(ctx) {
             const out = { status: 'مستقر', statusLevel: 'success', insights: [] };
             const hist = ctx.sorted;
@@ -4362,7 +4706,7 @@ ${_advisorSnapshotText}`;
 
     // -------------------- الوكيل ٢: وكيل المخاطر --------------------
     const RiskDetectionAgent = {
-        icon: '⚠️', name: 'وكيل المخاطر',
+        icon: '<svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>', name: 'وكيل المخاطر',
         run(ctx) {
             const out = { insights: [] };
             const hist = ctx.sorted;
@@ -4440,7 +4784,7 @@ ${_advisorSnapshotText}`;
 
     // -------------------- الوكيل ٣: وكيل التحصيل --------------------
     const PaymentCollectionAgent = {
-        icon: '📬', name: 'وكيل التحصيل',
+        icon: '<svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg>', name: 'وكيل التحصيل',
         run(ctx) {
             const out = { insights: [], unpaid: [], reminderText: '', latest: null };
             const hist = ctx.sorted;
@@ -4486,7 +4830,7 @@ ${_advisorSnapshotText}`;
     // -------------------- الوكيل ٤: وكيل التقارير --------------------
     // يدمج مخرجات الوكلاء الثلاثة في ملخص إداري واحد جاهز لاجتماع الملاك / المشاركة عبر واتساب.
     const ReportGeneratorAgent = {
-        icon: '📊', name: 'وكيل التقارير',
+        icon: '<svg class="icon" aria-hidden="true"><use href="#i-printer"/></svg>', name: 'وكيل التقارير',
         run(ctx, financial, risk, collection) {
             const hist = ctx.sorted;
             const latest = hist.length ? hist[hist.length - 1] : null;
@@ -4580,7 +4924,7 @@ ${_advisorSnapshotText}`;
         return `
             <div style="background:var(--card-bg); border:1px solid var(--border-soft); border-radius:12px; padding:12px 14px; margin-bottom:12px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
-                    <div style="font-weight:800; color:var(--primary-color); font-size:14px;">${icon} ${name}</div>
+                    <div style="font-weight:800; color:var(--brand-text); font-size:15px; display:flex; align-items:center; gap:8px;">${icon} ${name}</div>
                     <div>${headerExtra || ''}</div>
                 </div>
                 ${bodyHTML}
@@ -4596,17 +4940,17 @@ ${_advisorSnapshotText}`;
 
         let collBody = r.collection.insights.map(renderAgentInsight).join('');
         if (r.collection.reminderText) {
-            collBody += `<button type="button" onclick="shareAgentCollectionReminder()" style="width:100%; margin-top:6px; padding:10px; border:none; border-radius:8px; background:#25D366; color:#fff; font-weight:800; font-size:13px; cursor:pointer;">📲 إرسال تذكير سداد عبر واتساب</button>`;
+            collBody += `<button type="button" class="btn btn-whatsapp" onclick="shareAgentCollectionReminder()" style="margin-top:6px;"><svg class="icon" aria-hidden="true"><use href="#i-message"/></svg> إرسال تذكير سداد عبر واتساب</button>`;
         }
 
         let repBody = r.report.insights.map(renderAgentInsight).join('');
         repBody += `<div style="display:flex; gap:8px; margin-top:6px;">
-            <button type="button" onclick="shareAgentBrief()" style="flex:1; padding:10px; border:none; border-radius:8px; background:#25D366; color:#fff; font-weight:800; font-size:12.5px; cursor:pointer;">📲 مشاركة الملخص</button>
-            <button type="button" onclick="printAgentBrief()" style="flex:1; padding:10px; border:none; border-radius:8px; background:linear-gradient(135deg,var(--primary-color),var(--secondary-color)); color:#fff; font-weight:800; font-size:12.5px; cursor:pointer;">🖨️ طباعة</button>
+            <button type="button" class="btn btn-whatsapp" onclick="shareAgentBrief()" style="flex:1; margin-top:0;"><svg class="icon" aria-hidden="true"><use href="#i-message"/></svg> مشاركة الملخص</button>
+            <button type="button" class="btn btn-outline" onclick="printAgentBrief()" style="flex:1; margin-top:0;"><svg class="icon" aria-hidden="true"><use href="#i-printer"/></svg> طباعة</button>
         </div>`;
 
         const html = `
-            <h2 style="margin-top:0;">🏛️ مجلس المستشارين الماليين — ${escapeHtml(getPropertyName())}</h2>
+            <h2 style="margin-top:0; display:flex; align-items:center; gap:8px;"><svg class="icon" aria-hidden="true"><use href="#i-council"/></svg> مجلس المستشارين الماليين — ${escapeHtml(getPropertyName())}</h2>
             <p style="font-size:11.5px; color:var(--muted-text); margin:0 0 12px 0;">جلسة تحليل فورية محلية — بلا إنترنت. انعقدت الآن.</p>
             ${agentCardBlock(FinancialAnalystAgent.icon, FinancialAnalystAgent.name, finBody, agentStatusPill(r.financial.status, r.financial.statusLevel))}
             ${agentCardBlock(RiskDetectionAgent.icon, RiskDetectionAgent.name, riskBody)}
@@ -4670,13 +5014,13 @@ ${_advisorSnapshotText}`;
         const s = AGENT_LEVEL_STYLE;
         if (dangers > 0) {
             badge.style.background = s.danger.bg; badge.style.color = s.danger.tx; badge.style.borderColor = s.danger.bd;
-            badge.innerText = `🔴 ${dangers} تنبيه حرج${warnings ? ` · 🟡 ${warnings} تحذير` : ''} — اضغط للتفاصيل`;
+            badge.innerText = `${dangers} تنبيه حرج${warnings ? ` · ${warnings} تحذير` : ''} — اضغط للتفاصيل`;
         } else if (warnings > 0) {
             badge.style.background = s.warning.bg; badge.style.color = s.warning.tx; badge.style.borderColor = s.warning.bd;
-            badge.innerText = `🟡 ${warnings} تحذير — اضغط للتفاصيل`;
+            badge.innerText = `${warnings} تحذير — اضغط للتفاصيل`;
         } else {
             badge.style.background = s.success.bg; badge.style.color = s.success.tx; badge.style.borderColor = s.success.bd;
-            badge.innerText = `✅ الوضع مطمئن — لا تنبيهات حالية`;
+            badge.innerText = `الوضع مطمئن — لا تنبيهات حالية`;
         }
     }
 
