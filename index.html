@@ -4,18 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جوار — إدارة ميزانية العمارة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* خط Cairo مضمَّن داخل التطبيق (fonts/) — بدون أي طلب لخوادم قوقل. الترخيص: fonts/OFL.txt */
-        @font-face {
-            font-family: 'Cairo'; font-style: normal; font-weight: 400 900; font-display: swap;
-            src: url('fonts/cairo-arabic.woff2') format('woff2');
-            unicode-range: U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
-        }
-        @font-face {
-            font-family: 'Cairo'; font-style: normal; font-weight: 400 900; font-display: swap;
-            src: url('fonts/cairo-latin.woff2') format('woff2');
-            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-        }
         * , *::before, *::after { box-sizing: border-box; }
 
         /* ===== رموز التصميم (Design Tokens) — المرحلة 1 من إعادة التصميم =====
@@ -946,7 +938,7 @@
                     <span class="start"><svg class="icon" aria-hidden="true"><use href="#i-council"/></svg> اسأل مجلس المستشارين</span>
                     <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
                 </button>
-                <div id="local_agents_badge" role="button" tabindex="0" onclick="runLocalAgents()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); runLocalAgents(); }" style="cursor:pointer; font-size:13px; font-weight:bold; text-align:center; padding:8px; margin:0 12px 12px 12px; border-radius:var(--radius-field); background:var(--field-bg); color:var(--muted-text); border:1px solid var(--border-soft);">— جاهز للتشغيل —</div>
+                <div id="local_agents_badge" style="font-size:13px; font-weight:bold; text-align:center; padding:8px; margin:0 12px 12px 12px; border-radius:var(--radius-field); background:var(--field-bg); color:var(--muted-text); border:1px solid var(--border-soft);">— جاهز للتشغيل —</div>
             </div>
 
             <details class="card" id="home_details">
@@ -972,7 +964,7 @@
                 <p style="font-size:13px; font-weight:bold; color:var(--muted-text); margin:0 0 8px 0;">٢) الإجماليات والاحتياطيات المتراكمة (عبر كل السنة)</p>
                 <div class="metrics-grid">
                     <div class="metric-box annual-surplus" id="box_annual">الفائض السنوي الصافي بعد دفعات المصعد (<span id="annual_year_label" style="display:inline">0</span>)<span id="m_annual_surplus">0.00</span></div>
-                    <div class="metric-box emergency-reserve" id="box_emergency_reserve">رصيد صندوق الطوارئ (تراكمي)<span id="m_emergency_reserve">0.00</span><span class="withdrawal-note" id="emergency_overage_note" style="display:none;">العجز تجاوز المتاح للصرف ورصيد الصندوق معًا</span></div>
+                    <div class="metric-box emergency-reserve" id="box_emergency_reserve">رصيد صندوق الطوارئ (تراكمي)<span id="m_emergency_reserve">0.00</span><span class="withdrawal-note" id="emergency_overage_note" style="display:none;">صرف الطوارئ هذا الشهر تجاوز رصيد الصندوق</span></div>
                     <div class="metric-box elevator-cumulative" id="box_elevator_cumulative">الرصيد التراكمي لحصة المصعد<span id="m_elevator_cumulative">0.00</span></div>
                 </div>
                 <p style="font-size:13px; color:var(--warn-soft-text); background:var(--warn-soft-bg); border:1px solid var(--warn-soft-text); border-radius:var(--radius-field); padding:10px 12px; margin-top:10px; font-weight:600; line-height:1.7;">
@@ -1093,6 +1085,8 @@
                 </div>
             </div>
 
+            <!-- 🧠 بطاقة "إعدادات المستشار المالي الذكي" (مفتاح Anthropic API) أُخفيت مؤقتًا — مرتبطة بالمستشار المؤجّل للتطوير القادم.
+                 الدوال المرتبطة (getAdvisorPersonalKey / saveAdvisorPersonalKey / clearAdvisorPersonalKey) باقية سليمة لإعادة التفعيل لاحقًا. -->
 
             <details class="card" style="padding:0;">
                 <summary style="cursor:pointer; padding:16px; font-weight:700; color:var(--text-color); font-size:17px; list-style:none; min-height:44px;">الرصيد الافتتاحي</summary>
@@ -1752,52 +1746,14 @@
         return cachedJSON('apt_phone_numbers', {});
     }
 
-    // يحوّل أي صيغة لجوال سعودي إلى 05XXXXXXXX، أو null لو الرقم غير صالح.
-    // يقبل: أرقام عربية/فارسية (٠٥… / ۰۵…)، 00966، ‎+966، 966، مع أو بدون صفر بعد رمز الدولة،
-    // 5XXXXXXXX، ومع مسافات أو شرطات أو أقواس أو رموز اتجاه مخفية من جهات الاتصال.
-    function normalizeSaudiMobile(raw) {
-        let digits = String(raw || '')
-            .replace(/[\u0660-\u0669]/g, ch => String(ch.charCodeAt(0) - 0x0660))
-            .replace(/[\u06F0-\u06F9]/g, ch => String(ch.charCodeAt(0) - 0x06F0))
-            .replace(/[^\d]/g, '');
-        if (digits.startsWith('00')) digits = digits.slice(2);
-        if (digits.startsWith('966')) digits = digits.slice(3);
-        if (digits.startsWith('0')) digits = digits.slice(1);
-        return /^5\d{8}$/.test(digits) ? '0' + digits : null;
-    }
-
-    function setAptPhoneStatus(aptNum, state) {
-        const el = document.getElementById(`apt_phone_status_${aptNum}`);
-        if (!el) return;
-        const map = {
-            ok: ['محفوظ', 'var(--success-soft-text)'],
-            invalid: ['رقم غير صحيح — اكتبه مثل 05XXXXXXXX أو 009665XXXXXXXX (لم يُحفظ)', 'var(--danger-soft-text)'],
-            empty: ['', 'var(--muted-text)']
-        };
-        const [text, color] = map[state] || map.empty;
-        el.textContent = text;
-        el.style.color = color;
-    }
-
-    function onAptPhoneNumberChange(aptNum, finalize) {
+    function onAptPhoneNumberChange(aptNum, fromContact) {
         const input = document.getElementById(`apt_phone_${aptNum}`);
         if (!input) return;
         const numbers = getAptPhoneNumbers();
         const val = input.value.trim();
-        const normalized = normalizeSaudiMobile(val);
-        if (!val) {
-            delete numbers[aptNum];
-            setAptPhoneStatus(aptNum, 'empty');
-        } else if (normalized) {
-            numbers[aptNum] = normalized;
-            setAptPhoneStatus(aptNum, 'ok');
-            // عند الخروج من الخانة يُعرض الرقم بصيغته الموحّدة
-            if (finalize) input.value = normalized;
-        } else {
-            // غير صالح: لا يُحفظ (ويُحذف أي رقم سابق للشقة حتى لا يُرسل تذكير لرقم خاطئ)
-            delete numbers[aptNum];
-            setAptPhoneStatus(aptNum, finalize ? 'invalid' : 'empty');
-        }
+        if (val) numbers[aptNum] = val; else delete numbers[aptNum];
+        // تعديل يدوي للرقم يلغي اسم جهة الاتصال المرتبط (لم يعد بالضرورة نفس الشخص)
+        if (!fromContact && typeof setAptContactName === 'function') setAptContactName(aptNum, '');
         localStorage.setItem('apt_phone_numbers', JSON.stringify(numbers));
         updateAptPhoneToggleButtonLabel();
         // أعد رسم أزرار التذكير الفردية بتقرير الشهر لو مفتوح حاليًا (لتنعكس الإضافة فورًا)
@@ -1822,37 +1778,93 @@
         btn.innerText = (isOpen ? 'إخفاء أرقام الجوالات' : 'إضافة / تعديل أرقام الجوالات') + suffix;
     }
 
+    // اختيار الرقم من جهات اتصال الجوال (Contact Picker API) — مدعوم في Chrome على أندرويد فقط.
+    // في باقي الأجهزة (آيفون/الكمبيوتر) يبقى الإدخال اليدوي كما هو.
+    function supportsContactPicker() {
+        return !!(navigator.contacts && typeof navigator.contacts.select === 'function' && 'ContactsManager' in window);
+    }
+
+    function getAptContactNames() {
+        return cachedJSON('apt_contact_names', {});
+    }
+
+    function setAptContactName(aptNum, name) {
+        const names = getAptContactNames();
+        if (name) names[aptNum] = name; else delete names[aptNum];
+        localStorage.setItem('apt_contact_names', JSON.stringify(names));
+        const el = document.getElementById(`apt_contact_name_${aptNum}`);
+        if (el) { el.innerText = name ? `👤 ${name}` : ''; el.style.display = name ? 'block' : 'none'; }
+    }
+
+    async function pickContactForApt(aptNum) {
+        if (!supportsContactPicker()) {
+            const ua = navigator.userAgent || '';
+            let reason = 'متصفحك الحالي لا يسمح للمواقع بقراءة جهات الاتصال.';
+            if (/iPhone|iPad|iPod/i.test(ua)) reason = 'أجهزة آيفون/آيباد (Safari وكل المتصفحات عليها) لا تسمح للمواقع بقراءة جهات الاتصال.';
+            else if (/EdgA\//i.test(ua)) reason = 'متصفح Edge لا يدعم هذه الميزة — افتح التطبيق من Google Chrome (وانقل بياناتك بنسخة احتياطية لأن كل متصفح يحفظ بياناته منفصلة).';
+            else if (/SamsungBrowser/i.test(ua)) reason = 'متصفح سامسونج لا يدعم هذه الميزة — افتح التطبيق من Google Chrome.';
+            else if (/Android/i.test(ua) && !/Chrome\//i.test(ua)) reason = 'هذا المتصفح على أندرويد لا يدعم الميزة — افتح التطبيق من Google Chrome.';
+            else if (!/Android/i.test(ua)) reason = 'الميزة متاحة على الجوال فقط (Chrome على أندرويد)، وليست متاحة على الكمبيوتر.';
+            alert('📇 ' + reason + '\n\nاكتب الرقم يدويًا في الخانة.');
+            return;
+        }
+        try {
+            const results = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+            if (!results || !results.length) return; // المستخدم ألغى
+            const contact = results[0];
+            const tels = (contact.tel || []).filter(Boolean);
+            if (!tels.length) { alert('⚠️ جهة الاتصال المختارة ليس لها رقم جوال.'); return; }
+            let tel = tels[0];
+            if (tels.length > 1) {
+                const choice = prompt('جهة الاتصال لها أكثر من رقم، اكتب رقم الخيار:\n' + tels.map((t, i) => `${i + 1}) ${t}`).join('\n'), '1');
+                if (choice === null) return;
+                const idx = parseInt(choice, 10) - 1;
+                if (tels[idx]) tel = tels[idx];
+            }
+            const input = document.getElementById(`apt_phone_${aptNum}`);
+            if (!input) return;
+            input.value = tel.trim();
+            onAptPhoneNumberChange(aptNum, true);
+            setAptContactName(aptNum, ((contact.name || [])[0] || '').trim());
+        } catch (err) {
+            // إلغاء المستخدم أو رفض الإذن — لا شيء يُعدَّل
+        }
+    }
+
     function renderAptPhoneNumberInputs() {
         const container = document.getElementById('apt_phone_numbers_container');
         if (!container) return;
         const count = getApartmentCount();
         const numbers = getAptPhoneNumbers();
-        let html = '<p class="section-note">اكتب رقم الجوال لكل شقة بأي صيغة (05… أو 00966… أو ‎+966…) — يُحوَّل تلقائيًا للصيغة الموحّدة.</p>';
+        const names = getAptContactNames();
+        const canPick = supportsContactPicker();
+        let html = canPick
+            ? '<p style="font-size:12px; color:var(--muted-text); margin:0 0 10px 0;">اضغط 📇 بجانب الشقة لاختيار الرقم من جهات اتصال جوالك مباشرة.</p>'
+            : '<p style="font-size:11px; color:var(--muted-text); background:var(--field-bg); padding:8px; border-radius:6px; margin:0 0 10px 0;">ℹ️ اختيار الأرقام من جهات الاتصال يعمل في متصفح Chrome على أندرويد فقط. على هذا الجهاز اكتب الرقم يدويًا.</p>';
         for (let i = 1; i <= count; i++) {
-            const stored = numbers[i] || '';
-            const val = normalizeSaudiMobile(stored) || stored;
+            const val = numbers[i] || '';
+            const name = names[i] || '';
             html += `<div class="form-group" style="margin-bottom:10px;">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <label for="apt_phone_${i}" style="min-width:64px; margin:0;">شقة ${i}</label>
-                    <input type="tel" id="apt_phone_${i}" value="${escapeHtml(val)}" placeholder="05XXXXXXXX" lang="en" dir="ltr" inputmode="tel" autocomplete="off" style="flex:1;" oninput="onAptPhoneNumberChange(${i})" onchange="onAptPhoneNumberChange(${i}, true)">
+                    <label style="min-width:70px; margin:0;">شقة ${i}:</label>
+                    <input type="tel" id="apt_phone_${i}" value="${escapeHtml(val)}" placeholder="05xxxxxxxx" lang="en" dir="ltr" style="flex:1;" oninput="onAptPhoneNumberChange(${i})">
+                    ${true ? `<button type="button" onclick="pickContactForApt(${i})" title="اختيار من جهات الاتصال" style="flex:0 0 auto; width:auto; padding:8px 12px; border:1px solid var(--primary-color); background:var(--field-bg); color:var(--primary-color); border-radius:6px; cursor:pointer; font-size:16px;">📇</button>` : ''}
                 </div>
-                <div id="apt_phone_status_${i}" style="font-size:12px; font-weight:600; margin:4px 72px 0 0; min-height:16px;"></div>
+                <div id="apt_contact_name_${i}" style="display:${name ? 'block' : 'none'}; font-size:12px; color:var(--muted-text); margin:4px 78px 0 0;">${name ? '👤 ' + escapeHtml(name) : ''}</div>
             </div>`;
         }
         container.innerHTML = html;
-        for (let i = 1; i <= count; i++) {
-            if (numbers[i]) setAptPhoneStatus(i, normalizeSaudiMobile(numbers[i]) ? 'ok' : 'invalid');
-        }
         updateAptPhoneToggleButtonLabel();
     }
 
-    // صيغة دولية بدون + تناسب رابط wa.me
+    // يحوّل أي صيغة شائعة لرقم سعودي (05xxxxxxxx، +9665xxxxxxxx، 5xxxxxxxx...) لصيغة دولية بدون + تناسب رابط wa.me
     function normalizePhoneForWhatsApp(raw) {
-        const saudi = normalizeSaudiMobile(raw);
-        if (saudi) return '966' + saudi.slice(1);
-        let digits = String(raw || '').replace(/[^\d]/g, '');
+        let digits = (raw || '').replace(/[^\d]/g, '');
+        if (!digits) return '';
         if (digits.startsWith('00')) digits = digits.slice(2);
-        return digits.length >= 10 ? digits : '';
+        if (digits.startsWith('0')) digits = '966' + digits.slice(1);
+        else if (digits.startsWith('5') && digits.length === 9) digits = '966' + digits;
+        return digits;
     }
     // ========== نهاية نظام أرقام الجوالات ==========
 
@@ -2230,6 +2242,10 @@
 
         const suggestedEmergencyLimit = updateSuggestedEmergencyLimit();
 
+        // السحب من الاحتياطي: عندما يساوي أو يتجاوز إجمالي الصرف غير الثابت (طوارئ + مصاريف أخرى) الفائض التشغيلي الشهري
+        // هذا مجرد "تنبيه" بأن الشهر سحب من الرصيد المتراكم — لا يعني إخفاء الرقم الحقيقي
+        const nonFixedSpending = emergency + otherExpensesTotal;
+        const withdrewFromReserve = nonFixedSpending >= baseSurplus;
         // تصحيح: الصافي المحفوظ والمعروض يبقى الرقم الفعلي دائمًا (حتى لو سالبًا)،
         // لأن تصفيره إلى صفر كان يُفقد قيمة العجز الحقيقي من كل الحسابات التراكمية والسنوية اللاحقة
         const netSurplus = rawNetSurplus;
@@ -2248,12 +2264,22 @@
         // تلوين نصيحة المحلل: أخضر عند وجود فائض تشغيلي صحي، أحمر عند العجز
         // لون صندوق النقد الحر يُحدَّد داخل updateSuggestedEmergencyLimit (أحمر لو سالب)
 
+        // تلوين صندوق "الصافي المحول للاحتياطي": أحمر + تنبيه سحب إذا كانت الطوارئ >= الفائض الشهري
+        const surplusBox = document.getElementById('box_surplus');
+        const withdrawalNote = document.getElementById('withdrawal_note');
+        if (withdrewFromReserve) {
+            surplusBox.classList.add('risk');
+            withdrawalNote.style.display = 'block';
+        } else {
+            surplusBox.classList.remove('risk');
+            withdrawalNote.style.display = 'none';
+        }
 
         // 2. الحفظ التلقائي الفوري في قاعدة البيانات المحلية (localStorage)
         const record = {
             month: currentMonth, year: currentYear,
             rev: totalRevenue, exp: totalExpenses, emerg: emergency, surp: netSurplus,
-            withdrew: false,   // يُحدَّث بعد الحفظ من محرك الصندوق (سحب فعلي فقط)
+            withdrew: withdrewFromReserve,
             apts: aptValues,
             breakdown: { guard, elevator: elevatorCommitment, elec, water, clean, otherTotal: otherExpensesTotal, otherItems },
             // تعديل شهر محفوظ يحتفظ بنسبته الأصلية، والشهر الجديد يأخذ النسبة الحالية من الإعدادات
@@ -2272,19 +2298,6 @@
         
         localStorage.setItem('property_history', JSON.stringify(history));
         
-        // بعد الحفظ: هل احتاج الشهر سحبًا فعليًا من صندوق الطوارئ؟ (المتاح للصرف يغطي العجز أولًا)
-        const reserveDraw = getReserveDrawFor(currentMonth, currentYear);
-        if (reserveDraw > 0) {
-            record.withdrew = true;
-            record.reserveDraw = reserveDraw;
-            localStorage.setItem('property_history', JSON.stringify(history));
-        }
-        const surplusBox = document.getElementById('box_surplus');
-        const withdrawalNote = document.getElementById('withdrawal_note');
-        surplusBox.classList.toggle('risk', netSurplus < 0);
-        withdrawalNote.style.display = reserveDraw > 0 ? 'block' : 'none';
-        withdrawalNote.innerText = reserveDraw > 0 ? `سُحب ${fmtMoney(reserveDraw)} ر.س من صندوق الطوارئ لتغطية العجز` : '';
-
         // 3. إعادة تحميل السجل التاريخي فوراً ليراه المستخدم محدثاً
         loadHistory();
         populateReportMonthSelect();
@@ -2364,104 +2377,56 @@
     // مسبقًا (historical: true) بالبيانات تبقى تُعرض كما هي بسجل الدفعات دون أي تأثير — لم يُحذف شيء من البيانات.
 
     // ===== محرك صندوق الطوارئ التراكمي (عبر كل السنوات) =====
-    // النقد في الحساب مقسوم لثلاث خانات: متاح للصرف (حر)، صندوق الطوارئ، حصة المصعد المحجوزة.
-    // لكل شهر محفوظ بالتسلسل الزمني:
-    //   1) صافي الشهر بعد حصة المصعد = الإيرادات − كل المصاريف المعتادة (حارس+كهرباء+ماء+نظافة+مصاريف أخرى) − حصة المصعد
-    //   2) لو فائض: نسبة الصندوق (40% افتراضيًا) تذهب للصندوق، والباقي للمتاح
-    //   3) لو عجز: يُغطّى من المتاح أولًا، وإن لم يكفِ يُسحب الباقي من الصندوق (فينقص رصيده فعلًا)
-    //   4) مصروف الطوارئ الفعلي يُصرف من الصندوق، وما يتجاوز رصيده يُغطّى من المتاح
-    //   5) دفعات المصعد تُصرف من حصته المحجوزة، وأي زيادة عليها تُغطّى بنفس قاعدة العجز
-    // الرصيد الافتتاحي يدخل للمتاح بداية سنته. بهذا مجموع الخانات الثلاث = النقد الفعلي دائمًا،
-    // ولا يمكن أن يظهر الصندوق أكبر من المال الموجود فعلًا.
+    // بالترتيب المعتمد: لكل شهر محفوظ (بالتسلسل الزمني منذ أول شهر بالسجل):
+    //   1) صافٍ تشغيلي = الإيرادات − المصاريف الثابتة (حارس+كهرباء+ماء+نظافة)
+    //   2) ناقص حصة المصعد الشهرية لذلك الشهر (التزام صلب يُخصم أولًا)
+    //   3) الباقي يُقسّم: 40% يُضاف لرصيد صندوق الطوارئ المتراكم، و60% هو "النصح المالي" الأساسي لذلك الشهر
+    //   4) مصروف الطوارئ الفعلي لذلك الشهر يُخصم من رصيد الصندوق المتراكم (وليس من صافي الشهر نفسه)
+    //      — إن تجاوز الصرف الرصيد المتاح، يتوقف الرصيد عند صفر (لا يظهر سالبًا)، ويُسجَّل الفرق كـ"تجاوز"
+    //        يُخصم بدوره من النصح المالي لنفس الشهر مع تنبيه واضح لمدير العقار (شفافية بدون رصيد سالب مربك).
+    // هذا يفصل صندوق الطوارئ تمامًا عن أي اعتماد دائري: الإيداع محسوب من التشغيلي قبل الطوارئ نفسها.
     function computeEmergencyFundState() {
         const history = readHistory();
-        const nowYear = new Date().getFullYear();
         const sorted = [...history].sort((a, b) => {
-            const ya = a.year || nowYear;
-            const yb = b.year || nowYear;
+            const ya = a.year || new Date().getFullYear();
+            const yb = b.year || new Date().getFullYear();
             if (ya !== yb) return ya - yb;
             return MONTHS_ORDER.indexOf(a.month) - MONTHS_ORDER.indexOf(b.month);
         });
 
-        const ob = getOpeningBalance();
-        const payments = getElevatorPayments()
-            .filter(p => !p.historical && Number(p.amount) > 0)
-            .map(p => { const d = new Date(p.timestamp); return { key: d.getFullYear() * 12 + d.getMonth(), amount: Number(p.amount) }; })
-            .sort((a, b) => a.key - b.key);
-
-        let free = 0, balance = 0, elevatorPot = 0, pIdx = 0, openingApplied = false;
-        let totalOverageAllTime = 0, lastMonthOverage = 0, lastMonthDeposit = 0, lastMonthDraw = 0;
-        const monthlyNetAdvices = [];
-        const drawsByMonth = {};   // المسحوب من الصندوق لتغطية عجز كل شهر (بدون مصروف الطوارئ المخطط)
-        const uncoveredByMonth = {}; // عجز لم يغطّه المتاح ولا الصندوق، لكل شهر
-        const fundChanges = [];    // تغيّر رصيد الصندوق لكل شهر بالتسلسل (للوكلاء)
-
-        // يغطي أي سالب بالمتاح من الصندوق، ويرجع المسحوب
-        const coverFromFund = () => {
-            if (free >= 0) return 0;
-            const take = Math.min(balance, -free);
-            balance -= take; free += take;
-            return take;
-        };
-        const applyOpening = key => {
-            if (!openingApplied && ob && Number(ob.amount) && key >= Number(ob.year) * 12) {
-                free += Number(ob.amount); openingApplied = true;
-            }
-        };
-        const applyPaymentsUpTo = key => {
-            let drawn = 0;
-            while (pIdx < payments.length && payments[pIdx].key <= key) {
-                elevatorPot -= payments[pIdx].amount;
-                if (elevatorPot < 0) { free += elevatorPot; elevatorPot = 0; }
-                drawn += coverFromFund();
-                pIdx++;
-            }
-            return drawn;
-        };
+        let balance = 0;
+        let totalOverageAllTime = 0;
+        let lastMonthOverage = 0;
+        let lastMonthDeposit = 0;
+        const monthlyNetAdvices = []; // صافي النصح لكل شهر (بعد خصم أي تجاوز بنفس الشهر) — بالتسلسل الزمني
 
         sorted.forEach(item => {
-            const y = item.year || nowYear;
-            const key = y * 12 + MONTHS_ORDER.indexOf(item.month);
-            applyOpening(key);
-            applyPaymentsUpTo(key - 1);
-            const fundBefore = balance;
-
             const b = item.breakdown || {};
-            const regular = (b.guard || 0) + (b.elec || 0) + (b.water || 0) + (b.clean || 0) + (b.otherTotal || 0);
+            const guard = b.guard || 0, elec = b.elec || 0, water = b.water || 0, clean = b.clean || 0;
             const elevatorCommitment = b.elevator || 0;
             const emerg = item.emerg || 0;
-            elevatorPot += elevatorCommitment;
-            const afterElevator = (item.rev || 0) - regular - elevatorCommitment;
+            const baseSurplus = (item.rev || 0) - (guard + elec + water + clean);
+            const afterElevator = baseSurplus - elevatorCommitment;
+            // الإيداع فقط لو فيه فائض تشغيلي حقيقي بعد المصعد — شهر عاجز تشغيليًا لا يودع ولا يسحب من الصندوق
+            const deposit = afterElevator > 0 ? afterElevator * getRecordReserveRatio(item) : 0;
+            const adviceBeforeOverage = afterElevator - deposit;
 
-            let deposit = 0;
-            if (afterElevator > 0) {
-                deposit = afterElevator * getRecordReserveRatio(item);
-                balance += deposit;
-                free += afterElevator - deposit;
-            } else {
-                free += afterElevator;
-            }
+            balance += deposit;
+            let overage = 0;
             if (emerg > 0) {
                 balance -= emerg;
-                if (balance < 0) { free += balance; balance = 0; }
+                if (balance < 0) { overage = -balance; balance = 0; }
             }
-            let draw = coverFromFund();
-            draw += applyPaymentsUpTo(key);
-
-            const overage = free < 0 ? -free : 0;   // عجز لم يغطّه لا المتاح ولا الصندوق
             totalOverageAllTime += overage;
+
             lastMonthDeposit = deposit;
             lastMonthOverage = overage;
-            lastMonthDraw = draw;
-            drawsByMonth[`${y}|${item.month}`] = draw;
-            uncoveredByMonth[`${y}|${item.month}`] = overage;
-            fundChanges.push(balance - fundBefore);
-            monthlyNetAdvices.push((afterElevator > 0 ? afterElevator - deposit : afterElevator) - overage);
+            monthlyNetAdvices.push(adviceBeforeOverage - overage);
         });
-        applyOpening(Infinity);
-        applyPaymentsUpTo(Infinity);
 
-        // النصح المالي المعروض = متوسط آخر 3 أشهر محفوظة (أو كل المتاح لو أقل من 3)
+        // النصح المالي المعروض = متوسط آخر 3 أشهر محفوظة (أو كل المتاح لو أقل من 3) —
+        // نافذة ثابتة الحجم (لا تكبر مع تراكم السنوات) لتبقى دائمًا حسّاسة للوضع الحالي
+        // دون التأثر بتذبذب شهر واحد منفرد (تحصيل متأخر، مصروف استثنائي...).
         const ADVICE_WINDOW_SIZE = 3;
         const recentAdvices = monthlyNetAdvices.slice(-ADVICE_WINDOW_SIZE);
         const averagedAdvice = recentAdvices.length > 0
@@ -2470,22 +2435,13 @@
 
         return {
             balance,                                          // رصيد الصندوق الحالي (لا ينزل تحت صفر أبدًا)
-            totalOverageAllTime,                              // مجموع العجز الذي لم يغطّه المتاح ولا الصندوق
+            totalOverageAllTime,                              // مجموع كل التجاوزات التاريخية (للعلم فقط)
             lastMonthDeposit,
-            lastMonthOverage,                                 // عجز آخر شهر غير المغطّى (0 لو مغطّى)
-            lastMonthDraw,                                    // المسحوب من الصندوق لتغطية عجز آخر شهر
-            drawsByMonth,
-            uncoveredByMonth,
-            fundChanges,
-            lastMonthAdvice: averagedAdvice,
+            lastMonthOverage,                                 // تجاوز آخر شهر تحديدًا (0 لو ما فيه تجاوز)
+            lastMonthAdvice: averagedAdvice,                   // النصح المالي = متوسط آخر 3 أشهر (أو كل المتاح)
             monthsUsedForAdvice: recentAdvices.length,
             hasAnyMonth: sorted.length > 0
         };
-    }
-
-    // المسحوب من صندوق الطوارئ لتغطية عجز شهر معيّن (0 لو المتاح غطّاه)
-    function getReserveDrawFor(month, year) {
-        return computeEmergencyFundState().drawsByMonth[`${year || new Date().getFullYear()}|${month}`] || 0;
     }
     // ===== نهاية محرك صندوق الطوارئ =====
 
@@ -2740,7 +2696,6 @@
         });
 
         // العرض: الأحدث أولًا، مجمّع حسب السنة — بطاقة لكل شهر بدل جدول عريض يحتاج تمرير أفقي
-        const draws = computeEmergencyFundState().drawsByMonth;
         let lastYear = null;
         [...sortedHistory].reverse().forEach(item => {
             // تحصين العرض: أي قيمة غير رقمية (بيانات قديمة تالفة) تُعرض كصفر بدل انهيار القائمة كاملة
@@ -2762,7 +2717,6 @@
                     <div class="t">${escapeHtml(item.month)}</div>
                     <div class="s">إيرادات <span dir="ltr">${fmtMoney(rev)}</span> · مصاريف <span dir="ltr">${fmtMoney(exp)}</span>${emerg > 0 ? ` · طوارئ <span dir="ltr">${fmtMoney(emerg)}</span>` : ''}</div>
                     <div class="s">تراكمي السنة: <span dir="ltr" style="color:${running >= 0 ? 'var(--text-color)' : 'var(--danger-soft-text)'}">${fmtMoney(running)}</span></div>
-                    ${(draws[`${year}|${item.month}`] || 0) > 0 ? `<div class="s" style="color:var(--danger-soft-text); font-weight:700;">سُحب من الطوارئ: <span dir="ltr">${fmtMoney(draws[`${year}|${item.month}`])}</span></div>` : ''}
                 </div>
                 <span class="net ${surp >= 0 ? 'pos' : 'neg'}">${fmtMoney(surp)}</span>
                 <span class="payment-actions" style="margin-right:0;">
@@ -3255,10 +3209,7 @@
                     Object.keys(data[key]).forEach(k => {
                         const n = parseInt(k, 10);
                         const v = data[key][k];
-                        if (n >= 1 && n <= getApartmentCount() && typeof v === 'string' && v.trim()) {
-                            const phone = key === 'apt_phone_numbers' ? normalizeSaudiMobile(v) : v.trim().slice(0, 60);
-                            if (phone) merged[n] = phone;
-                        }
+                        if (n >= 1 && n <= getApartmentCount() && typeof v === 'string' && v.trim()) merged[n] = v.trim().slice(0, 60);
                     });
                     localStorage.setItem(key, JSON.stringify(merged));
                 }
@@ -3447,9 +3398,8 @@
     // النقد الحر = النقد المتوفر فعليًا − ما هو محجوز (رصيد صندوق الطوارئ + حصة المصعد المستحقة غير المدفوعة)
     // يُعرض كما هو حتى لو سالب، لأن السالب معلومة مهمة: النقد الحالي لا يغطي كل المحجوز.
     function getFreeCashBreakdown(cash) {
+        const emergency = computeEmergencyFundState().balance || 0;
         const elevatorDue = getElevatorCumulativeNow() || 0;
-        // سقف أمان: الصندوق لا يُعرض أكبر من النقد الموجود فعلًا بعد حجز حصة المصعد
-        const emergency = Math.min(computeEmergencyFundState().balance || 0, Math.max(0, cash - elevatorDue));
         return { cash, emergency, elevatorDue, free: cash - emergency - elevatorDue };
     }
 
@@ -3751,7 +3701,7 @@
                     <tr><td style="border:1px solid #ccc; padding:6px;">إجمالي المصاريف</td><td style="border:1px solid #ccc; padding:6px; direction:ltr;">${item.exp.toFixed(2)} ر.س</td></tr>
                 </table>
 
-                ${(() => { const d = getReserveDrawFor(item.month, item.year); return d > 0 ? `<p style="color:#c62828; font-weight:bold; margin-top:15px;">⚠️ سُحب ${d.toFixed(2)} ر.س من صندوق الطوارئ لتغطية عجز هذا الشهر.</p>` : ''; })()}
+                ${item.withdrew ? '<p style="color:#c62828; font-weight:bold; margin-top:15px;">⚠️ تم السحب من الاحتياطي هذا الشهر لتغطية المصاريف.</p>' : ''}
 
                 <h3 style="margin-top:20px;">4. الوضع السنوي</h3>
                 <table style="width:100%; border-collapse:collapse; font-size:13px;">
@@ -3801,7 +3751,7 @@ ${(b.otherItems && b.otherItems.length) ? `\nبيان المصاريف الأخ�
 3) الملخص المالي النهائي:
 إجمالي الإيرادات: ${item.rev.toFixed(2)} ر.س
 إجمالي المصاريف: ${item.exp.toFixed(2)} ر.س
-${(() => { const d = getReserveDrawFor(item.month, item.year); return d > 0 ? `⚠️ سُحب ${d.toFixed(2)} ر.س من صندوق الطوارئ لتغطية عجز هذا الشهر.` : ''; })()}
+${item.withdrew ? '⚠️ تم السحب من الاحتياطي هذا الشهر لتغطية المصاريف.' : ''}
 
 تم إصدار هذا التقرير آلياً من نظام إدارة ${getPropertyName()}${getManagerSignatureText()}`;
     }
@@ -4316,8 +4266,6 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 
         // بدء التحميل العادي
-        // المستشار الذكي (Claude API) أُزيل: لا اتصال بأي خدمة خارجية — يُحذف أي مفتاح قديم محفوظ
-        try { Object.keys(localStorage).filter(k => /advisor|anthropic/i.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) {}
         stampReserveRatioOnLegacyRecords();
         showSetupWizardIfNeeded();
         applyThemeButtonLabel(document.documentElement.getAttribute('data-theme') || 'dark');
@@ -4412,6 +4360,232 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
     }
 
     // ================================================================
+    // ===== المستشار المالي الذكي (AI Agent) =====
+    // وكيل يقرأ بيانات العقار الحقيقية المحفوظة محليًا، يحسب مؤشرات موضوعية عنها،
+    // ثم يستخدم نموذج ذكاء اصطناعي لتحويلها إلى تحليل وتوصيات بلغة عربية طبيعية،
+    // ويسمح للمستخدم بطرح أسئلة متابعة على نفس البيانات (محادثة متعددة الخطوات).
+    //
+    // يعمل فقط بمفتاح Anthropic API خاص بالمستخدم (يُدخله بالإعدادات ويُحفظ محليًا على جهازه).
+    // النداء يذهب مباشرة من المتصفح لـ Anthropic بلا أي خادم وسيط — لا حدود استخدام مفروضة هنا،
+    // أي حدود تكون فقط حسب خطة/رصيد حساب Anthropic الخاص بالمستخدم نفسه.
+    // ================================================================
+
+    let _advisorConversation = []; // [{role:'user'|'assistant', content:'...'}]
+    let _advisorSnapshotText = ''; // نص البيانات المرسل كسياق ثابت لكل رسالة
+
+    function getAdvisorPersonalKey() {
+        return (localStorage.getItem('advisor_personal_api_key') || '').trim();
+    }
+
+    function saveAdvisorPersonalKey() {
+        const input = document.getElementById('advisor_personal_key_input');
+        const status = document.getElementById('advisor_key_status');
+        const key = input ? input.value.trim() : '';
+        if (!key) { if (status) status.innerText = 'اكتب المفتاح أولًا.'; return; }
+        if (!key.startsWith('sk-ant-')) {
+            if (status) status.innerText = '⚠️ الصيغة غير متوقعة لمفتاح Anthropic (يبدأ عادة بـ sk-ant-)، تأكد من نسخه كاملًا.';
+        }
+        localStorage.setItem('advisor_personal_api_key', key);
+        if (input) input.value = '';
+        if (status) status.innerText = '✅ تم حفظ المفتاح على هذا الجهاز فقط — المستشار الذكي جاهز للاستخدام الآن.';
+    }
+
+    function clearAdvisorPersonalKey() {
+        localStorage.removeItem('advisor_personal_api_key');
+        const status = document.getElementById('advisor_key_status');
+        if (status) status.innerText = 'تم حذف المفتاح — المستشار الذكي لن يعمل حتى تضيف مفتاحًا من جديد.';
+    }
+
+    function goToAdvisorSettings() {
+        closeBottomSheet();
+        switchTab('settings');
+        const card = document.getElementById('advisor_settings_card');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // خطوة ١: جمع البيانات الفعلية من كل مصادر التخزين المحلي (لا بيانات وهمية)
+    function buildFinancialSnapshot() {
+        const propertyName = getPropertyName();
+        const history = readHistory().slice().sort((a, b) => {
+            const ya = a.year || new Date().getFullYear(), yb = b.year || new Date().getFullYear();
+            if (ya !== yb) return ya - yb;
+            return MONTHS_ORDER.indexOf(a.month) - MONTHS_ORDER.indexOf(b.month);
+        });
+        const last6 = history.slice(-6).map(item => ({
+            الشهر: `${item.month} ${item.year || ''}`,
+            الإيرادات: +(item.rev || 0).toFixed(2),
+            المصاريف: +(item.exp || 0).toFixed(2),
+            الطوارئ: +(item.emerg || 0).toFixed(2),
+            صافي_الفائض: +(item.surp || 0).toFixed(2),
+            شقق_متأخرة: (getUnpaidAptNumbersFromRecord(item) || []).length
+        }));
+        const fundState = computeEmergencyFundState();
+        const elevatorCumulative = getElevatorCumulativeNow();
+        const selectedYear = getSelectedYear();
+        const openingBalance = getOpeningBalanceForYear(selectedYear);
+        const latest = history.length ? history[history.length - 1] : null;
+        const latestUnpaid = latest ? (getUnpaidAptNumbersFromRecord(latest) || []) : [];
+
+        return {
+            اسم_العقار: propertyName,
+            عدد_الشقق: getApartmentCount(),
+            عدد_الأشهر_المسجلة: history.length,
+            آخر_6_أشهر: last6,
+            آخر_شهر_مسجل: latest ? {
+                الشهر: `${latest.month} ${latest.year || ''}`,
+                شقق_لم_تدفع: latestUnpaid
+            } : null,
+            صندوق_الطوارئ: {
+                الرصيد_الحالي: +fundState.balance.toFixed(2),
+                تجاوزات_تاريخية_تراكمية: +fundState.totalOverageAllTime.toFixed(2),
+                تجاوز_آخر_شهر: +fundState.lastMonthOverage.toFixed(2),
+                النصح_المالي_الحالي_متوسط_3_أشهر: +fundState.lastMonthAdvice.toFixed(2)
+            },
+            التزام_المصعد_التراكمي_غير_المسدد: +elevatorCumulative.toFixed(2),
+            الرصيد_الافتتاحي_للسنة: +openingBalance
+        };
+    }
+
+    function advisorSetLoading(msg) {
+        const box = document.getElementById('advisor_result_box');
+        if (box) box.innerHTML = `<div style="text-align:center; padding:24px 0; color:var(--muted-text);">⏳ ${msg}</div>`;
+    }
+
+    function advisorRenderMessages() {
+        const box = document.getElementById('advisor_result_box');
+        if (!box) return;
+        box.innerHTML = _advisorConversation.map(m => {
+            const isUser = m.role === 'user';
+            return `<div style="margin:8px 0; padding:10px 12px; border-radius:10px; font-size:13px; line-height:1.7; white-space:pre-wrap;
+                background:${isUser ? 'var(--field-bg)' : 'var(--info-bg)'};
+                color:${isUser ? 'var(--text-color)' : 'var(--info-text)'};
+                border:1px solid var(--border-soft); ${isUser ? 'font-weight:600;' : ''}">${
+                isUser ? ('🗣️ ' + escapeHtml(m.content)) : ('🧠 ' + escapeHtml(m.content))
+            }</div>`;
+        }).join('');
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function advisorRenderMissingKey() {
+        const box = document.getElementById('advisor_result_box');
+        if (!box) return;
+        box.innerHTML = `
+            <div style="margin:8px 0; padding:12px; border-radius:10px; font-size:13px; line-height:1.8; background:var(--warn-soft-bg); color:var(--warn-soft-text); border:1px solid var(--border-soft);">
+                🚫 المستشار المالي الذكي يحتاج مفتاح Anthropic API خاص بك لكي يعمل (يتطلب حساب واشتراك في Anthropic).
+                <div style="margin-top:10px;">
+                    <button type="button" onclick="goToAdvisorSettings()" style="padding:8px 14px; border:none; border-radius:8px; background:var(--primary-color); color:var(--th-text); font-weight:800; cursor:pointer; font-size:12px;">⚙️ إضافة المفتاح من الإعدادات</button>
+                </div>
+            </div>`;
+    }
+
+    // خطوة ٢: نداء نموذج الذكاء الاصطناعي مباشرة بمفتاح المستخدم الخاص
+    async function callAdvisorAPI() {
+        const instructions = `أنت مستشار مالي متخصص في إدارة العقارات السكنية في السعودية، تساعد مدير عقار سكني.
+لديك بيانات مالية فعلية للعقار بصيغة JSON. مهمتك:
+1) صنّف الوضع المالي العام (مستقر / يحتاج انتباه / حرج) بجملة واحدة.
+2) اذكر أهم ملاحظتين أو ثلاث مبنية فعليًا على الأرقام المعطاة (لا تخترع أرقامًا).
+3) اقترح إجراءين أو ثلاثة عملية قصيرة لمدير العقار.
+اكتب بالعربية الفصحى المبسطة، بدون مقدمات، وبنقاط قصيرة، وبأسلوب مباشر ومهني. لا تتجاوز 180 كلمة إلا إذا كان سؤال المستخدم يتطلب تفصيلاً أكثر.
+
+بيانات العقار الحالية (JSON):
+${_advisorSnapshotText}`;
+
+        if (_advisorConversation.length === 0) {
+            _advisorConversation.push({ role: 'user', content: 'حلّل الوضع المالي الحالي للعقار وأعطني توصياتك.' });
+        }
+        const messages = _advisorConversation.map(m => ({ role: m.role, content: m.content }));
+        const personalKey = getAdvisorPersonalKey();
+
+        if (!personalKey) {
+            const err = new Error('NO_KEY');
+            err.isNoKey = true;
+            throw err;
+        }
+
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": personalKey,
+                "anthropic-version": "2023-06-01",
+                "anthropic-dangerous-direct-browser-access": "true"
+            },
+            body: JSON.stringify({
+                model: "claude-sonnet-4-6",
+                max_tokens: 1000,
+                system: instructions,
+                messages: messages
+            })
+        });
+        if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error('PERSONAL_KEY_ERROR: ' + errBody.slice(0, 200));
+        }
+        const data = await response.json();
+        const textBlock = (data.content || []).find(b => b.type === 'text');
+        return textBlock ? textBlock.text : 'تعذر الحصول على تحليل هذه المرة، حاول مرة أخرى.';
+    }
+
+    // خطوة ٣: تنفيذ الوكيل الكامل (تحليل أولي + واجهة أسئلة متابعة)
+    async function runSmartAdvisor() {
+        const snapshot = buildFinancialSnapshot();
+        _advisorSnapshotText = JSON.stringify(snapshot, null, 2);
+        _advisorConversation = [];
+
+        openBottomSheet(`
+            <h2 style="margin-top:0;">🧠 المستشار المالي الذكي — ${escapeHtml(snapshot.اسم_العقار)}</h2>
+            <div id="advisor_result_box" style="max-height:45vh; overflow-y:auto; margin-bottom:12px;"></div>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="advisor_follow_up_input" placeholder="اسأل سؤال متابعة عن الوضع المالي..." style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border-soft); background:var(--field-bg); color:var(--text-color); font-size:13px;">
+                <button type="button" onclick="askAdvisorFollowUp()" style="padding:10px 16px; border:none; border-radius:8px; background:var(--primary-color); color:var(--th-text); font-weight:800; cursor:pointer;">إرسال</button>
+            </div>
+        `);
+
+        if (!getAdvisorPersonalKey()) {
+            advisorRenderMissingKey();
+            return;
+        }
+
+        advisorSetLoading('جاري تحليل بيانات العقار...');
+        try {
+            const answer = await callAdvisorAPI();
+            _advisorConversation.push({ role: 'assistant', content: answer });
+            advisorRenderMessages();
+        } catch (e) {
+            if (e && e.isNoKey) {
+                advisorRenderMissingKey();
+            } else {
+                const box = document.getElementById('advisor_result_box');
+                if (box) box.innerHTML = `<div style="color:var(--danger-color); padding:12px;">⚠️ تعذر الاتصال بخدمة التحليل الذكي. تحقق من صحة مفتاحك أو رصيد حسابك في Anthropic وحاول مرة أخرى.</div>`;
+            }
+        }
+    }
+
+    async function askAdvisorFollowUp() {
+        const input = document.getElementById('advisor_follow_up_input');
+        if (!input) return;
+        const question = input.value.trim();
+        if (!question) return;
+        input.value = '';
+
+        _advisorConversation.push({ role: 'user', content: question });
+        advisorRenderMessages();
+        advisorSetLoading('جاري التفكير...');
+
+        try {
+            const answer = await callAdvisorAPI();
+            _advisorConversation.push({ role: 'assistant', content: answer });
+            advisorRenderMessages();
+        } catch (e) {
+            if (e && e.isNoKey) {
+                advisorRenderMissingKey();
+            } else {
+                _advisorConversation.push({ role: 'assistant', content: '⚠️ تعذر الحصول على رد الآن، حاول مرة أخرى.' });
+                advisorRenderMessages();
+            }
+        }
+    }
+    // ===== نهاية المستشار المالي الذكي =====
 
     // ===== مركز الوكلاء الذكي المحلي (Local Rule-Based Agents) =====
     // أربعة وكلاء يعملون بمنطق حسابي محض على جهاز المستخدم — بلا إنترنت، بلا API، بلا تكلفة.
@@ -4472,17 +4646,8 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             // ١) الوضع التشغيلي العام للشهر الأخير
             if (baseSurplus < 0) {
                 out.insights.push(ins('danger', `الشهر الأخير (${latest.month} ${latest.year || ''}) سجّل عجزًا تشغيليًا قدره ${Math.abs(baseSurplus).toFixed(0)} ر.س — الإيرادات لم تغطِّ المصاريف الثابتة.`));
-            } else if ((latest.surp || 0) < 0) {
-                // فائض تشغيلي لكن المصاريف الأخرى/الطوارئ قلبت صافي الشهر إلى عجز — لا يُعرض كـ"مستقر"
-                const key = `${latest.year || new Date().getFullYear()}|${latest.month}`;
-                const draw = (ctx.fund.drawsByMonth || {})[key] || 0;
-                const uncovered = (ctx.fund.uncoveredByMonth || {})[key] || 0;
-                const how = uncovered > 0
-                    ? ` — لم يكفِ المتاح ولا الصندوق، والحساب الآن في عجز تراكمي قدره ${uncovered.toFixed(0)} ر.س`
-                    : (draw > 0 ? ` (سُحب ${draw.toFixed(0)} ر.س من صندوق الطوارئ)` : ' (غطّاه المتاح للصرف)');
-                out.insights.push(ins(uncovered > 0 ? 'danger' : 'warning', `${latest.month} ${latest.year || ''}: فائض تشغيلي ${baseSurplus.toFixed(0)} ر.س، لكن المصاريف الأخرى والطوارئ جعلت صافي الشهر عجزًا قدره ${Math.abs(latest.surp).toFixed(0)} ر.س${how}.`));
             } else {
-                out.insights.push(ins('success', `الوضع التشغيلي مستقر: فائض تشغيلي ${baseSurplus.toFixed(0)} ر.س وصافي ${(latest.surp || 0).toFixed(0)} ر.س في ${latest.month} ${latest.year || ''}.`));
+                out.insights.push(ins('success', `الوضع التشغيلي مستقر: فائض تشغيلي ${baseSurplus.toFixed(0)} ر.س في ${latest.month} ${latest.year || ''} (قبل الطوارئ والمصاريف الأخرى).`));
             }
 
             // ٢) مقارنة بنود المصروف بمتوسط الأشهر السابقة (كهرباء/ماء/حارس/نظافة)
@@ -4572,8 +4737,13 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             }
 
             // ٢) مسار استنزاف الصندوق: صافي تغيّر شهري (إيداع − صرف طوارئ) على آخر 6 أشهر
-            const recentMonths = hist.slice(-6);
-            const netChanges = (fund.fundChanges || []).slice(-6);
+            const window = hist.slice(-6);
+            let netChanges = [];
+            window.forEach(r => {
+                const afterElevator = (r.rev || 0) - agentBaseExpensesOf(r) - ((r.breakdown && r.breakdown.elevator) || 0);
+                const deposit = afterElevator > 0 ? afterElevator * getRecordReserveRatio(r) : 0;
+                netChanges.push(deposit - (r.emerg || 0));
+            });
             const avgNet = netChanges.length ? netChanges.reduce((s, v) => s + v, 0) / netChanges.length : 0;
             if (avgNet < 0 && fund.balance > 0) {
                 const monthsToZero = fund.balance / -avgNet;
@@ -4594,9 +4764,9 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             }
 
             // ٤) عجز متكرر — أشهر صافيها سالب ضمن آخر 6
-            const deficitMonths = recentMonths.filter(r => (r.surp || 0) < 0);
+            const deficitMonths = window.filter(r => (r.surp || 0) < 0);
             if (deficitMonths.length >= 2) {
-                out.insights.push(ins('danger', `تكرار العجز: ${deficitMonths.length} أشهر بصافي سالب ضمن آخر ${recentMonths.length} أشهر — نمط يستدعي مراجعة الرسوم أو المصاريف.`));
+                out.insights.push(ins('danger', `تكرار العجز: ${deficitMonths.length} أشهر بصافي سالب ضمن آخر ${window.length} أشهر — نمط يستدعي مراجعة الرسوم أو المصاريف.`));
             }
 
             // ٥) تأخر مزمن لنفس الشقة عبر أشهر متتالية
