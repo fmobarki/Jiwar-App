@@ -29,5 +29,6 @@
 | `sw.js` | Service Worker: العمل بدون إنترنت والتحديث |
 | `manifest.json` | بيانات التثبيت كتطبيق |
 | `icons/`, `favicon.ico` | الأيقونات وشاشات البداية |
+| `fonts/` | خط Cairo مضمَّن (بدون Google Fonts) — ترخيص SIL OFL في `fonts/OFL.txt` |
 
 © Fahad Mobarki 2026 — راجع [LICENSE.md](LICENSE.md).

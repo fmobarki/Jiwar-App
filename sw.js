@@ -4,7 +4,7 @@
 // هذا يجبر كل المستخدمين على استلام آخر نسخة تلقائياً
 // ============================================================
 
-const CACHE_VERSION = 'jiwar-v14';   // ⬅️ غيّر هذا الرقم مع كل تحديث فعلي (v12, v13, ...)
+const CACHE_VERSION = 'jiwar-v18';   // ⬅️ غيّر هذا الرقم مع كل تحديث فعلي (v12, v13, ...)
 const CACHE_NAME = CACHE_VERSION;
 
 const CORE_ASSETS = [
@@ -15,11 +15,10 @@ const CORE_ASSETS = [
     './icons/icon-192.png',
     './icons/icon-512.png',
     './icons/icon-512-maskable.png',
-    './icons/apple-touch-icon.png'
+    './icons/apple-touch-icon.png',
+    './fonts/cairo-arabic.woff2',
+    './fonts/cairo-latin.woff2'
 ];
-
-// خطوط Google: تُخزَّن أيضاً حتى يبقى خط Cairo ظاهراً بدون إنترنت
-const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 // عند التثبيت: خزّن الملفات الأساسية فوراً بدون انتظار
 self.addEventListener('install', (event) => {
@@ -40,13 +39,11 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// يُخزَّن فقط: ردود ناجحة من نفس الموقع، أو ملفات الخطوط. لا تُخزَّن ردود الأخطاء (404/500)
-// ولا أي خدمة خارجية أخرى (مثل واجهة المستشار الذكي)
+// يُخزَّن فقط: ردود ناجحة من نفس الموقع (الخط مضمَّن داخل التطبيق، لا طلبات لقوقل).
+// لا تُخزَّن ردود الأخطاء (404/500) ولا أي خدمة خارجية
 function shouldCache(request, response) {
     const url = new URL(request.url);
-    if (url.origin === self.location.origin) return response.ok && response.type === 'basic';
-    if (FONT_HOSTS.includes(url.hostname)) return response.ok || response.type === 'opaque';
-    return false;
+    return url.origin === self.location.origin && response.ok && response.type === 'basic';
 }
 
 // استراتيجية الجلب: الشبكة أولاً، والكاش فقط عند فشل الاتصال
