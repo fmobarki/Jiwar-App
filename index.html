@@ -168,6 +168,15 @@
         .banner.danger { background: var(--danger-soft-bg); border-color: var(--danger-soft-text); }
         .banner.danger p { color: var(--danger-soft-text); }
         .section-note { font-size: 13px; color: var(--muted-text); margin: 0 0 12px 0; line-height: 1.6; }
+        .bulk-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-soft); }
+        .bulk-main { flex: 1; min-width: 0; }
+        .bulk-name { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+        .bulk-phone { font-size: 13px; color: var(--muted-text); }
+        .bulk-select, .bulk-search {
+            min-height: 44px; border-radius: var(--radius-field); border: 1px solid var(--border-soft);
+            background: var(--field-bg); color: var(--text-color); font-family: 'Cairo', sans-serif; font-size: 15px; padding: 6px 10px;
+        }
+        .bulk-search { width: 100%; margin-bottom: 8px; }
 
         /* ===== المرحلة 3: الرئيسية ===== */
         .app-header-sub { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted-text); }
@@ -1800,6 +1809,11 @@
             numbers[aptNum] = normalized;
             setAptPhoneStatus(aptNum, 'ok');
             if (finalize) input.value = normalized;
+            // إدخال سريع: اكتمال رقم صحيح أثناء الكتابة أو اللصق ينقل المؤشر للشقة التالية تلقائيًا
+            else if (!fromContactFile && document.activeElement === input) {
+                input.value = normalized;
+                focusNextAptPhone(aptNum);
+            }
         } else {
             // غير صالح: لا يُحفظ (ويُحذف أي رقم سابق للشقة حتى لا يُرسل تذكير لرقم خاطئ)
             delete numbers[aptNum];
@@ -1810,6 +1824,12 @@
         updateAptPhoneToggleButtonLabel();
         // أعد رسم أزرار التذكير الفردية بتقرير الشهر لو مفتوح حاليًا (لتنعكس الإضافة فورًا)
         if (typeof updateReportUnpaidAptsDisplay === 'function') updateReportUnpaidAptsDisplay();
+    }
+
+    function focusNextAptPhone(aptNum) {
+        const next = document.getElementById(`apt_phone_${aptNum + 1}`);
+        if (next) { next.focus(); next.select(); }
+        else document.getElementById(`apt_phone_${aptNum}`).blur();   // آخر شقة: إغلاق لوحة المفاتيح
     }
 
     function toggleAptPhoneNumbersSection() {
@@ -1892,9 +1912,10 @@
         return cards.map(c => ({ name: (c.fn || c.n || '').replace(/\\([,;\\])/g, '$1').trim(), tels: c.tels }));
     }
 
-    let _vcfTargetApt = null;
-    function pickVcfForApt(aptNum) {
-        _vcfTargetApt = aptNum;
+    // ملف واحد لكل الملاك: جهات الاتصال المقروءة من الملف (اسم + جوالات سعودية صالحة فقط)
+    let _bulkContacts = [];
+
+    function openContactsFilePicker() {
         const input = document.getElementById('vcf_file_input');
         if (!input) return;
         input.value = '';
@@ -1903,37 +1924,89 @@
 
     function onVcfFileChosen(event) {
         const file = event.target.files && event.target.files[0];
-        const apt = _vcfTargetApt;
         event.target.value = '';
-        if (!file || !apt) return;
-        if (file.size > 512 * 1024) { alert('⚠️ الملف كبير جدًا — اختر ملف جهة اتصال واحدة (vcf).'); return; }
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { alert('⚠️ الملف كبير جدًا (أكثر من 5 ميجا) — صدّر جهات اتصال الملاك فقط.'); return; }
         const reader = new FileReader();
         reader.onload = () => {
             const cards = parseVCard(reader.result);
-            if (!cards.length) { alert('⚠️ هذا ليس ملف جهة اتصال (vcf) صالح.'); return; }
-            const card = cards[0];
-            const valid = [...new Set(card.tels.map(normalizeSaudiMobile).filter(Boolean))];
-            if (!valid.length) {
-                alert(`⚠️ جهة الاتصال${card.name ? ` (${card.name})` : ''} لا تحتوي رقم جوال سعودي صالح.`);
-                return;
-            }
-            let phone = valid[0];
-            if (valid.length > 1) {
-                const choice = prompt('لجهة الاتصال أكثر من رقم جوال، اكتب رقم الخيار:\n' + valid.map((t, i) => `${i + 1}) ${t}`).join('\n'), '1');
-                if (choice === null) return;
-                const idx = parseInt(choice, 10) - 1;
-                if (valid[idx]) phone = valid[idx];
-            }
-            const input = document.getElementById(`apt_phone_${apt}`);
-            if (!input) return;
-            input.value = phone;
-            onAptPhoneNumberChange(apt, true, true);
-            setAptContactName(apt, card.name.slice(0, 60));
-            alert(`✅ تمت إضافة ${card.name || 'الرقم'} (${phone}) للشقة ${apt}.` +
-                (cards.length > 1 ? ` الملف فيه ${cards.length} جهات اتصال، أُخذت الأولى فقط.` : ''));
+            if (!cards.length) { alert('⚠️ هذا ليس ملف جهات اتصال (vcf) صالح.'); return; }
+            const list = cards
+                .map(c => ({ name: c.name.slice(0, 60), phones: [...new Set(c.tels.map(normalizeSaudiMobile).filter(Boolean))] }))
+                .filter(c => c.phones.length);
+            if (!list.length) { alert('⚠️ لا يوجد في الملف أي رقم جوال سعودي صالح.'); return; }
+            _bulkContacts = list;
+            openBulkAssignSheet(cards.length - list.length);
         };
         reader.onerror = () => alert('⚠️ تعذّرت قراءة الملف.');
         reader.readAsText(file);
+    }
+
+    // نافذة التوزيع: بجانب كل مالك قائمة الشقق؛ الشقة تُختار مسبقًا لو رقمه محفوظ لها من قبل
+    function openBulkAssignSheet(skipped) {
+        const numbers = getAptPhoneNumbers();
+        const count = getApartmentCount();
+        const aptOf = phone => Object.keys(numbers).find(k => normalizeSaudiMobile(numbers[k]) === phone) || '';
+        const rows = _bulkContacts.map((c, idx) => {
+            const pre = c.phones.map(aptOf).find(Boolean) || '';
+            const phonePart = c.phones.length > 1
+                ? `<select id="bulk_phone_${idx}" lang="en" dir="ltr" aria-label="رقم ${escapeHtml(c.name)}" class="bulk-select">${c.phones.map(ph => `<option value="${ph}">${ph}</option>`).join('')}</select>`
+                : `<span dir="ltr" class="bulk-phone">${c.phones[0]}</span>`;
+            let aptOptions = '<option value="">—</option>';
+            for (let n = 1; n <= count; n++) aptOptions += `<option value="${n}"${String(n) === String(pre) ? ' selected' : ''}>شقة ${n}</option>`;
+            return `<div class="bulk-row" data-name="${escapeHtml(c.name)}">
+                <div class="bulk-main"><div class="bulk-name">${escapeHtml(c.name || 'بدون اسم')}</div>${phonePart}</div>
+                <select id="bulk_apt_${idx}" aria-label="شقة ${escapeHtml(c.name)}" class="bulk-select">${aptOptions}</select>
+            </div>`;
+        }).join('');
+        const search = _bulkContacts.length > 8
+            ? '<input type="search" placeholder="ابحث بالاسم" oninput="filterBulkRows(this.value)" class="bulk-search" aria-label="بحث بالاسم">'
+            : '';
+        openBottomSheet(`
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:6px;">توزيع الأرقام على الشقق</strong>
+            <p class="section-note">${_bulkContacts.length} جهة اتصال${skipped ? ` (تُجوهلت ${skipped} بدون جوال سعودي)` : ''}. اختر الشقة بجانب كل مالك، واترك «—» لمن لا يخص العمارة.</p>
+            ${search}
+            <div id="bulk_rows">${rows}</div>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button type="button" class="btn btn-primary" onclick="saveBulkAssignments()" style="margin-top:0;"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> حفظ الكل</button>
+                <button type="button" class="btn btn-outline" onclick="closeBottomSheet()" style="margin-top:0;">إلغاء</button>
+            </div>
+        `);
+    }
+
+    function filterBulkRows(q) {
+        const query = String(q || '').trim();
+        document.querySelectorAll('#bulk_rows .bulk-row').forEach(row => {
+            row.style.display = !query || (row.dataset.name || '').includes(query) ? '' : 'none';
+        });
+    }
+
+    function saveBulkAssignments() {
+        const assignments = [];
+        const used = {};
+        let duplicate = null;
+        _bulkContacts.forEach((c, idx) => {
+            const apt = document.getElementById(`bulk_apt_${idx}`).value;
+            if (!apt) return;
+            const phone = c.phones.length > 1 ? document.getElementById(`bulk_phone_${idx}`).value : c.phones[0];
+            if (used[apt]) duplicate = apt;
+            used[apt] = true;
+            assignments.push({ apt, phone, name: c.name });
+        });
+        if (duplicate) { alert(`⚠️ الشقة ${duplicate} مختارة لأكثر من جهة اتصال — اختر شقة واحدة لكل مالك.`); return; }
+        if (!assignments.length) { alert('⚠️ اختر الشقة لجهة اتصال واحدة على الأقل.'); return; }
+        const numbers = Object.assign({}, getAptPhoneNumbers());
+        const names = Object.assign({}, getAptContactNames());
+        assignments.forEach(a => {
+            numbers[a.apt] = a.phone;
+            if (a.name) names[a.apt] = a.name; else delete names[a.apt];
+        });
+        localStorage.setItem('apt_phone_numbers', JSON.stringify(numbers));
+        localStorage.setItem('apt_contact_names', JSON.stringify(names));
+        closeBottomSheet();
+        renderAptPhoneNumberInputs();
+        if (typeof updateReportUnpaidAptsDisplay === 'function') updateReportUnpaidAptsDisplay();
+        alert(`✅ تم حفظ ${assignments.length} رقم جوال للشقق.`);
     }
 
     function renderAptPhoneNumberInputs() {
@@ -1942,8 +2015,10 @@
         const count = getApartmentCount();
         const numbers = getAptPhoneNumbers();
         const names = getAptContactNames();
-        let html = '<p class="section-note">اكتب رقم الجوال لكل شقة بأي صيغة (05… أو 00966… أو ‎+966…)، أو اضغط زر الملف بجانب الشقة لاستيراد جهة اتصال محفوظة كملف (vcf): في تطبيق جهات الاتصال اختر الشخص ← مشاركة ← احفظ كملف. الملف يُقرأ على جهازك فقط ولا يُرسل لأي جهة.</p>'
-            + '<input type="file" id="vcf_file_input" accept=".vcf,text/vcard,text/x-vcard,text/directory" style="display:none;" onchange="onVcfFileChosen(event)">';
+        let html = '<p class="section-note"><strong>كل الملاك دفعة واحدة:</strong> في تطبيق جهات الاتصال حدّد الملاك وشاركهم كملف واحد (vcf)، ثم اضغط الزر أدناه واختر الشقة لكل مالك. الملف يُقرأ على جهازك فقط ولا يُرسل لأي جهة.</p>'
+            + '<button type="button" class="btn btn-outline" onclick="openContactsFilePicker()" style="margin:0 0 14px 0;"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg> استيراد من ملف جهات الاتصال</button>'
+            + '<input type="file" id="vcf_file_input" accept=".vcf,text/vcard,text/x-vcard,text/directory" style="display:none;" onchange="onVcfFileChosen(event)">'
+            + '<p class="section-note">أو اكتب الرقم لكل شقة بأي صيغة (05… أو 00966… أو ‎+966…) — عند اكتمال الرقم ينتقل المؤشر للشقة التالية تلقائيًا.</p>';
         for (let i = 1; i <= count; i++) {
             const stored = numbers[i] || '';
             const name = names[i] || '';
@@ -1951,8 +2026,7 @@
             html += `<div class="form-group" style="margin-bottom:10px;">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <label for="apt_phone_${i}" style="min-width:64px; margin:0;">شقة ${i}</label>
-                    <input type="tel" id="apt_phone_${i}" value="${escapeHtml(val)}" placeholder="05XXXXXXXX" lang="en" dir="ltr" inputmode="tel" autocomplete="off" style="flex:1;" oninput="onAptPhoneNumberChange(${i})" onchange="onAptPhoneNumberChange(${i}, true)">
-                    <button type="button" class="icon-btn" onclick="pickVcfForApt(${i})" aria-label="استيراد رقم الشقة ${i} من ملف جهة اتصال" title="من ملف جهة اتصال (vcf)"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg></button>
+                    <input type="tel" id="apt_phone_${i}" value="${escapeHtml(val)}" placeholder="05XXXXXXXX" lang="en" dir="ltr" inputmode="tel" enterkeyhint="${i < count ? 'next' : 'done'}" autocomplete="off" style="flex:1;" oninput="onAptPhoneNumberChange(${i})" onchange="onAptPhoneNumberChange(${i}, true)" onkeydown="if (event.key === 'Enter') { event.preventDefault(); onAptPhoneNumberChange(${i}, true); focusNextAptPhone(${i}); }">
                 </div>
                 <div id="apt_contact_name_${i}" style="display:${name ? 'block' : 'none'}; font-size:12px; color:var(--muted-text); margin:4px 72px 0 0;">${name ? 'جهة الاتصال: ' + escapeHtml(name) : ''}</div>
                 <div id="apt_phone_status_${i}" style="font-size:12px; font-weight:600; margin:4px 72px 0 0; min-height:16px;"></div>
