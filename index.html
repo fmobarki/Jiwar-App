@@ -916,6 +916,7 @@
                     <span class="c-elevator" id="home_bar_elevator" style="width:0%"></span>
                 </div>
                 <div class="legend"><span><i class="c-free"></i>متاح</span><span><i class="c-emergency"></i>صندوق الطوارئ</span><span><i class="c-elevator"></i>حصة المصعد</span></div>
+                <p id="home_draw_note" style="display:none; margin:0; font-size:13px; font-weight:700; color:var(--warn-soft-text); background:var(--warn-soft-bg); border-radius:var(--radius-field); padding:8px 10px;"></p>
             </section>
 
             <section class="card month-card" aria-label="تسجيل الشهر الحالي">
@@ -1259,7 +1260,12 @@
         const annual = getAnnualTotalForYear(year);
         document.getElementById('home_annual').innerText = fmtMoney(annual);
         document.getElementById('home_tile_annual').classList.toggle('risk', annual < 0);
-        document.getElementById('home_emergency').innerText = fmtMoney(computeEmergencyFundState().balance);
+        document.getElementById('home_emergency').innerText = fmtMoney(f.emergency);
+        // ملاحظة السحب التلقائي من الطوارئ لآخر شهر مسجّل
+        const st = computeEmergencyFundState();
+        const drawNote = document.getElementById('home_draw_note');
+        drawNote.style.display = st.lastMonthDraw > 0 ? 'block' : 'none';
+        drawNote.innerText = st.lastMonthDraw > 0 ? `تم السحب من الطوارئ ${fmtMoney(st.lastMonthDraw)} ر.س لتغطية مصاريف ${st.lastMonthLabel}` : '';
         document.getElementById('home_elevator').innerText = fmtMoney(getElevatorCumulativeNow());
         enforceSingleBanner();
     }
@@ -2242,10 +2248,6 @@
 
         const suggestedEmergencyLimit = updateSuggestedEmergencyLimit();
 
-        // السحب من الاحتياطي: عندما يساوي أو يتجاوز إجمالي الصرف غير الثابت (طوارئ + مصاريف أخرى) الفائض التشغيلي الشهري
-        // هذا مجرد "تنبيه" بأن الشهر سحب من الرصيد المتراكم — لا يعني إخفاء الرقم الحقيقي
-        const nonFixedSpending = emergency + otherExpensesTotal;
-        const withdrewFromReserve = nonFixedSpending >= baseSurplus;
         // تصحيح: الصافي المحفوظ والمعروض يبقى الرقم الفعلي دائمًا (حتى لو سالبًا)،
         // لأن تصفيره إلى صفر كان يُفقد قيمة العجز الحقيقي من كل الحسابات التراكمية والسنوية اللاحقة
         const netSurplus = rawNetSurplus;
@@ -2264,22 +2266,12 @@
         // تلوين نصيحة المحلل: أخضر عند وجود فائض تشغيلي صحي، أحمر عند العجز
         // لون صندوق النقد الحر يُحدَّد داخل updateSuggestedEmergencyLimit (أحمر لو سالب)
 
-        // تلوين صندوق "الصافي المحول للاحتياطي": أحمر + تنبيه سحب إذا كانت الطوارئ >= الفائض الشهري
-        const surplusBox = document.getElementById('box_surplus');
-        const withdrawalNote = document.getElementById('withdrawal_note');
-        if (withdrewFromReserve) {
-            surplusBox.classList.add('risk');
-            withdrawalNote.style.display = 'block';
-        } else {
-            surplusBox.classList.remove('risk');
-            withdrawalNote.style.display = 'none';
-        }
 
         // 2. الحفظ التلقائي الفوري في قاعدة البيانات المحلية (localStorage)
         const record = {
             month: currentMonth, year: currentYear,
             rev: totalRevenue, exp: totalExpenses, emerg: emergency, surp: netSurplus,
-            withdrew: withdrewFromReserve,
+            withdrew: false,   // يُحدَّث بعد الحفظ: true فقط لو حصل سحب فعلي من الصندوق
             apts: aptValues,
             breakdown: { guard, elevator: elevatorCommitment, elec, water, clean, otherTotal: otherExpensesTotal, otherItems },
             // تعديل شهر محفوظ يحتفظ بنسبته الأصلية، والشهر الجديد يأخذ النسبة الحالية من الإعدادات
@@ -2305,7 +2297,20 @@
 
 
 
-        alert(`✅ تم الاعتماد والحفظ التلقائي بنجاح لتقرير شهر (${currentMonth} ${currentYear}) في السجل التاريخي للعقار.`);
+        // بعد الحفظ: هل نفد المتاح وسُحب من الطوارئ لتغطية مصاريف هذا الشهر؟
+        const reserveDraw = getReserveDrawFor(currentMonth, currentYear);
+        if (reserveDraw > 0) {
+            record.withdrew = true;
+            localStorage.setItem('property_history', JSON.stringify(history));
+        }
+        const surplusBox = document.getElementById('box_surplus');
+        const withdrawalNote = document.getElementById('withdrawal_note');
+        surplusBox.classList.toggle('risk', reserveDraw > 0);
+        withdrawalNote.style.display = reserveDraw > 0 ? 'block' : 'none';
+        withdrawalNote.innerText = reserveDraw > 0 ? `تم السحب من الطوارئ ${fmtMoney(reserveDraw)} ر.س لتغطية المصاريف` : '';
+
+        alert(`✅ تم الاعتماد والحفظ التلقائي بنجاح لتقرير شهر (${currentMonth} ${currentYear}) في السجل التاريخي للعقار.` +
+            (reserveDraw > 0 ? `\nنفد المتاح للصرف — تم السحب من الطوارئ ${fmtMoney(reserveDraw)} ر.س لتغطية المصاريف.` : ''));
         setLoadedMonthContext(currentMonth, currentYear);
         checkBackupReminder(); // تذكير ذكي: أفضل توقيت لتذكير المستخدم بالنسخ الاحتياطي هو مباشرة بعد اعتماد بيانات جديدة
         checkEmergencyFundThreshold(); // رصيد الصندوق تغيّر بعد هذا الاعتماد، لازم يُعاد فحصه فورًا
@@ -2385,44 +2390,95 @@
     //      — إن تجاوز الصرف الرصيد المتاح، يتوقف الرصيد عند صفر (لا يظهر سالبًا)، ويُسجَّل الفرق كـ"تجاوز"
     //        يُخصم بدوره من النصح المالي لنفس الشهر مع تنبيه واضح لمدير العقار (شفافية بدون رصيد سالب مربك).
     // هذا يفصل صندوق الطوارئ تمامًا عن أي اعتماد دائري: الإيداع محسوب من التشغيلي قبل الطوارئ نفسها.
+    // السحب التلقائي (إضافة على القاعدة أعلاه): نتتبّع "المتاح للصرف" شهرًا بشهر بجانب الصندوق.
+    // المتاح = الرصيد الافتتاحي + كل ما لم يُودَع بالصندوق − كل المصاريف (بما فيها الأخرى) − دفعات المصعد
+    // الزائدة عن حصته المحجوزة. لو نزل المتاح تحت الصفر، يُسحب الفرق تلقائيًا من الصندوق ويصبح المتاح صفرًا،
+    // ويُسجَّل المبلغ المسحوب لذلك الشهر. لو لم يكفِ الصندوق، يبقى المتاح سالبًا (عجز حقيقي).
     function computeEmergencyFundState() {
         const history = readHistory();
+        const nowYear = new Date().getFullYear();
         const sorted = [...history].sort((a, b) => {
-            const ya = a.year || new Date().getFullYear();
-            const yb = b.year || new Date().getFullYear();
+            const ya = a.year || nowYear;
+            const yb = b.year || nowYear;
             if (ya !== yb) return ya - yb;
             return MONTHS_ORDER.indexOf(a.month) - MONTHS_ORDER.indexOf(b.month);
         });
 
-        let balance = 0;
+        const ob = getOpeningBalance();
+        const payments = getElevatorPayments()
+            .filter(p => !p.historical && Number(p.amount) > 0)
+            .map(p => { const d = new Date(p.timestamp); return { key: d.getFullYear() * 12 + d.getMonth(), amount: Number(p.amount) }; })
+            .sort((a, b) => a.key - b.key);
+
+        let balance = 0, free = 0, elevatorPot = 0, pIdx = 0, openingApplied = false;
         let totalOverageAllTime = 0;
         let lastMonthOverage = 0;
         let lastMonthDeposit = 0;
+        let lastMonthDraw = 0;
         const monthlyNetAdvices = []; // صافي النصح لكل شهر (بعد خصم أي تجاوز بنفس الشهر) — بالتسلسل الزمني
+        const drawsByMonth = {};      // المسحوب تلقائيًا من الصندوق لكل شهر
+
+        const drawIfNeeded = () => {
+            if (free >= 0) return 0;
+            const take = Math.min(balance, -free);
+            balance -= take; free += take;
+            return take;
+        };
+        const applyOpening = key => {
+            if (!openingApplied && ob && Number(ob.amount) && key >= Number(ob.year) * 12) {
+                free += Number(ob.amount); openingApplied = true;
+            }
+        };
+        const applyPaymentsUpTo = key => {
+            let drawn = 0;
+            while (pIdx < payments.length && payments[pIdx].key <= key) {
+                elevatorPot -= payments[pIdx].amount;
+                if (elevatorPot < 0) { free += elevatorPot; elevatorPot = 0; }
+                drawn += drawIfNeeded();
+                pIdx++;
+            }
+            return drawn;
+        };
 
         sorted.forEach(item => {
+            const y = item.year || nowYear;
+            const key = y * 12 + MONTHS_ORDER.indexOf(item.month);
+            applyOpening(key);
+            applyPaymentsUpTo(key - 1);
+
             const b = item.breakdown || {};
             const guard = b.guard || 0, elec = b.elec || 0, water = b.water || 0, clean = b.clean || 0;
+            const other = b.otherTotal || 0;
             const elevatorCommitment = b.elevator || 0;
             const emerg = item.emerg || 0;
             const baseSurplus = (item.rev || 0) - (guard + elec + water + clean);
             const afterElevator = baseSurplus - elevatorCommitment;
-            // الإيداع فقط لو فيه فائض تشغيلي حقيقي بعد المصعد — شهر عاجز تشغيليًا لا يودع ولا يسحب من الصندوق
+            // الإيداع كما هو: فقط لو فيه فائض تشغيلي حقيقي بعد المصعد (قبل المصاريف الأخرى)
             const deposit = afterElevator > 0 ? afterElevator * getRecordReserveRatio(item) : 0;
             const adviceBeforeOverage = afterElevator - deposit;
 
             balance += deposit;
+            elevatorPot += elevatorCommitment;
+            // ما لم يُودَع يذهب للمتاح، والمصاريف الأخرى تُدفع من المتاح
+            free += afterElevator - deposit - other;
+
             let overage = 0;
             if (emerg > 0) {
                 balance -= emerg;
-                if (balance < 0) { overage = -balance; balance = 0; }
+                if (balance < 0) { overage = -balance; free += balance; balance = 0; }
             }
+            let draw = drawIfNeeded();
+            draw += applyPaymentsUpTo(key);
             totalOverageAllTime += overage;
 
             lastMonthDeposit = deposit;
             lastMonthOverage = overage;
+            lastMonthDraw = draw;
+            drawsByMonth[`${y}|${item.month}`] = draw;
             monthlyNetAdvices.push(adviceBeforeOverage - overage);
         });
+        applyOpening(Infinity);
+        applyPaymentsUpTo(Infinity);
 
         // النصح المالي المعروض = متوسط آخر 3 أشهر محفوظة (أو كل المتاح لو أقل من 3) —
         // نافذة ثابتة الحجم (لا تكبر مع تراكم السنوات) لتبقى دائمًا حسّاسة للوضع الحالي
@@ -2433,15 +2489,24 @@
             ? recentAdvices.reduce((sum, v) => sum + v, 0) / recentAdvices.length
             : 0;
 
+        const lastItem = sorted[sorted.length - 1];
         return {
             balance,                                          // رصيد الصندوق الحالي (لا ينزل تحت صفر أبدًا)
             totalOverageAllTime,                              // مجموع كل التجاوزات التاريخية (للعلم فقط)
             lastMonthDeposit,
             lastMonthOverage,                                 // تجاوز آخر شهر تحديدًا (0 لو ما فيه تجاوز)
+            lastMonthDraw,                                    // المسحوب تلقائيًا من الصندوق في آخر شهر
+            lastMonthLabel: lastItem ? `${lastItem.month} ${lastItem.year || nowYear}` : '',
+            drawsByMonth,
             lastMonthAdvice: averagedAdvice,                   // النصح المالي = متوسط آخر 3 أشهر (أو كل المتاح)
             monthsUsedForAdvice: recentAdvices.length,
             hasAnyMonth: sorted.length > 0
         };
+    }
+
+    // المسحوب تلقائيًا من صندوق الطوارئ لتغطية مصاريف شهر معيّن (0 لو المتاح كفى)
+    function getReserveDrawFor(month, year) {
+        return computeEmergencyFundState().drawsByMonth[`${year || new Date().getFullYear()}|${month}`] || 0;
     }
     // ===== نهاية محرك صندوق الطوارئ =====
 
@@ -2478,7 +2543,7 @@
         // منفصل تمامًا عن "الفائض السنوي" المعروض أعلاه — لا علاقة بينهما حسب القرار المعتمد.
         const fundState = computeEmergencyFundState();
         const reserveEl = document.getElementById('m_emergency_reserve');
-        if (reserveEl) reserveEl.innerText = fundState.balance.toFixed(2) + " ر.س";
+        if (reserveEl) reserveEl.innerText = getFreeCashBreakdown(getCumulativeCashThroughYear(getSelectedYear())).emergency.toFixed(2) + " ر.س";
         const reserveBox = document.getElementById('box_emergency_reserve');
         const overageNote = document.getElementById('emergency_overage_note');
         if (reserveBox) {
@@ -2696,6 +2761,7 @@
         });
 
         // العرض: الأحدث أولًا، مجمّع حسب السنة — بطاقة لكل شهر بدل جدول عريض يحتاج تمرير أفقي
+        const draws = computeEmergencyFundState().drawsByMonth;
         let lastYear = null;
         [...sortedHistory].reverse().forEach(item => {
             // تحصين العرض: أي قيمة غير رقمية (بيانات قديمة تالفة) تُعرض كصفر بدل انهيار القائمة كاملة
@@ -2717,6 +2783,7 @@
                     <div class="t">${escapeHtml(item.month)}</div>
                     <div class="s">إيرادات <span dir="ltr">${fmtMoney(rev)}</span> · مصاريف <span dir="ltr">${fmtMoney(exp)}</span>${emerg > 0 ? ` · طوارئ <span dir="ltr">${fmtMoney(emerg)}</span>` : ''}</div>
                     <div class="s">تراكمي السنة: <span dir="ltr" style="color:${running >= 0 ? 'var(--text-color)' : 'var(--danger-soft-text)'}">${fmtMoney(running)}</span></div>
+                    ${(draws[`${year}|${item.month}`] || 0) > 0 ? `<div class="s" style="color:var(--warn-soft-text); font-weight:700;">تم السحب من الطوارئ <span dir="ltr">${fmtMoney(draws[`${year}|${item.month}`])}</span> ر.س لتغطية المصاريف</div>` : ''}
                 </div>
                 <span class="net ${surp >= 0 ? 'pos' : 'neg'}">${fmtMoney(surp)}</span>
                 <span class="payment-actions" style="margin-right:0;">
@@ -3398,9 +3465,15 @@
     // النقد الحر = النقد المتوفر فعليًا − ما هو محجوز (رصيد صندوق الطوارئ + حصة المصعد المستحقة غير المدفوعة)
     // يُعرض كما هو حتى لو سالب، لأن السالب معلومة مهمة: النقد الحالي لا يغطي كل المحجوز.
     function getFreeCashBreakdown(cash) {
-        const emergency = computeEmergencyFundState().balance || 0;
+        let emergency = computeEmergencyFundState().balance || 0;
         const elevatorDue = getElevatorCumulativeNow() || 0;
-        return { cash, emergency, elevatorDue, free: cash - emergency - elevatorDue };
+        let free = cash - emergency - elevatorDue;
+        // حماية إضافية: المتاح لا يُعرض سالبًا ما دام في الصندوق رصيد — الفرق يُغطّى من الصندوق
+        if (free < 0 && emergency > 0) {
+            const take = Math.min(emergency, -free);
+            emergency -= take; free += take;
+        }
+        return { cash, emergency, elevatorDue, free };
     }
 
     function getAnnualTotalForYear(year) {
@@ -3701,7 +3774,7 @@
                     <tr><td style="border:1px solid #ccc; padding:6px;">إجمالي المصاريف</td><td style="border:1px solid #ccc; padding:6px; direction:ltr;">${item.exp.toFixed(2)} ر.س</td></tr>
                 </table>
 
-                ${item.withdrew ? '<p style="color:#c62828; font-weight:bold; margin-top:15px;">⚠️ تم السحب من الاحتياطي هذا الشهر لتغطية المصاريف.</p>' : ''}
+                ${(() => { const d = getReserveDrawFor(item.month, item.year); return d > 0 ? `<p style="color:#c62828; font-weight:bold; margin-top:15px;">⚠️ تم السحب من الطوارئ ${d.toFixed(2)} ر.س لتغطية المصاريف.</p>` : ''; })()}
 
                 <h3 style="margin-top:20px;">4. الوضع السنوي</h3>
                 <table style="width:100%; border-collapse:collapse; font-size:13px;">
@@ -3751,7 +3824,7 @@ ${(b.otherItems && b.otherItems.length) ? `\nبيان المصاريف الأخ�
 3) الملخص المالي النهائي:
 إجمالي الإيرادات: ${item.rev.toFixed(2)} ر.س
 إجمالي المصاريف: ${item.exp.toFixed(2)} ر.س
-${item.withdrew ? '⚠️ تم السحب من الاحتياطي هذا الشهر لتغطية المصاريف.' : ''}
+${(() => { const d = getReserveDrawFor(item.month, item.year); return d > 0 ? `⚠️ تم السحب من الطوارئ ${d.toFixed(2)} ر.س لتغطية المصاريف.` : ''; })()}
 
 تم إصدار هذا التقرير آلياً من نظام إدارة ${getPropertyName()}${getManagerSignatureText()}`;
     }
@@ -4643,11 +4716,29 @@ ${_advisorSnapshotText}`;
             const latestRevenue = latest.rev || 0;
             const baseSurplus = latestRevenue - latestBase;
 
-            // ١) الوضع التشغيلي العام للشهر الأخير
+            // ١) الوضع العام للشهر الأخير — الحكم على صافي الشهر الفعلي (بعد المصاريف الأخرى والطوارئ)،
+            // لا على الفائض التشغيلي وحده؛ فشهر فائضه التشغيلي موجب قد ينتهي بعجز يُسحب له من الطوارئ.
+            const label = `${latest.month} ${latest.year || ''}`;
+            const net = Number(latest.surp) || 0;
+            const fmt = v => Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 });
             if (baseSurplus < 0) {
-                out.insights.push(ins('danger', `الشهر الأخير (${latest.month} ${latest.year || ''}) سجّل عجزًا تشغيليًا قدره ${Math.abs(baseSurplus).toFixed(0)} ر.س — الإيرادات لم تغطِّ المصاريف الثابتة.`));
+                out.insights.push(ins('danger', `الشهر الأخير (${label}) سجّل عجزًا تشغيليًا قدره ${fmt(baseSurplus)} ر.س — الإيرادات لم تغطِّ المصاريف الثابتة.`));
+            } else if (net < 0) {
+                const b = latest.breakdown || {};
+                const other = b.otherTotal || 0, emerg = latest.emerg || 0;
+                const causes = [other > 0 ? `المصاريف الأخرى (${fmt(other)})` : '', emerg > 0 ? `الطوارئ (${fmt(emerg)})` : ''].filter(Boolean).join(' و');
+                const draw = (ctx.fund.drawsByMonth || {})[`${latest.year || new Date().getFullYear()}|${latest.month}`] || 0;
+                const head = `${label}: فائض تشغيلي ${fmt(baseSurplus)} ر.س قبل المصاريف الأخرى، لكن ${causes || 'المصاريف'} جعلت صافي الشهر عجزًا قدره ${fmt(net)} ر.س`;
+                if (draw > 0) {
+                    out.insights.push(ins('danger', `${head} — نفد المتاح وتم السحب من الطوارئ ${fmt(draw)} ر.س لتغطية المصاريف.`));
+                } else {
+                    // مصروف الطوارئ يُصرف أصلًا من صندوقه، وما يتبقى من العجز يغطيه المتاح
+                    out.insights.push(ins('warning', emerg > 0
+                        ? `${head}؛ صُرفت الطوارئ من صندوقها والباقي غطّاه المتاح للصرف.`
+                        : `${head}، وغطّاه المتاح للصرف.`));
+                }
             } else {
-                out.insights.push(ins('success', `الوضع التشغيلي مستقر: فائض تشغيلي ${baseSurplus.toFixed(0)} ر.س في ${latest.month} ${latest.year || ''} (قبل الطوارئ والمصاريف الأخرى).`));
+                out.insights.push(ins('success', `الوضع مستقر: فائض تشغيلي ${fmt(baseSurplus)} ر.س وصافي الشهر ${fmt(net)} ر.س في ${label}.`));
             }
 
             // ٢) مقارنة بنود المصروف بمتوسط الأشهر السابقة (كهرباء/ماء/حارس/نظافة)
