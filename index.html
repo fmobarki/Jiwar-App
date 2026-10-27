@@ -946,7 +946,7 @@
                     <span class="start"><svg class="icon" aria-hidden="true"><use href="#i-council"/></svg> اسأل مجلس المستشارين</span>
                     <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
                 </button>
-                <div id="local_agents_badge" style="font-size:13px; font-weight:bold; text-align:center; padding:8px; margin:0 12px 12px 12px; border-radius:var(--radius-field); background:var(--field-bg); color:var(--muted-text); border:1px solid var(--border-soft);">— جاهز للتشغيل —</div>
+                <div id="local_agents_badge" role="button" tabindex="0" onclick="runLocalAgents()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); runLocalAgents(); }" style="cursor:pointer; font-size:13px; font-weight:bold; text-align:center; padding:8px; margin:0 12px 12px 12px; border-radius:var(--radius-field); background:var(--field-bg); color:var(--muted-text); border:1px solid var(--border-soft);">— جاهز للتشغيل —</div>
             </div>
 
             <details class="card" id="home_details">
@@ -2393,6 +2393,7 @@
         let totalOverageAllTime = 0, lastMonthOverage = 0, lastMonthDeposit = 0, lastMonthDraw = 0;
         const monthlyNetAdvices = [];
         const drawsByMonth = {};   // المسحوب من الصندوق لتغطية عجز كل شهر (بدون مصروف الطوارئ المخطط)
+        const uncoveredByMonth = {}; // عجز لم يغطّه المتاح ولا الصندوق، لكل شهر
         const fundChanges = [];    // تغيّر رصيد الصندوق لكل شهر بالتسلسل (للوكلاء)
 
         // يغطي أي سالب بالمتاح من الصندوق، ويرجع المسحوب
@@ -2453,6 +2454,7 @@
             lastMonthOverage = overage;
             lastMonthDraw = draw;
             drawsByMonth[`${y}|${item.month}`] = draw;
+            uncoveredByMonth[`${y}|${item.month}`] = overage;
             fundChanges.push(balance - fundBefore);
             monthlyNetAdvices.push((afterElevator > 0 ? afterElevator - deposit : afterElevator) - overage);
         });
@@ -2473,6 +2475,7 @@
             lastMonthOverage,                                 // عجز آخر شهر غير المغطّى (0 لو مغطّى)
             lastMonthDraw,                                    // المسحوب من الصندوق لتغطية عجز آخر شهر
             drawsByMonth,
+            uncoveredByMonth,
             fundChanges,
             lastMonthAdvice: averagedAdvice,
             monthsUsedForAdvice: recentAdvices.length,
@@ -4469,8 +4472,17 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             // ١) الوضع التشغيلي العام للشهر الأخير
             if (baseSurplus < 0) {
                 out.insights.push(ins('danger', `الشهر الأخير (${latest.month} ${latest.year || ''}) سجّل عجزًا تشغيليًا قدره ${Math.abs(baseSurplus).toFixed(0)} ر.س — الإيرادات لم تغطِّ المصاريف الثابتة.`));
+            } else if ((latest.surp || 0) < 0) {
+                // فائض تشغيلي لكن المصاريف الأخرى/الطوارئ قلبت صافي الشهر إلى عجز — لا يُعرض كـ"مستقر"
+                const key = `${latest.year || new Date().getFullYear()}|${latest.month}`;
+                const draw = (ctx.fund.drawsByMonth || {})[key] || 0;
+                const uncovered = (ctx.fund.uncoveredByMonth || {})[key] || 0;
+                const how = uncovered > 0
+                    ? ` — لم يكفِ المتاح ولا الصندوق، والحساب الآن في عجز تراكمي قدره ${uncovered.toFixed(0)} ر.س`
+                    : (draw > 0 ? ` (سُحب ${draw.toFixed(0)} ر.س من صندوق الطوارئ)` : ' (غطّاه المتاح للصرف)');
+                out.insights.push(ins(uncovered > 0 ? 'danger' : 'warning', `${latest.month} ${latest.year || ''}: فائض تشغيلي ${baseSurplus.toFixed(0)} ر.س، لكن المصاريف الأخرى والطوارئ جعلت صافي الشهر عجزًا قدره ${Math.abs(latest.surp).toFixed(0)} ر.س${how}.`));
             } else {
-                out.insights.push(ins('success', `الوضع التشغيلي مستقر: فائض تشغيلي ${baseSurplus.toFixed(0)} ر.س في ${latest.month} ${latest.year || ''} (قبل الطوارئ والمصاريف الأخرى).`));
+                out.insights.push(ins('success', `الوضع التشغيلي مستقر: فائض تشغيلي ${baseSurplus.toFixed(0)} ر.س وصافي ${(latest.surp || 0).toFixed(0)} ر.س في ${latest.month} ${latest.year || ''}.`));
             }
 
             // ٢) مقارنة بنود المصروف بمتوسط الأشهر السابقة (كهرباء/ماء/حارس/نظافة)
@@ -4560,6 +4572,7 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             }
 
             // ٢) مسار استنزاف الصندوق: صافي تغيّر شهري (إيداع − صرف طوارئ) على آخر 6 أشهر
+            const recentMonths = hist.slice(-6);
             const netChanges = (fund.fundChanges || []).slice(-6);
             const avgNet = netChanges.length ? netChanges.reduce((s, v) => s + v, 0) / netChanges.length : 0;
             if (avgNet < 0 && fund.balance > 0) {
@@ -4581,9 +4594,9 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
             }
 
             // ٤) عجز متكرر — أشهر صافيها سالب ضمن آخر 6
-            const deficitMonths = window.filter(r => (r.surp || 0) < 0);
+            const deficitMonths = recentMonths.filter(r => (r.surp || 0) < 0);
             if (deficitMonths.length >= 2) {
-                out.insights.push(ins('danger', `تكرار العجز: ${deficitMonths.length} أشهر بصافي سالب ضمن آخر ${window.length} أشهر — نمط يستدعي مراجعة الرسوم أو المصاريف.`));
+                out.insights.push(ins('danger', `تكرار العجز: ${deficitMonths.length} أشهر بصافي سالب ضمن آخر ${recentMonths.length} أشهر — نمط يستدعي مراجعة الرسوم أو المصاريف.`));
             }
 
             // ٥) تأخر مزمن لنفس الشقة عبر أشهر متتالية
