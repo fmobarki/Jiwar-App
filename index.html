@@ -1208,7 +1208,7 @@
                 <p id="import_export_status" style="font-size:12px; color:var(--muted-text); margin-top:8px;"></p>
             </div>
 
-            <div class="card">
+            <div class="card" id="pin_card">
                 <h2>رمز القفل PIN</h2>
                 <p style="font-size:12px; color:var(--muted-text); margin:0 0 12px 0;">
                     رمز رباعي يُطلب عند كل فتح للتطبيق — لمنع أي شخص آخر من رؤية البيانات المالية.
@@ -1838,7 +1838,7 @@
         return eq(cloudRec.rev, row.rev) && eq(cloudRec.exp, row.exp) && eq(cloudRec.emerg, row.emerg) && eq(cloudRec.surp, row.surp);
     }
 
-    async function cloudBuildUploadPlan() {
+    async function cloudBuildUploadPlan(source) {
         if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
         const pulled = await cloudPullAll();
         if (!pulled.ok) return pulled;
@@ -1847,11 +1847,12 @@
         const legacyIds = new Set(legacy.rows.map(r => r.legacy_id).filter(Boolean));
 
         const cloudByKey = new Map(pulled.months.map(m => [`${m.year}|${m.month}`, m]));
-        const localMonths = readHistory();
+        const localMonths = source ? source.months : readHistory();
+        const localPayments = source ? source.payments : readPayments();
         const plan = {
             ok: true,
             cloudSettings: pulled.settings,
-            local: { months: localMonths.length, payments: readPayments().length },
+            local: { months: localMonths.length, payments: localPayments.length },
             cloud: { months: pulled.months.length, payments: pulled.payments.length },
             monthsToUpload: [], monthsSame: [], monthsDifferent: [], monthsInvalid: [], monthsCloudOnly: [],
             paymentsToUpload: [], paymentsExisting: 0, paymentsInvalid: 0,
@@ -1869,7 +1870,7 @@
         });
         pulled.months.forEach(m => { if (!localKeys.has(`${m.year}|${m.month}`)) plan.monthsCloudOnly.push(cloudMonthLabel(m)); });
 
-        readPayments().forEach(p => {
+        localPayments.forEach(p => {
             const row = cloudPaymentToRow(p);
             if (!row) { plan.paymentsInvalid++; return; }
             const dup = legacyIds.has(String(p.id))
@@ -1976,9 +1977,16 @@
         const sheet = document.getElementById('bottom_sheet_content');
         if (!plan || !sheet) return;
         const nothing = !plan.monthsToUpload.length && !plan.paymentsToUpload.length && !plan.settingsWillWrite;
-        const recent = cloudBackupIsRecent();
+        const restoring = !!window._cloudRestoreMode;
+        const recent = restoring || cloudBackupIsRecent();
         const ts = parseInt(localStorage.getItem('last_backup_at')) || 0;
-        sheet.innerHTML = `
+        sheet.innerHTML = restoring ? `
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:8px;">استعادة نسخة احتياطية إلى السحابة</strong>
+            ${cloudUploadPlanHtml(plan)}
+            <p class="section-note" style="margin-top:12px;">تُضاف إلى السحابة الأشهر والدفعات المفقودة فقط. ما هو موجود في السحابة لا يُستبدل ولا يُحذف.</p>
+            <p id="sheet_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
+            <button type="button" class="btn btn-primary" id="cu_run" onclick="cloudUploadConfirm()" ${nothing ? 'disabled' : ''}>${nothing ? 'لا يوجد ما يُضاف' : 'إضافة إلى السحابة'}</button>
+            <button type="button" class="btn btn-outline" onclick="cloudRestoreClose()">إغلاق</button>` : `
             <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:8px;">رفع بيانات هذا الجهاز</strong>
             ${cloudUploadPlanHtml(plan)}
             <p class="section-note" style="margin-top:12px; ${recent ? '' : 'color:var(--warn-soft-text); font-weight:700;'}">
@@ -1997,7 +2005,7 @@
 
     async function cloudUploadConfirm() {
         const plan = window._cloudPlan;
-        if (!plan || !cloudBackupIsRecent()) { renderCloudUploadSheet(); return; }
+        if (!plan || !(window._cloudRestoreMode || cloudBackupIsRecent())) { renderCloudUploadSheet(); return; }
         const btn = document.getElementById('cu_run');
         btn.disabled = true; btn.textContent = 'جارٍ الرفع…';
         const r = await cloudRunUpload(plan);
@@ -2016,7 +2024,31 @@
             <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:8px;">${r.ok ? '✅ اكتمل الرفع' : '⚠️ توقف الرفع'}</strong>
             ${r.ok ? '' : `<p class="section-note" style="color:var(--danger-soft-text); font-weight:700;">${escapeHtml(cloudMessage(r.error))} (الخطوة: ${escapeHtml(r.step || '')}). ما رُفع قبل التوقف يبقى، ويمكنك إعادة الرفع بأمان: لا يتكرر شيء.</p>`}
             <div class="review-list">${lines.map(l => `<div class="review-row"><span>${escapeHtml(l)}</span></div>`).join('')}</div>
-            <button type="button" class="btn btn-primary" onclick="closeBottomSheet()">تم</button>`;
+            <button type="button" class="btn btn-primary" onclick="cloudRestoreClose()">تم</button>`;
+    }
+
+    // ---- استعادة نسخة احتياطية أثناء الربط بالسحابة ----
+    // الدمج المحلي المعتاد يجري أولًا، ثم نأخذ نتيجته كمصدر للخطة ونُرجع الجهاز لحالته؛ ما يُضاف إلى السحابة
+    // هو المفقود منها فقط، وبعدها يُسحب الوضع النهائي من السحابة.
+    async function cloudRestoreBegin(snap) {
+        const merged = { months: readHistory(), payments: readPayments() };
+        cloudRestore(snap);
+        cloudRefreshViews();
+        window._cloudRestoreMode = true;
+        openBottomSheet('<strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:6px;">استعادة نسخة احتياطية</strong><p class="section-note">جارٍ مقارنة النسخة بالسحابة…</p>');
+        const plan = await cloudBuildUploadPlan(merged);
+        const sheet = document.getElementById('bottom_sheet_content');
+        if (!plan.ok) {
+            if (sheet) sheet.innerHTML = `<strong style="font-size:16px; display:block; margin-bottom:6px;">استعادة نسخة احتياطية</strong><p class="section-note" style="color:var(--danger-soft-text); font-weight:700;">${escapeHtml(cloudMessage(plan.error))}</p><button type="button" class="btn btn-outline" onclick="cloudRestoreClose()">إغلاق</button>`;
+            return;
+        }
+        window._cloudPlan = plan;
+        renderCloudUploadSheet();
+    }
+    function cloudRestoreClose() {
+        window._cloudRestoreMode = false;
+        window._cloudPlan = null;
+        closeBottomSheet();
     }
 
     // ----- الواجهة -----
@@ -2034,6 +2066,7 @@
         }
         cloudSetLive(cloudLiveState === 'idle' ? 'live' : cloudLiveState);
         document.body.classList.toggle('viewer-mode', !!(cloudSession && cloudProfile && cloudProfile.role !== 'manager'));
+        if (typeof refreshPinUI === 'function') refreshPinUI();
         const quickTab = document.getElementById('tab_quick');
         if (quickTab && document.body.classList.contains('viewer-mode') && quickTab.style.display !== 'none') switchTab('dashboard');
     }
@@ -4499,11 +4532,9 @@
     function importAllData(event) {
         const file = event.target.files[0];
         if (!file) return;
-        if (cloudWriteOn()) {
-            showToast('⚠️ استعادة نسخة احتياطية غير متاحة أثناء ربط العمارة بالسحابة، لحماية بيانات الجميع.', { duration: 8000 });
-            event.target.value = '';
-            return;
-        }
+        const cloudRestoreMode = cloudWriteOn();
+        if (cloudRestoreMode && !cloudIsManager()) { showToast('⚠️ ' + cloudMessage('forbidden')); event.target.value = ''; return; }
+        const cloudRestoreSnap = cloudRestoreMode ? cloudSnap(['property_history', 'elevator_payments', 'fixed_building_settings', 'emergency_reserve_ratio_pct', 'emergency_fund_min_threshold', 'opening_balance']) : null;
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -4680,9 +4711,14 @@
             let dupNote = skippedDuplicates > 0 ? ` (تم تجاهل ${skippedDuplicates} دفعة مصعد مكررة تلقائيًا)` : '';
             if (keptNewerLocal > 0) dupNote += ` (أُبقي ${keptNewerLocal} شهر بنسخته المحلية الأحدث)`;
             if (settingsApplied) dupNote += ' (تم استيراد الإعدادات المالية)';
+            event.target.value = '';
+            if (cloudRestoreMode) {
+                if (statusEl) statusEl.innerText = `تمت قراءة النسخة (${importedHistory.length} شهر، ${importedPayments.length} دفعة) — راجع نافذة الاستعادة.`;
+                cloudRestoreBegin(cloudRestoreSnap);
+                return;
+            }
             if (statusEl) statusEl.innerText = `✅ تم دمج النسخة الاحتياطية بنجاح (${importedHistory.length} شهر، ${importedPayments.length} دفعة)${dupNote}.`;
             alert(`✅ تم استيراد ودمج البيانات بنجاح.${dupNote}`);
-            event.target.value = '';
         };
         reader.readAsText(file);
     }
@@ -5680,6 +5716,8 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
     }
 
     function refreshPinUI() {
+        const pinCard = document.getElementById('pin_card');
+        if (pinCard) pinCard.style.display = cloudDeviceEnabled() ? 'none' : '';
         const hasPIN = !!localStorage.getItem('app_pin_code');
         const statusBox = document.getElementById('pin_status_box');
         const setupDiv = document.getElementById('pin_setup_div');
@@ -5711,7 +5749,8 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         const hasPIN = !!localStorage.getItem('app_pin_code');
         const isUnlocked = sessionStorage.getItem('pin_unlocked') === 'yes';
 
-        if (hasPIN && !isUnlocked) {
+        // الجهاز المرتبط بالسحابة يحميه تسجيل الدخول، فلا يُطلب PIN
+        if (hasPIN && !isUnlocked && !cloudDeviceEnabled()) {
             document.getElementById('pin_lock_screen').style.display = 'flex';
             refreshPinUI(); // تحديث الواجهة (في الإعدادات)
             return; // التحميل يكمل من checkPin / submitRecoveryCode عبر initAppAfterUnlock
