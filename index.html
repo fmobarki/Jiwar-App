@@ -1986,7 +1986,7 @@
             </p>
             <p id="sheet_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
             <button type="button" class="btn btn-outline" id="cu_backup" onclick="cloudUploadBackup()" style="margin-top:0;">نسخة احتياطية الآن</button>
-            <button type="button" class="btn btn-primary" id="cu_run" onclick="cloudUploadConfirm()" ${recent && !nothing ? '' : 'disabled'}>${nothing ? 'لا يوجد ما يُرفع' : 'رفع الآن'}</button>
+            <button type="button" class="btn btn-primary" id="cu_run" onclick="cloudUploadConfirm()" ${recent ? '' : 'disabled'}>${nothing ? 'ربط هذا الجهاز بالسحابة' : 'رفع الآن'}</button>
             <button type="button" class="btn btn-outline" onclick="closeBottomSheet()">إغلاق</button>`;
     }
 
