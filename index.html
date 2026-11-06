@@ -580,6 +580,17 @@
             }
         }
         #print_credit_footer { display: none; }
+        /* ===== وضع المطّلع: اطلاع فقط ===== */
+        body.viewer-mode .editor-only { display: none !important; }
+        body.viewer-mode .payment-actions { display: none !important; }
+        body.viewer-mode #tab_settings > :not(#cloud_account_card):not(#cloud_group_title) { display: none !important; }
+        /* ===== بوابة دخول السحابة ===== */
+        #cloud_gate {
+            position: fixed; inset: 0; z-index: 10000;
+            background: var(--bg-color); background-image: var(--bg-glow);
+            display: none; align-items: center; justify-content: center;
+            padding: 24px; direction: rtl;
+        }
         /* ===== شاشة الإعداد الأولي (Setup Wizard) ===== */
         #setup_wizard_overlay {
             position: fixed; inset: 0; z-index: 9999;
@@ -699,6 +710,26 @@
         </div>
 
         <button type="button" class="setup-wizard-btn" onclick="completeSetupWizard()">ابدأ الآن</button>
+        <p style="margin:16px 0 0 0;"><a href="#" onclick="openCloudGate(true); return false;" style="color:var(--brand-text); font-size:14px; font-weight:700;">لدي حساب في السحابة — تسجيل الدخول</a></p>
+    </div>
+</div>
+
+<!-- بوابة دخول السحابة: تظهر على جهاز مرتبط بالسحابة حين لا يوجد تسجيل دخول -->
+<div id="cloud_gate" role="dialog" aria-modal="true" aria-labelledby="cloud_gate_title">
+    <div class="setup-wizard-card">
+        <div class="setup-wizard-title" id="cloud_gate_title">تسجيل الدخول</div>
+        <div class="setup-wizard-subtitle" id="cloud_gate_sub">سجّل الدخول للاطلاع على بيانات العمارة.</div>
+        <div class="setup-wizard-field">
+            <label for="gate_username">اسم المستخدم</label>
+            <input type="text" id="gate_username" lang="en" dir="ltr" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="32" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('gate_password').focus(); }">
+        </div>
+        <div class="setup-wizard-field">
+            <label for="gate_password">كلمة المرور</label>
+            <input type="password" id="gate_password" lang="en" dir="ltr" autocomplete="current-password" maxlength="72" onkeydown="if (event.key === 'Enter') { event.preventDefault(); cloudGateSubmit(); }">
+        </div>
+        <p id="gate_error" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700; font-size:13px;"></p>
+        <button type="button" class="setup-wizard-btn" id="gate_btn" onclick="cloudGateSubmit()">تسجيل الدخول</button>
+        <p id="gate_back" style="margin:16px 0 0 0; display:none;"><a href="#" onclick="closeCloudGate(); return false;" style="color:var(--brand-text); font-size:14px; font-weight:700;">رجوع</a></p>
     </div>
 </div>
 
@@ -774,6 +805,7 @@
     <header>
         <p class="app-header-sub" id="app_header_title">عمارة 169</p>
         <h1 id="app_header_month">—</h1>
+        <p class="app-header-sub" id="cloud_live" style="display:none; font-size:11px; margin-top:2px;"></p>
     </header>
 
     <!-- الترتيب (من اليمين): الرئيسية، السجل، زر التسجيل في المنتصف، التقارير، المزيد -->
@@ -784,7 +816,7 @@
         <button type="button" class="bottom-nav-btn" id="navbtn_history" onclick="switchTab('history')">
             <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>السجل</span>
         </button>
-        <div class="nav-fab-wrap">
+        <div class="nav-fab-wrap editor-only">
             <button type="button" class="nav-fab" id="navbtn_quick" onclick="switchTab('quick')" aria-label="تسجيل شهر">
                 <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
             </button>
@@ -826,7 +858,7 @@
     </div>
 
     <div class="grid">
-        <div class="sidebar" id="tab_quick" style="display:none;">
+        <div class="sidebar editor-only" id="tab_quick" style="display:none;">
             <div class="wizard-head">
                 <button type="button" class="icon-btn" onclick="exitWizard()" aria-label="إغلاق"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
                 <div>
@@ -940,7 +972,7 @@
                 <div class="row"><span class="title" id="home_month_title">—</span><span class="pill warn" id="home_month_status">غير مسجّل</span></div>
                 <div class="row" style="margin-top:8px;"><span class="muted" id="home_month_count">—</span><span style="font-weight:700; white-space:nowrap;"><span id="home_month_amount" style="direction:ltr; display:inline-block;">0</span> ر.س</span></div>
                 <div class="progress" aria-hidden="true"><span id="home_month_progress" style="width:0%"></span></div>
-                <button type="button" class="btn btn-primary" id="home_month_btn" onclick="openCurrentMonthEntry()">سجّل الشهر</button>
+                <button type="button" class="btn btn-primary editor-only" id="home_month_btn" onclick="openCurrentMonthEntry()">سجّل الشهر</button>
             </section>
 
             <section class="stat-grid" aria-label="الأرصدة">
@@ -951,7 +983,7 @@
 
                 <p id="elevator_payment_due_notice" style="display:none; background:var(--warn-soft-bg); color:var(--warn-soft-text); border:1px solid var(--warn-soft-text); border-radius:var(--radius-field); padding:10px 12px; font-size:13px; font-weight:700; margin-top:12px;"></p>
 
-            <div class="card" id="local_agents_card" style="padding:0; overflow:hidden;">
+            <div class="card editor-only" id="local_agents_card" style="padding:0; overflow:hidden;">
                 <button type="button" class="link-row" onclick="runLocalAgents()" style="border:none; margin:0; border-radius:0;">
                     <span class="start"><svg class="icon" aria-hidden="true"><use href="#i-council"/></svg> اسأل مجلس المستشارين</span>
                     <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
@@ -995,15 +1027,15 @@
             <div id="tab_history" style="display:none;">
             <div class="card">
                 <h2>السجل الشهري</h2>
-                <button onclick="clearHistory()" class="btn-danger-text" style="float: left;"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg> مسح السجل كاملًا</button>
+                <button onclick="clearHistory()" class="btn-danger-text editor-only" style="float: left;"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg> مسح السجل كاملًا</button>
                 <div id="history_rows" style="clear:both;"></div>
             </div>
 
             <div class="card">
                 <h2>دفعات صيانة المصعد</h2>
                 <div id="elevator_payments_log"></div>
-                <p style="font-size:13px; color:var(--warn-soft-text); font-weight:700; margin:12px 0 8px 0; display:flex; align-items:center; gap:6px;"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg> عند دفع الدفعة الربعية فعليًا (كل 3 أشهر):</p>
-                <button type="button" class="btn btn-outline" id="btn_elevator_paid" onclick="markElevatorPaid()" style="margin-top:0;">تم دفع دفعة المصعد (تصفير التراكم)</button>
+                <p class="editor-only" style="font-size:13px; color:var(--warn-soft-text); font-weight:700; margin:12px 0 8px 0; display:flex; align-items:center; gap:6px;"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg> عند دفع الدفعة الربعية فعليًا (كل 3 أشهر):</p>
+                <button type="button" class="btn btn-outline editor-only" id="btn_elevator_paid" onclick="markElevatorPaid()" style="margin-top:0;">تم دفع دفعة المصعد (تصفير التراكم)</button>
             </div>
             </div>
 
@@ -1014,14 +1046,14 @@
                     <label>اختر الشهر المراد إصدار تقريره التفصيلي:</label>
                     <select id="report_month_select" onchange="updateReportUnpaidAptsDisplay()"></select>
                 </div>
-                <div class="form-group" style="background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field);">
+                <div class="form-group editor-only" style="background:var(--field-bg); padding:10px 12px; border-radius:var(--radius-field);">
                     <label style="color: var(--danger-soft-text); margin-bottom:4px;">الشقق غير المدفوعة لهذا الشهر:</label>
                     <div id="report_unpaid_apts_display" style="font-weight:bold; text-align:center; padding:6px; color:var(--success-soft-text);">—</div>
                 </div>
                 <button class="btn btn-primary" id="btn_generate_pdf" onclick="generatePDFReport()"><svg class="icon" aria-hidden="true"><use href="#i-printer"/></svg> إنشاء التقرير وحفظه PDF</button>
                 <button class="btn btn-whatsapp" id="btn_send_whatsapp" onclick="shareWhatsApp()"><svg class="icon" aria-hidden="true"><use href="#i-message"/></svg> إرسال ملخص عبر واتساب</button>
-                <button class="btn btn-outline" id="btn_send_report_reminder" onclick="shareReportUnpaidReminder()"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg> إرسال تذكير سداد لهذا الشهر</button>
-                <div id="individual_reminder_buttons_container" style="margin-top:8px;"></div>
+                <button class="btn btn-outline editor-only" id="btn_send_report_reminder" onclick="shareReportUnpaidReminder()"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg> إرسال تذكير سداد لهذا الشهر</button>
+                <div class="editor-only" id="individual_reminder_buttons_container" style="margin-top:8px;"></div>
                 <p class="section-note" style="margin-top:10px;">
                     "إنشاء التقرير" يفتح نافذة الطباعة لحفظ نسخة PDF على جهازك.
                     "واتساب" يرسل نفس التقرير كرسالة نصية جاهزة.
@@ -1044,6 +1076,45 @@
             </div>
 
             <div id="tab_settings" style="display:none;">
+            <h2 class="group-title" id="cloud_group_title">الحساب السحابي</h2>
+            <div class="card" id="cloud_account_card">
+                <div id="cloud_signed_out">
+                    <p class="section-note">سجّل الدخول بالحساب الذي أنشأه لك المدير. في هذه المرحلة تبقى بيانات العمارة محلية على الجهاز.</p>
+                    <div class="form-group">
+                        <label for="cloud_username">اسم المستخدم</label>
+                        <input type="text" id="cloud_username" lang="en" dir="ltr" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="32" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('cloud_password').focus(); }">
+                    </div>
+                    <div class="form-group">
+                        <label for="cloud_password">كلمة المرور</label>
+                        <input type="password" id="cloud_password" lang="en" dir="ltr" autocomplete="current-password" maxlength="72" onkeydown="if (event.key === 'Enter') { event.preventDefault(); cloudLoginSubmit(); }">
+                    </div>
+                    <p id="cloud_login_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
+                    <button type="button" class="btn btn-primary" id="cloud_login_btn" onclick="cloudLoginSubmit()" style="margin-top:0;">تسجيل الدخول</button>
+                </div>
+                <div id="cloud_signed_in" style="display:none;">
+                    <div class="review-list">
+                        <div class="review-row"><span>المستخدم</span><span class="v" id="cloud_who" style="direction:rtl;"></span></div>
+                        <div class="review-row"><span>الدور</span><span class="v" id="cloud_role" style="direction:rtl;"></span></div>
+                        <div class="review-row"><span>الحالة</span><span class="v" id="cloud_sync_status" style="direction:rtl;">—</span></div>
+                    </div>
+                    <div class="btn-row" style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); margin-top:12px;">
+                        <button type="button" class="btn btn-outline" onclick="openCloudPasswordSheet()" style="margin-top:0;">كلمة المرور</button>
+                        <button type="button" class="btn btn-outline" onclick="cloudSignOutUI()" style="margin-top:0;">تسجيل الخروج</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="cloud_users_card" style="display:none;">
+                <h2>المستخدمون</h2>
+                <p class="section-note">المدير والأدمن بصلاحيات واحدة: تعديل كامل وإدارة المستخدمين. المطّلع يرى مالية العمارة فقط.</p>
+                <div id="cloud_users_list"></div>
+                <button type="button" class="btn btn-primary" onclick="openAddUserSheet()">إضافة مستخدم</button>
+            </div>
+            <div class="card" id="cloud_migrate_card" style="display:none;">
+                <h2>نقل بيانات العمارة إلى السحابة</h2>
+                <p class="section-note">لمرة واحدة من الجهاز الذي فيه التاريخ الكامل: ترفع الأشهر والدفعات والإعدادات. تظهر معاينة أولًا، وتُطلب نسخة احتياطية قبل الرفع. لا يُحذف ولا يُستبدل شيء في السحابة، وأرقام الجوال لا تُرفع.</p>
+                <button type="button" class="btn btn-outline" onclick="openCloudUploadSheet()" style="margin-top:0;">معاينة الرفع</button>
+            </div>
+
             <h2 class="group-title">العقار</h2>
             <div class="card">
                 <h2>معلومات العقار</h2>
@@ -1220,10 +1291,1046 @@
     })();
     // ===== نهاية نظام تبديل السمة =====
 
+    // ===== الحساب السحابي (Supabase) — المرحلة 3: تسجيل الدخول وإدارة المستخدمين =====
+    // الاتصال بـ fetch مباشرة (بلا أي مكتبة خارجية). المفتاح العام مصمَّم ليظهر هنا؛ الحماية الفعلية
+    // في صلاحيات قاعدة البيانات (RLS) ودالة الخادم manage-users. بيانات العمارة لا تُرفع في هذه المرحلة.
+    const CLOUD = {
+        url: 'https://anikewdykfkygycekeva.supabase.co',
+        key: 'sb_publishable_bFg6RaiBFFjo-FNcFxLy_w_oPP0DBdA',
+        emailDomain: 'jiwar.invalid',          // بريد داخلي غير حقيقي: اسم المستخدم + هذا النطاق
+        sessionKey: 'jiwar_cloud_session',
+        profileKey: 'jiwar_cloud_profile'
+    };
+    let cloudSession = null;   // { access_token, refresh_token, expires_at (ثوانٍ), user_id }
+    let cloudProfile = null;   // { id, username, role, display_name } — للعرض فقط؛ الخادم هو من يفرض الصلاحيات
+    let cloudUsers = [];
+    let cloudRefreshing = null;
+
+    const CLOUD_ERRORS = {
+        network: 'تعذّر الاتصال بالخدمة — تحقق من الإنترنت وحاول مرة أخرى.',
+        invalid_credentials: 'اسم المستخدم أو كلمة المرور غير صحيحة.',
+        no_profile: 'حسابك غير مفعّل بعد — تواصل مع المدير.',
+        disabled: 'حسابك معطّل — تواصل مع المدير.',
+        unauthorized: 'انتهت الجلسة — سجّل الدخول من جديد.',
+        forbidden: 'ليست لديك صلاحية لهذا الإجراء.',
+        invalid_username: 'اسم المستخدم: 3 إلى 32 حرفًا، أحرف إنجليزية صغيرة وأرقام و . _ - فقط.',
+        weak_password: 'كلمة المرور قصيرة — 8 أحرف على الأقل.',
+        invalid_role: 'الدور غير صحيح.',
+        username_taken: 'اسم المستخدم مستخدم من قبل.',
+        cannot_target_self: 'لا يمكنك تنفيذ هذا الإجراء على حسابك نفسه.',
+        last_manager: 'لا يمكن ترك العمارة بلا مدير فعّال.',
+        not_found: 'المستخدم غير موجود.',
+        create_failed: 'تعذّر إنشاء الحساب.',
+        update_failed: 'تعذّر تنفيذ التعديل.',
+        delete_failed: 'تعذّر الحذف.',
+        reauthentication_needed: 'سجّل الخروج ثم الدخول من جديد، ثم غيّر كلمة المرور.',
+        same_password: 'كلمة المرور الجديدة يجب أن تختلف عن الحالية.',
+        weak_password_policy: 'كلمة المرور لا تحقق شروط الأمان.',
+        conflict: 'عدّل مدير آخر هذه البيانات قبل قليل — حدّث الصفحة ثم أعد المحاولة.',
+        invalid_data: 'بيانات غير صالحة للحفظ في السحابة.',
+        server_error: 'خطأ من الخادم — حاول مرة أخرى.'
+    };
+    function cloudMessage(code) { return CLOUD_ERRORS[code] || 'حدث خطأ غير متوقع — حاول مرة أخرى.'; }
+
+    function cloudStoreSession() {
+        try {
+            if (cloudSession) localStorage.setItem(CLOUD.sessionKey, JSON.stringify(cloudSession)); else localStorage.removeItem(CLOUD.sessionKey);
+            if (cloudProfile) localStorage.setItem(CLOUD.profileKey, JSON.stringify(cloudProfile)); else localStorage.removeItem(CLOUD.profileKey);
+        } catch (e) {}
+    }
+    function cloudClearSession() { cloudSession = null; cloudProfile = null; cloudUsers = []; cloudStoreSession(); }
+
+    async function cloudRequest(path, opts) {
+        const o = opts || {};
+        const headers = { apikey: CLOUD.key };
+        if (o.body !== undefined) headers['Content-Type'] = 'application/json';
+        if (o.headers) Object.assign(headers, o.headers);
+        if (o.auth !== false) {
+            const token = await cloudAccessToken();
+            if (token === 'network') return { ok: false, status: 0, data: { error: 'network' } };
+            if (!token) return { ok: false, status: 401, data: { error: 'unauthorized' } };
+            headers.Authorization = 'Bearer ' + token;
+        }
+        try {
+            const res = await fetch(CLOUD.url + path, { method: o.method || 'GET', headers, body: o.body === undefined ? undefined : JSON.stringify(o.body) });
+            const text = await res.text();
+            let data = null;
+            if (text) { try { data = JSON.parse(text); } catch (e) { data = { raw: text }; } }
+            return { ok: res.ok, status: res.status, data };
+        } catch (e) {
+            return { ok: false, status: 0, data: { error: 'network' } };
+        }
+    }
+
+    // توكن الدخول الصالح؛ يُجدَّد تلقائيًا قبل انتهائه بدقيقة
+    async function cloudAccessToken() {
+        if (!cloudSession) return null;
+        if (cloudSession.expires_at - Date.now() / 1000 > 60) return cloudSession.access_token;
+        if (!cloudRefreshing) {
+            cloudRefreshing = (async () => {
+                const r = await cloudRequest('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: cloudSession.refresh_token }, auth: false });
+                if (r.status === 0) return 'network';
+                if (!r.ok || !r.data || !r.data.access_token) { cloudClearSession(); renderCloudAccount(); return null; }
+                cloudSession = {
+                    access_token: r.data.access_token,
+                    refresh_token: r.data.refresh_token || cloudSession.refresh_token,
+                    expires_at: Math.floor(Date.now() / 1000) + (r.data.expires_in || 3600),
+                    user_id: cloudSession.user_id
+                };
+                cloudStoreSession();
+                return cloudSession.access_token;
+            })().finally(() => { cloudRefreshing = null; });
+        }
+        return cloudRefreshing;
+    }
+
+    async function cloudLoadProfile() {
+        const r = await cloudRequest(`/rest/v1/profiles?select=id,username,role,display_name,disabled&id=eq.${encodeURIComponent(cloudSession.user_id)}`);
+        if (r.status === 0) return { ok: false, error: 'network' };
+        if (!r.ok || !Array.isArray(r.data)) return { ok: false, error: 'unauthorized' };
+        const p = r.data[0];
+        if (!p) return { ok: false, error: 'no_profile' };
+        if (p.disabled) return { ok: false, error: 'disabled' };
+        cloudProfile = { id: p.id, username: p.username, role: p.role, display_name: p.display_name || '' };
+        cloudStoreSession();
+        return { ok: true };
+    }
+
+    async function cloudSignIn(username, password) {
+        const r = await cloudRequest('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: `${username}@${CLOUD.emailDomain}`, password }, auth: false });
+        if (r.status === 0) return { ok: false, error: 'network' };
+        if (!r.ok || !r.data || !r.data.access_token) return { ok: false, error: 'invalid_credentials' };
+        cloudSession = {
+            access_token: r.data.access_token,
+            refresh_token: r.data.refresh_token,
+            expires_at: Math.floor(Date.now() / 1000) + (r.data.expires_in || 3600),
+            user_id: r.data.user && r.data.user.id
+        };
+        const p = await cloudLoadProfile();
+        if (!p.ok) { await cloudRequest('/auth/v1/logout', { method: 'POST' }); cloudClearSession(); return p; }
+        return { ok: true };
+    }
+
+    async function cloudSignOut() {
+        if (cloudSession) await cloudRequest('/auth/v1/logout', { method: 'POST' });
+        cloudClearSession();
+    }
+
+    async function cloudManage(action, payload) {
+        const r = await cloudRequest('/functions/v1/manage-users', { method: 'POST', body: Object.assign({ action }, payload || {}) });
+        if (r.status === 401) { cloudClearSession(); renderCloudAccount(); }
+        return { ok: r.ok && r.data && r.data.ok === true, error: (r.data && r.data.error) || (r.status === 0 ? 'network' : 'unknown') };
+    }
+
+    // ===== بيانات العمارة في السحابة — المرحلة 4، الخطوة 1: طبقة البيانات =====
+    // تحويل بين صيغة التطبيق المحلية (localStorage) وجداول السحابة، وسحب البيانات وعمليات الحفظ/الحذف.
+    // غير مربوطة بواجهة التطبيق بعد: لا شيء من هذا يُستدعى تلقائيًا ولا يغيّر بياناتك المحلية.
+    // أرقام الجوال وأسماء جهات الاتصال لا تدخل هنا إطلاقًا (تبقى محلية).
+    function cloudNum(v, fallback) {
+        const n = Number(v);
+        return isFinite(n) ? n : (fallback === undefined ? 0 : fallback);
+    }
+
+    function cloudIsManager() { return !!(cloudSession && cloudProfile && cloudProfile.role === 'manager'); }
+
+    function cloudDataError(r) {
+        if (r.status === 0) return 'network';
+        if (r.status === 401) return 'unauthorized';
+        if (r.status === 403) return 'forbidden';
+        if (r.status === 409) return 'conflict';
+        if (r.status === 400 && r.data && r.data.code === '23514') return 'invalid_data';
+        return 'server_error';
+    }
+
+    // ---- شهر ----
+    function cloudMonthToRow(rec) {
+        const year = Math.trunc(cloudNum(rec.year, new Date().getFullYear()));
+        if (!MONTHS_ORDER.includes(rec.month) || year < 2000 || year > 2200) return null;
+        const apts = Array.isArray(rec.apts) ? rec.apts : null;
+        const paid = apts ? apts.filter(v => cloudNum(v) > 0).length : cloudNum(rec.paidCount);
+        const ratio = Number(rec.reserveRatioPct);
+        const savedAt = new Date(cloudNum(rec.savedAt, Date.now()));
+        return {
+            year,
+            month: rec.month,
+            rev: cloudNum(rec.rev),
+            exp: cloudNum(rec.exp),
+            emerg: Math.max(0, cloudNum(rec.emerg)),
+            surp: cloudNum(rec.surp),
+            withdrew: !!rec.withdrew,
+            paid_count: Math.max(0, Math.min(64, Math.trunc(paid))),
+            breakdown: rec.breakdown && typeof rec.breakdown === 'object' ? JSON.parse(JSON.stringify(rec.breakdown)) : {},
+            reserve_ratio_pct: isValidReservePct(ratio) ? ratio : null,
+            saved_at: isNaN(savedAt.getTime()) ? new Date().toISOString() : savedAt.toISOString()
+        };
+    }
+
+    // تفصيل الشقق (للمدراء فقط في السحابة)
+    function cloudMonthToAptsRow(rec) {
+        if (!Array.isArray(rec.apts) || !rec.apts.length || rec.apts.length > 64) return null;
+        const year = Math.trunc(cloudNum(rec.year, new Date().getFullYear()));
+        if (!MONTHS_ORDER.includes(rec.month)) return null;
+        return { year, month: rec.month, apts: rec.apts.map(v => cloudNum(v)) };
+    }
+
+    function cloudRowToMonth(row, aptsRow) {
+        const rec = {
+            month: row.month,
+            year: Number(row.year),
+            rev: cloudNum(row.rev),
+            exp: cloudNum(row.exp),
+            emerg: cloudNum(row.emerg),
+            surp: cloudNum(row.surp),
+            withdrew: !!row.withdrew,
+            apts: aptsRow && Array.isArray(aptsRow.apts) ? aptsRow.apts.map(v => cloudNum(v)) : [],   // المطّلع لا يستلم التفصيل
+            paidCount: cloudNum(row.paid_count),
+            breakdown: row.breakdown && typeof row.breakdown === 'object' ? row.breakdown : {},
+            savedAt: Date.parse(row.saved_at) || Date.now(),
+            _updatedAt: row.updated_at   // نص كما وصل (بدقة الميكروثانية) لاستخدامه في كشف التعارض
+        };
+        if (row.reserve_ratio_pct !== null && row.reserve_ratio_pct !== undefined) rec.reserveRatioPct = cloudNum(row.reserve_ratio_pct);
+        return rec;
+    }
+
+    // ---- دفعة مصعد ----
+    function cloudPaymentToRow(p) {
+        const when = new Date(cloudNum(p.timestamp, Date.now()));
+        const amount = cloudNum(p.amount);
+        if (!(amount > 0) || isNaN(when.getTime())) return null;
+        return {
+            amount,
+            paid_at: when.toISOString(),
+            year: Math.trunc(cloudNum(p.year, when.getFullYear())),
+            historical: !!p.historical
+        };
+    }
+
+    function cloudRowToPayment(row) {
+        const p = { id: row.id, amount: cloudNum(row.amount), timestamp: Date.parse(row.paid_at) || Date.now(), year: Number(row.year), _updatedAt: row.updated_at };
+        if (row.historical) p.historical = true;
+        return p;
+    }
+
+    // ---- إعدادات العمارة (تُقرأ من مفاتيح التخزين المحلية الحالية) ----
+    function cloudSettingsToRow() {
+        const f = getFixedSettings() || {};
+        const ob = getOpeningBalance();
+        const ratio = parseFloat(localStorage.getItem('emergency_reserve_ratio_pct'));
+        const fee = parseFloat(f.defaultAptFee);
+        return {
+            property_name: String(f.propertyName || '').trim().slice(0, 80) || 'عمارة',
+            manager_name: String(f.managerName || '').trim().slice(0, 80),
+            apartment_count: getApartmentCount(),
+            guard_salary: Math.max(0, cloudNum(parseFloat(f.guard))),
+            elevator_annual: Math.max(0, cloudNum(parseFloat(f.elevatorAnnual))),
+            default_apt_fee: isFinite(fee) ? Math.max(0, fee) : null,
+            reserve_ratio_pct: isValidReservePct(ratio) ? ratio : 40,
+            emergency_min_threshold: Math.max(0, cloudNum(parseFloat(localStorage.getItem('emergency_fund_min_threshold')))),
+            opening_amount: ob ? cloudNum(ob.amount) : 0,
+            opening_year: ob && ob.year >= 2000 && ob.year <= 2200 ? Math.trunc(ob.year) : null
+        };
+    }
+
+    // صف الإعدادات من السحابة إلى مفاتيح التخزين المحلية
+    function cloudApplySettingsRow(row) {
+        const str = v => (v === null || v === undefined) ? '' : String(cloudNum(v));
+        localStorage.setItem('fixed_building_settings', JSON.stringify({
+            guard: str(row.guard_salary),
+            elevatorAnnual: str(row.elevator_annual),
+            managerName: row.manager_name || '',
+            propertyName: row.property_name || '',
+            defaultAptFee: str(row.default_apt_fee)
+        }));
+        localStorage.setItem('emergency_reserve_ratio_pct', String(cloudNum(row.reserve_ratio_pct, 40)));
+        const threshold = cloudNum(row.emergency_min_threshold);
+        if (threshold > 0) localStorage.setItem('emergency_fund_min_threshold', String(threshold)); else localStorage.removeItem('emergency_fund_min_threshold');
+        const opening = cloudNum(row.opening_amount);
+        if (opening !== 0 && row.opening_year) localStorage.setItem('opening_balance', JSON.stringify({ amount: opening, year: Number(row.opening_year) }));
+        else localStorage.removeItem('opening_balance');
+    }
+
+    // ---- سحب كل البيانات ----
+    async function cloudGet(path) {
+        const r = await cloudRequest(path);
+        if (!r.ok || !Array.isArray(r.data)) return { ok: false, error: cloudDataError(r) };
+        return { ok: true, rows: r.data };
+    }
+
+    async function cloudPullAll() {
+        if (!cloudSession) return { ok: false, error: 'unauthorized' };
+        const [months, apts, payments, settings] = await Promise.all([
+            cloudGet('/rest/v1/months?select=*&order=year.asc'),
+            cloudGet('/rest/v1/month_apartments?select=*'),
+            cloudGet('/rest/v1/elevator_payments?select=*&order=paid_at.asc'),
+            cloudGet('/rest/v1/building_settings?select=*&id=eq.1')
+        ]);
+        const failed = [months, apts, payments, settings].find(x => !x.ok);
+        if (failed) return { ok: false, error: failed.error };
+        if (!settings.rows.length) return { ok: false, error: 'server_error' };
+        const aptsByKey = {};
+        apts.rows.forEach(a => { aptsByKey[`${a.year}|${a.month}`] = a; });
+        return {
+            ok: true,
+            months: months.rows.map(r => cloudRowToMonth(r, aptsByKey[`${r.year}|${r.month}`])),
+            payments: payments.rows.map(cloudRowToPayment),
+            settings: settings.rows[0]
+        };
+    }
+
+    // يستبدل النسخة المحلية من بيانات العمارة بما سُحب. لا يلمس الجوالات ولا الأسماء ولا رمز PIN ولا المظهر.
+    function cloudApplyPull(pulled, opts) {
+        // حماية: سحبة فارغة لا تمسح بيانات محلية موجودة (حالة السحابة الجديدة قبل رفع بيانات الجهاز الرئيسي)
+        if (!(opts && opts.allowEmpty) && !pulled.months.length && !pulled.payments.length
+            && (readHistory().length || readPayments().length)) {
+            return { ok: false, error: 'would_erase_local' };
+        }
+        localStorage.setItem('property_history', JSON.stringify(pulled.months));
+        localStorage.setItem('elevator_payments', JSON.stringify(pulled.payments));
+        cloudApplySettingsRow(pulled.settings);
+        try { localStorage.setItem('cloud_meta', JSON.stringify({ settingsUpdatedAt: pulled.settings.updated_at, pulledAt: Date.now() })); } catch (e) {}
+        return { ok: true, months: pulled.months.length, payments: pulled.payments.length };
+    }
+
+    function cloudSettingsUpdatedAt() {
+        try { return (JSON.parse(localStorage.getItem('cloud_meta') || 'null') || {}).settingsUpdatedAt || null; } catch (e) { return null; }
+    }
+
+    // ---- عمليات الكتابة (للمدراء) مع كشف التعارض عبر updated_at ----
+    const CLOUD_PREFER_REP = { Prefer: 'return=representation' };
+
+    async function cloudSaveMonth(rec) {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        const row = cloudMonthToRow(rec);
+        if (!row) return { ok: false, error: 'invalid_data' };
+        let r;
+        if (rec._updatedAt) {
+            const body = Object.assign({}, row); delete body.year; delete body.month;
+            r = await cloudRequest(`/rest/v1/months?year=eq.${row.year}&month=eq.${encodeURIComponent(row.month)}&updated_at=eq.${encodeURIComponent(rec._updatedAt)}`,
+                { method: 'PATCH', body, headers: CLOUD_PREFER_REP });
+            if (r.ok && Array.isArray(r.data) && r.data.length === 0) return { ok: false, error: 'conflict' };
+        } else {
+            r = await cloudRequest('/rest/v1/months', { method: 'POST', body: row, headers: CLOUD_PREFER_REP });
+        }
+        if (!r.ok || !Array.isArray(r.data) || !r.data[0]) return { ok: false, error: cloudDataError(r) };
+        const updatedAt = r.data[0].updated_at;
+        const aptsRow = cloudMonthToAptsRow(rec);
+        if (aptsRow) {
+            const r2 = await cloudRequest('/rest/v1/month_apartments?on_conflict=year,month', { method: 'POST', body: aptsRow, headers: { Prefer: 'resolution=merge-duplicates,return=minimal' } });
+            if (!r2.ok) return { ok: false, error: cloudDataError(r2), partial: true, updatedAt };
+        }
+        return { ok: true, updatedAt };
+    }
+
+    async function cloudDeleteMonth(month, year, updatedAt) {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        let path = `/rest/v1/months?year=eq.${Math.trunc(cloudNum(year))}&month=eq.${encodeURIComponent(month)}`;
+        if (updatedAt) path += `&updated_at=eq.${encodeURIComponent(updatedAt)}`;
+        const r = await cloudRequest(path, { method: 'DELETE', headers: CLOUD_PREFER_REP });
+        if (!r.ok || !Array.isArray(r.data)) return { ok: false, error: cloudDataError(r) };
+        if (r.data.length === 0) return { ok: false, error: updatedAt ? 'conflict' : 'not_found' };
+        return { ok: true };
+    }
+
+    async function cloudInsertPayment(p) {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        const row = cloudPaymentToRow(p);
+        if (!row) return { ok: false, error: 'invalid_data' };
+        const r = await cloudRequest('/rest/v1/elevator_payments', { method: 'POST', body: row, headers: CLOUD_PREFER_REP });
+        if (!r.ok || !Array.isArray(r.data) || !r.data[0]) return { ok: false, error: cloudDataError(r) };
+        return { ok: true, payment: cloudRowToPayment(r.data[0]) };
+    }
+
+    async function cloudUpdatePayment(p) {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        const row = cloudPaymentToRow(p);
+        if (!row || !p.id) return { ok: false, error: 'invalid_data' };
+        let path = `/rest/v1/elevator_payments?id=eq.${encodeURIComponent(p.id)}`;
+        if (p._updatedAt) path += `&updated_at=eq.${encodeURIComponent(p._updatedAt)}`;
+        const r = await cloudRequest(path, { method: 'PATCH', body: row, headers: CLOUD_PREFER_REP });
+        if (!r.ok || !Array.isArray(r.data)) return { ok: false, error: cloudDataError(r) };
+        if (r.data.length === 0) return { ok: false, error: 'conflict' };
+        return { ok: true, payment: cloudRowToPayment(r.data[0]) };
+    }
+
+    async function cloudDeletePayment(id, updatedAt) {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        let path = `/rest/v1/elevator_payments?id=eq.${encodeURIComponent(id)}`;
+        if (updatedAt) path += `&updated_at=eq.${encodeURIComponent(updatedAt)}`;
+        const r = await cloudRequest(path, { method: 'DELETE', headers: CLOUD_PREFER_REP });
+        if (!r.ok || !Array.isArray(r.data)) return { ok: false, error: cloudDataError(r) };
+        if (r.data.length === 0) return { ok: false, error: updatedAt ? 'conflict' : 'not_found' };
+        return { ok: true };
+    }
+
+    // حفظ إعدادات العمارة الحالية (من مفاتيح التخزين المحلية) في السحابة
+    async function cloudSaveSettings() {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        const known = cloudSettingsUpdatedAt();
+        const path = '/rest/v1/building_settings?id=eq.1' + (known ? `&updated_at=eq.${encodeURIComponent(known)}` : '');
+        const r = await cloudRequest(path, { method: 'PATCH', body: cloudSettingsToRow(), headers: CLOUD_PREFER_REP });
+        if (!r.ok || !Array.isArray(r.data)) return { ok: false, error: cloudDataError(r) };
+        if (r.data.length === 0) return { ok: false, error: 'conflict' };
+        try { localStorage.setItem('cloud_meta', JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('cloud_meta') || '{}'), { settingsUpdatedAt: r.data[0].updated_at }))); } catch (e) {}
+        return { ok: true, updatedAt: r.data[0].updated_at };
+    }
+
+    // ===== المرحلة 4، الخطوة 3: كل تعديل يُحفظ في السحابة (للمدير) =====
+    // القاعدة: عند الاتصال بالسحابة لا يبقى تعديل محلي إلا بعد نجاح حفظه فيها (وإلا يُتراجع عنه).
+    // التعارض (عدّل مدير آخر نفس البيانات قبلك): نتراجع، نسحب النسخة الأحدث، ونطلب إعادة المحاولة.
+    let cloudBusy = false;
+    function cloudLock() {
+        if (cloudBusy) { showToast('⏳ جارٍ حفظ تعديل سابق — انتظر لحظة.'); return false; }
+        cloudBusy = true; return true;
+    }
+    function cloudUnlock() { cloudBusy = false; cloudPollSig = null; }   // تعديلنا لا يُعدّ تغييرًا خارجيًا
+
+    // وضع الكتابة: مسجّل دخول وسبق مطابقة هذا الجهاز مع السحابة (رفع أو سحب)
+    function cloudWriteOn() {
+        try { return !!(cloudSession && cloudProfile && (JSON.parse(localStorage.getItem('cloud_meta') || 'null') || {}).pulledAt); } catch (e) { return false; }
+    }
+
+    // المطّلع لا يعدّل شيئًا (الشاشات نفسها تُخفى في الخطوة 5؛ هذا حاجز إضافي)
+    function cloudEditBlocked() {
+        if (cloudSession && cloudProfile && cloudProfile.role !== 'manager') {
+            showToast('⚠️ حسابك للاطلاع فقط — لا يمكنك تعديل البيانات.');
+            return true;
+        }
+        return false;
+    }
+
+    function cloudSnap(keys) {
+        const snap = {};
+        keys.forEach(k => { snap[k] = localStorage.getItem(k); });
+        return snap;
+    }
+    function cloudRestore(snap) {
+        Object.keys(snap).forEach(k => { if (snap[k] === null) localStorage.removeItem(k); else localStorage.setItem(k, snap[k]); });
+    }
+
+    function cloudRefreshViews() {
+        try {
+            applyFixedSettings();
+            loadHistory();
+            populateReportMonthSelect();
+            populateAnnualReportYearSelect();
+            renderElevatorPaymentsLog();
+            renderHome();
+            checkEmergencyFundThreshold();
+        } catch (e) { console.warn('cloudRefreshViews', e); }
+    }
+
+    // سحب الحالة الحالية من السحابة وتطبيقها على هذا الجهاز
+    async function cloudResync() {
+        const pulled = await cloudPullAll();
+        if (!pulled.ok) return pulled;
+        const applied = cloudApplyPull(pulled, { allowEmpty: true });
+        cloudRefreshViews();
+        return applied;
+    }
+
+    async function cloudWriteFailed(error) {
+        if (error === 'conflict') {
+            const r = await cloudResync();
+            showToast(r && r.ok
+                ? '⚠️ عدّل مدير آخر هذه البيانات قبل قليل — حدّثنا الأرقام من السحابة. راجعها وأعد المحاولة.'
+                : '⚠️ ' + cloudMessage('conflict'), { duration: 9000 });
+        } else {
+            showToast('❌ لم يُحفظ التعديل في السحابة — ' + cloudMessage(error), { duration: 8000 });
+        }
+    }
+
+    // الإعدادات تُحفظ مع كل حرف يُكتب، فنؤجل الإرسال حتى يتوقف المستخدم لحظة
+    let cloudSettingsTimer = null;
+    function cloudQueueSettings() {
+        if (!cloudWriteOn() || !cloudIsManager()) return;
+        clearTimeout(cloudSettingsTimer);
+        cloudSettingsTimer = setTimeout(cloudFlushSettings, 1500);
+    }
+    async function cloudFlushSettings() {
+        clearTimeout(cloudSettingsTimer); cloudSettingsTimer = null;
+        if (!cloudWriteOn() || !cloudIsManager()) return;
+        if (cloudBusy) { cloudSettingsTimer = setTimeout(cloudFlushSettings, 1000); return; }
+        cloudBusy = true;
+        try {
+            const r = await cloudSaveSettings();
+            if (!r.ok) await cloudWriteFailed(r.error);
+        } finally { cloudBusy = false; cloudPollSig = null; }
+    }
+    document.addEventListener('visibilitychange', () => { if (document.hidden && cloudSettingsTimer) cloudFlushSettings(); });
+
+    // ===== المرحلة 4، الخطوة 4: التحديث اللحظي (استطلاع كل 5 ثوانٍ + عند فتح التطبيق/العودة إليه) =====
+    // يسحب الحالة من السحابة، ولا يطبّقها إلا إذا تغيّر شيء، ولا يقاطع مدخلات المستخدم أو حفظًا جاريًا.
+    const CLOUD_POLL_MS = 5000;
+    let cloudPollBusy = false, cloudPollSig = null, cloudLastOkAt = 0, cloudLiveState = 'idle';
+
+    function cloudPullSig(p) {
+        return JSON.stringify([
+            p.months.map(m => `${m.year}|${m.month}|${m._updatedAt}`),
+            p.payments.map(x => `${x.id}|${x._updatedAt}`),
+            p.settings.updated_at
+        ]);
+    }
+
+    function cloudSetLive(state) {
+        cloudLiveState = state;
+        const hdr = document.getElementById('cloud_live');
+        const row = document.getElementById('cloud_sync_status');
+        const on = !!(cloudSession && cloudProfile && cloudWriteOn());
+        const time = cloudLastOkAt ? new Date(cloudLastOkAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—';
+        const text = state === 'offline' ? `● غير متصل — آخر تحديث ${time}`
+            : state === 'expired' ? '● انتهت الجلسة — سجّل الدخول من جديد'
+            : `● متصل بالسحابة — آخر تحديث ${time}`;
+        const color = state === 'live' ? 'var(--success-soft-text, #2e7d32)' : 'var(--danger-soft-text, #c62828)';
+        if (hdr) { hdr.style.display = on ? '' : 'none'; hdr.textContent = text; hdr.style.color = color; }
+        if (row) { row.textContent = on ? text.replace('● ', '') : '—'; }
+    }
+
+    function cloudUserIsEditing() {
+        const a = document.activeElement;
+        return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+    }
+
+    async function cloudPollTick(force) {
+        if (cloudPollBusy || cloudBusy || !cloudWriteOn()) return;
+        if (!force && document.hidden) return;
+        if (cloudSettingsTimer) return;                    // عندي إعدادات لم تُرسل بعد
+        cloudPollBusy = true;
+        try {
+            const pulled = await cloudPullAll();
+            if (!pulled.ok) {
+                if (pulled.error === 'unauthorized') { cloudSetLive('expired'); cloudClearSession(); renderCloudAccount(); cloudGateCheck(); return; }
+                cloudSetLive('offline'); return;
+            }
+            cloudLastOkAt = Date.now();
+            const sig = cloudPullSig(pulled);
+            if (sig === cloudPollSig) { cloudSetLive('live'); return; }
+            if (cloudBusy || cloudSettingsTimer) return;   // بدأ حفظ أثناء السحب: تُترك للدورة القادمة
+            const settingsChanged = cloudPollSig !== null && JSON.parse(cloudPollSig)[2] !== pulled.settings.updated_at;
+            if (settingsChanged && cloudUserIsEditing()) { cloudSetLive('live'); return; }   // لا نقاطع الكتابة
+            const first = cloudPollSig === null;
+            const applied = cloudApplyPull(pulled);
+            if (!applied.ok) { cloudSetLive('live'); return; }
+            cloudPollSig = sig;
+            if (settingsChanged) applyFixedSettings();
+            loadHistory(); populateReportMonthSelect(); populateAnnualReportYearSelect();
+            renderElevatorPaymentsLog(); renderHome(); checkEmergencyFundThreshold();
+            if (!first) showToast('🔄 تم تحديث البيانات من السحابة.');
+            cloudSetLive('live');
+        } catch (e) { cloudSetLive('offline'); }
+        finally { cloudPollBusy = false; }
+    }
+
+    // يحدّث بصمة الحالة بعد أي حفظ ناجح من هذا الجهاز كي لا يُعدّ تعديلُنا تغييرًا خارجيًا
+    function cloudPollReset() { cloudPollSig = null; }
+
+    setInterval(() => cloudPollTick(false), CLOUD_POLL_MS);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) cloudPollTick(true); });
+    window.addEventListener('focus', () => cloudPollTick(true));
+    window.addEventListener('online', () => cloudPollTick(true));
+
+    // ===== المرحلة 4، الخطوة 2: رفع بيانات هذا الجهاز إلى السحابة (مرة واحدة، آمن للتكرار) =====
+    // القاعدة: لا يُستبدل ولا يُحذف شيء في السحابة. الشهر الموجود فيها يبقى كما هو، والدفعة الموجودة (بالمعرّف
+    // القديم أو بنفس المبلغ والوقت) لا تتكرر، والإعدادات تُكتب فقط إن لم يغيّرها أحد في السحابة من قبل.
+    function cloudMonthLabel(m) { return `${m.month} ${m.year}`; }
+
+    function cloudSameMonthFigures(cloudRec, row) {
+        const eq = (a, b) => Math.abs(cloudNum(a) - cloudNum(b)) < 0.005;
+        return eq(cloudRec.rev, row.rev) && eq(cloudRec.exp, row.exp) && eq(cloudRec.emerg, row.emerg) && eq(cloudRec.surp, row.surp);
+    }
+
+    async function cloudBuildUploadPlan() {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        const pulled = await cloudPullAll();
+        if (!pulled.ok) return pulled;
+        const legacy = await cloudGet('/rest/v1/elevator_payments?select=legacy_id');
+        if (!legacy.ok) return legacy;
+        const legacyIds = new Set(legacy.rows.map(r => r.legacy_id).filter(Boolean));
+
+        const cloudByKey = new Map(pulled.months.map(m => [`${m.year}|${m.month}`, m]));
+        const localMonths = readHistory();
+        const plan = {
+            ok: true,
+            cloudSettings: pulled.settings,
+            local: { months: localMonths.length, payments: readPayments().length },
+            cloud: { months: pulled.months.length, payments: pulled.payments.length },
+            monthsToUpload: [], monthsSame: [], monthsDifferent: [], monthsInvalid: [], monthsCloudOnly: [],
+            paymentsToUpload: [], paymentsExisting: 0, paymentsInvalid: 0,
+            settingsWillWrite: false, settingsReason: ''
+        };
+        const localKeys = new Set();
+        localMonths.forEach(rec => {
+            const row = cloudMonthToRow(rec);
+            if (!row) { plan.monthsInvalid.push(`${rec.month} ${rec.year}`); return; }
+            localKeys.add(`${row.year}|${row.month}`);
+            const existing = cloudByKey.get(`${row.year}|${row.month}`);
+            if (!existing) plan.monthsToUpload.push(rec);
+            else if (cloudSameMonthFigures(existing, row)) plan.monthsSame.push(cloudMonthLabel(row));
+            else plan.monthsDifferent.push(cloudMonthLabel(row));
+        });
+        pulled.months.forEach(m => { if (!localKeys.has(`${m.year}|${m.month}`)) plan.monthsCloudOnly.push(cloudMonthLabel(m)); });
+
+        readPayments().forEach(p => {
+            const row = cloudPaymentToRow(p);
+            if (!row) { plan.paymentsInvalid++; return; }
+            const dup = legacyIds.has(String(p.id))
+                || pulled.payments.some(c => Math.abs(c.amount - row.amount) < 0.005 && Math.abs(c.timestamp - Date.parse(row.paid_at)) < 1000);
+            if (dup) plan.paymentsExisting++; else plan.paymentsToUpload.push(p);
+        });
+
+        if (!getFixedSettings()) { plan.settingsReason = 'لا توجد إعدادات محفوظة على هذا الجهاز'; }
+        else if (pulled.settings.updated_by) { plan.settingsReason = 'سبق لمدير تعديل إعدادات السحابة، فتبقى كما هي'; }
+        else plan.settingsWillWrite = true;
+        return plan;
+    }
+
+    function cloudChunks(list, size) {
+        const out = [];
+        for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
+        return out;
+    }
+
+    // ينفّذ الخطة: أشهر ← تفصيل شقق للأشهر المرفوعة فعلًا ← دفعات ← إعدادات. كل خطوة آمنة للإعادة.
+    async function cloudRunUpload(plan) {
+        if (!cloudIsManager()) return { ok: false, error: 'forbidden' };
+        const report = { monthsUploaded: 0, paymentsUploaded: 0, settingsWritten: false, failures: [] };
+        const fail = (step, error) => { report.failures.push({ step, error }); return { ok: false, error, step, report }; };
+
+        // 1) الأشهر
+        const uploadedKeys = new Set();
+        for (const chunk of cloudChunks(plan.monthsToUpload, 100)) {
+            const rows = chunk.map(cloudMonthToRow).filter(Boolean);
+            const r = await cloudRequest('/rest/v1/months?on_conflict=year,month', { method: 'POST', body: rows, headers: { Prefer: 'resolution=ignore-duplicates,return=representation' } });
+            if (!r.ok || !Array.isArray(r.data)) return fail('months', cloudDataError(r));
+            r.data.forEach(row => uploadedKeys.add(`${row.year}|${row.month}`));
+            report.monthsUploaded += r.data.length;
+        }
+        // 2) تفصيل الشقق للأشهر التي رُفعت الآن فقط
+        const aptsRows = plan.monthsToUpload.filter(rec => uploadedKeys.has(`${Math.trunc(cloudNum(rec.year))}|${rec.month}`)).map(cloudMonthToAptsRow).filter(Boolean);
+        for (const chunk of cloudChunks(aptsRows, 100)) {
+            const r = await cloudRequest('/rest/v1/month_apartments?on_conflict=year,month', { method: 'POST', body: chunk, headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' } });
+            if (!r.ok) return fail('apartments', cloudDataError(r));
+        }
+        // 3) دفعات المصعد (المعرّف المحلي القديم يُحفظ في legacy_id لمنع التكرار)
+        for (const chunk of cloudChunks(plan.paymentsToUpload, 100)) {
+            const rows = chunk.map(p => Object.assign(cloudPaymentToRow(p), { legacy_id: String(p.id) })).filter(r => r.amount > 0);
+            const r = await cloudRequest('/rest/v1/elevator_payments?on_conflict=legacy_id', { method: 'POST', body: rows, headers: { Prefer: 'resolution=ignore-duplicates,return=representation' } });
+            if (!r.ok || !Array.isArray(r.data)) return fail('payments', cloudDataError(r));
+            report.paymentsUploaded += r.data.length;
+        }
+        // 4) الإعدادات
+        if (plan.settingsWillWrite) {
+            try { localStorage.setItem('cloud_meta', JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('cloud_meta') || '{}'), { settingsUpdatedAt: plan.cloudSettings.updated_at }))); } catch (e) {}
+            const r = await cloudSaveSettings();
+            if (!r.ok) return fail('settings', r.error);
+            report.settingsWritten = true;
+        }
+        report.applied = false;
+        // 5) مطابقة النسخة المحلية مع السحابة (لاستلام المعرّفات وتواريخ التعديل). لا تُنفَّذ لو في بيانات محلية غير صالحة
+        //    للسحابة، حتى لا تضيع من الجهاز.
+        if (!plan.monthsInvalid.length && !plan.paymentsInvalid) {
+            const pulled = await cloudPullAll();
+            if (!pulled.ok) return fail('refresh', pulled.error);
+            const applied = cloudApplyPull(pulled);
+            report.applied = !!applied.ok;
+        }
+        try { localStorage.setItem('cloud_meta', JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('cloud_meta') || '{}'), { uploadedAt: Date.now() }))); } catch (e) {}
+        return { ok: true, report };
+    }
+
+    // ----- نافذة المعاينة والرفع -----
+    function cloudBackupIsRecent() {
+        const ts = parseInt(localStorage.getItem('last_backup_at')) || 0;
+        return ts > 0 && Date.now() - ts < 2 * 60 * 60 * 1000;
+    }
+
+    function cloudUploadPlanHtml(plan) {
+        const row = (k, v) => `<div class="review-row"><span>${k}</span><span class="v" style="direction:rtl;">${v}</span></div>`;
+        const names = list => escapeHtml(list.slice(0, 6).join('، ') + (list.length > 6 ? ' …' : ''));
+        let html = '<div class="review-list">'
+            + row('أشهر على هذا الجهاز', plan.local.months)
+            + row('أشهر في السحابة الآن', plan.cloud.months)
+            + row('ستُرفع (غير موجودة في السحابة)', plan.monthsToUpload.length)
+            + row('موجودة ومطابقة', plan.monthsSame.length)
+            + row('دفعات المصعد التي ستُرفع', plan.paymentsToUpload.length)
+            + row('دفعات موجودة في السحابة', plan.paymentsExisting)
+            + row('الإعدادات', plan.settingsWillWrite ? 'ستُرفع' : escapeHtml(plan.settingsReason || 'لا شيء'))
+            + '</div>';
+        if (plan.monthsDifferent.length) html += `<p class="section-note" style="color:var(--warn-soft-text); font-weight:700; margin-top:10px;">أشهر موجودة في السحابة بأرقام مختلفة (تبقى نسخة السحابة ولا تُستبدل): ${names(plan.monthsDifferent)}</p>`;
+        if (plan.monthsCloudOnly.length) html += `<p class="section-note" style="margin-top:10px;">أشهر في السحابة وليست على هذا الجهاز (ستُضاف للجهاز بعد الرفع): ${names(plan.monthsCloudOnly)}</p>`;
+        if (plan.monthsInvalid.length || plan.paymentsInvalid) html += `<p class="section-note" style="color:var(--danger-soft-text); font-weight:700; margin-top:10px;">بيانات غير صالحة للسحابة ولن تُرفع (${plan.monthsInvalid.length} شهر، ${plan.paymentsInvalid} دفعة): ${names(plan.monthsInvalid)}. تبقى على جهازك كما هي.</p>`;
+        return html;
+    }
+
+    async function openCloudUploadSheet() {
+        if (!cloudIsManager()) { showToast('⚠️ ' + cloudMessage('forbidden')); return; }
+        openBottomSheet('<strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:6px;">رفع بيانات هذا الجهاز</strong><p class="section-note" id="cu_status">جارٍ فحص السحابة…</p>');
+        const plan = await cloudBuildUploadPlan();
+        const sheet = document.getElementById('bottom_sheet_content');
+        if (!plan.ok) { sheet.innerHTML = `<strong style="font-size:16px; display:block; margin-bottom:6px;">رفع بيانات هذا الجهاز</strong><p class="section-note" style="color:var(--danger-soft-text); font-weight:700;">${escapeHtml(cloudMessage(plan.error))}</p><button type="button" class="btn btn-outline" onclick="closeBottomSheet()">إغلاق</button>`; return; }
+        window._cloudPlan = plan;
+        renderCloudUploadSheet();
+    }
+
+    function renderCloudUploadSheet() {
+        const plan = window._cloudPlan;
+        const sheet = document.getElementById('bottom_sheet_content');
+        if (!plan || !sheet) return;
+        const nothing = !plan.monthsToUpload.length && !plan.paymentsToUpload.length && !plan.settingsWillWrite;
+        const recent = cloudBackupIsRecent();
+        const ts = parseInt(localStorage.getItem('last_backup_at')) || 0;
+        sheet.innerHTML = `
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:8px;">رفع بيانات هذا الجهاز</strong>
+            ${cloudUploadPlanHtml(plan)}
+            <p class="section-note" style="margin-top:12px; ${recent ? '' : 'color:var(--warn-soft-text); font-weight:700;'}">
+                ${recent ? 'آخر نسخة احتياطية: قبل أقل من ساعتين ✓' : (ts ? 'آخر نسخة احتياطية أقدم من ساعتين.' : 'لم تُؤخذ نسخة احتياطية بعد.') + ' خذ نسخة احتياطية الآن قبل الرفع.'}
+            </p>
+            <p id="sheet_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
+            <button type="button" class="btn btn-outline" id="cu_backup" onclick="cloudUploadBackup()" style="margin-top:0;">نسخة احتياطية الآن</button>
+            <button type="button" class="btn btn-primary" id="cu_run" onclick="cloudUploadConfirm()" ${recent && !nothing ? '' : 'disabled'}>${nothing ? 'لا يوجد ما يُرفع' : 'رفع الآن'}</button>
+            <button type="button" class="btn btn-outline" onclick="closeBottomSheet()">إغلاق</button>`;
+    }
+
+    async function cloudUploadBackup() {
+        await shareBackupData();
+        renderCloudUploadSheet();
+    }
+
+    async function cloudUploadConfirm() {
+        const plan = window._cloudPlan;
+        if (!plan || !cloudBackupIsRecent()) { renderCloudUploadSheet(); return; }
+        const btn = document.getElementById('cu_run');
+        btn.disabled = true; btn.textContent = 'جارٍ الرفع…';
+        const r = await cloudRunUpload(plan);
+        const sheet = document.getElementById('bottom_sheet_content');
+        const rp = r.report || {};
+        const lines = [
+            `أشهر رُفعت: ${rp.monthsUploaded || 0}`,
+            `دفعات رُفعت: ${rp.paymentsUploaded || 0}`,
+            `الإعدادات: ${rp.settingsWritten ? 'رُفعت' : 'لم تتغير'}`
+        ];
+        if (r.ok) {
+            if (typeof renderHome === 'function') { loadHistory(); renderHome(); }
+            lines.push(rp.applied ? 'تمت مطابقة هذا الجهاز مع السحابة.' : 'لم تُطابَق نسخة هذا الجهاز مع السحابة لأن فيها بيانات غير صالحة للسحابة؛ بقيت كما هي.');
+        }
+        sheet.innerHTML = `
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:8px;">${r.ok ? '✅ اكتمل الرفع' : '⚠️ توقف الرفع'}</strong>
+            ${r.ok ? '' : `<p class="section-note" style="color:var(--danger-soft-text); font-weight:700;">${escapeHtml(cloudMessage(r.error))} (الخطوة: ${escapeHtml(r.step || '')}). ما رُفع قبل التوقف يبقى، ويمكنك إعادة الرفع بأمان: لا يتكرر شيء.</p>`}
+            <div class="review-list">${lines.map(l => `<div class="review-row"><span>${escapeHtml(l)}</span></div>`).join('')}</div>
+            <button type="button" class="btn btn-primary" onclick="closeBottomSheet()">تم</button>`;
+    }
+
+    // ----- الواجهة -----
+    function renderCloudAccount() {
+        const out = document.getElementById('cloud_signed_out');
+        if (!out) return;
+        const signedIn = !!(cloudSession && cloudProfile);
+        out.style.display = signedIn ? 'none' : '';
+        document.getElementById('cloud_signed_in').style.display = signedIn ? '' : 'none';
+        document.getElementById('cloud_users_card').style.display = signedIn && cloudProfile.role === 'manager' ? '' : 'none';
+        document.getElementById('cloud_migrate_card').style.display = signedIn && cloudProfile.role === 'manager' ? '' : 'none';
+        if (signedIn) {
+            document.getElementById('cloud_who').textContent = cloudProfile.display_name ? `${cloudProfile.display_name} (${cloudProfile.username})` : cloudProfile.username;
+            document.getElementById('cloud_role').textContent = cloudProfile.role === 'manager' ? 'مدير (تعديل كامل)' : 'مطّلع (اطلاع فقط)';
+        }
+        cloudSetLive(cloudLiveState === 'idle' ? 'live' : cloudLiveState);
+        document.body.classList.toggle('viewer-mode', !!(cloudSession && cloudProfile && cloudProfile.role !== 'manager'));
+        const quickTab = document.getElementById('tab_quick');
+        if (quickTab && document.body.classList.contains('viewer-mode') && quickTab.style.display !== 'none') switchTab('dashboard');
+    }
+
+    // ---- بوابة الدخول (المرحلة 4، الخطوة 6) ----
+    function cloudDeviceEnabled() {
+        try { return !!(JSON.parse(localStorage.getItem('cloud_meta') || 'null') || {}).pulledAt; } catch (e) { return false; }
+    }
+    function openCloudGate(optional) {
+        const g = document.getElementById('cloud_gate');
+        if (!g) return;
+        document.getElementById('gate_back').style.display = optional ? '' : 'none';
+        document.getElementById('gate_error').style.display = 'none';
+        g.style.display = 'flex';
+    }
+    function closeCloudGate() { const g = document.getElementById('cloud_gate'); if (g) g.style.display = 'none'; }
+    function cloudGateCheck() {
+        const need = cloudDeviceEnabled() && !(cloudSession && cloudProfile);
+        if (need) openCloudGate(false); else if (cloudSession && cloudProfile) closeCloudGate();
+    }
+
+    // بعد تسجيل الدخول: المطّلع والجهاز الفارغ والجهاز المرتبط سابقًا يسحبون بيانات السحابة.
+    // المدير الذي لديه بيانات محلية غير مرتبطة يستخدم بطاقة "نقل بيانات العمارة" بدل السحب.
+    async function cloudAfterSignIn() {
+        const viewer = cloudProfile.role !== 'manager';
+        const hasLocal = readHistory().length > 0 || readPayments().length > 0;
+        if (!viewer && hasLocal && !cloudDeviceEnabled()) return { pulled: false };
+        if (hasLocal && !cloudDeviceEnabled() && !confirm('هذا الجهاز يحتوي بيانات محلية، وسيستبدلها السحب ببيانات السحابة. هل تتابع؟')) {
+            await cloudSignOut();
+            renderCloudAccount();
+            return { pulled: false, cancelled: true };
+        }
+        const r = await cloudResync();
+        if (!r.ok) { showToast('❌ تعذّر سحب بيانات السحابة — ' + cloudMessage(r.error === 'would_erase_local' ? 'server_error' : r.error), { duration: 8000 }); return { pulled: false }; }
+        if (!shouldShowSetupWizard()) document.getElementById('setup_wizard_overlay').style.display = 'none';
+        cloudPollReset();
+        return { pulled: true };
+    }
+
+    async function cloudGateSubmit() {
+        const userEl = document.getElementById('gate_username');
+        const passEl = document.getElementById('gate_password');
+        const errEl = document.getElementById('gate_error');
+        const btn = document.getElementById('gate_btn');
+        const username = userEl.value.trim().toLowerCase();
+        const showError = msg => { errEl.textContent = msg; errEl.style.display = msg ? 'block' : 'none'; };
+        showError('');
+        if (!/^[a-z0-9._-]{3,32}$/.test(username)) { showError(cloudMessage('invalid_username')); return; }
+        if (!passEl.value) { showError('اكتب كلمة المرور.'); return; }
+        btn.disabled = true; btn.textContent = 'جارٍ الدخول…';
+        const r = await cloudSignIn(username, passEl.value);
+        passEl.value = '';
+        if (!r.ok) { btn.disabled = false; btn.textContent = 'تسجيل الدخول'; showError(cloudMessage(r.error)); return; }
+        userEl.value = '';
+        renderCloudAccount();
+        const a = await cloudAfterSignIn();
+        btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+        if (a.cancelled) return;
+        closeCloudGate();
+        if (cloudProfile.role === 'manager') cloudRefreshUsers();
+        showToast(`✅ تم تسجيل الدخول: ${cloudProfile.username}`);
+    }
+
+    async function cloudLoginSubmit() {
+        const userEl = document.getElementById('cloud_username');
+        const passEl = document.getElementById('cloud_password');
+        const errEl = document.getElementById('cloud_login_error');
+        const btn = document.getElementById('cloud_login_btn');
+        const username = userEl.value.trim().toLowerCase();
+        const showError = msg => { errEl.textContent = msg; errEl.style.display = msg ? 'block' : 'none'; };
+        showError('');
+        if (!/^[a-z0-9._-]{3,32}$/.test(username)) { showError(cloudMessage('invalid_username')); return; }
+        if (!passEl.value) { showError('اكتب كلمة المرور.'); return; }
+        btn.disabled = true; btn.textContent = 'جارٍ الدخول…';
+        const r = await cloudSignIn(username, passEl.value);
+        btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+        passEl.value = '';
+        if (!r.ok) { showError(cloudMessage(r.error)); return; }
+        userEl.value = '';
+        renderCloudAccount();
+        const a = await cloudAfterSignIn();
+        if (a.cancelled) return;
+        if (cloudProfile.role === 'manager') cloudRefreshUsers();
+        showToast(`✅ تم تسجيل الدخول: ${cloudProfile.username}`);
+    }
+
+    async function cloudSignOutUI() {
+        await cloudSignOut();
+        renderCloudAccount();
+        cloudGateCheck();
+        showToast('تم تسجيل الخروج.');
+    }
+
+    async function cloudRefreshUsers() {
+        const r = await cloudRequest('/rest/v1/profiles?select=id,username,role,display_name,disabled,created_at&order=created_at.asc');
+        if (!r.ok || !Array.isArray(r.data)) {
+            if (r.status === 401) { cloudClearSession(); renderCloudAccount(); }
+            showToast('⚠️ ' + cloudMessage(r.status === 0 ? 'network' : 'unauthorized'));
+            return;
+        }
+        cloudUsers = r.data;
+        renderCloudUsers();
+    }
+
+    function renderCloudUsers() {
+        const box = document.getElementById('cloud_users_list');
+        if (!box) return;
+        box.textContent = '';
+        cloudUsers.forEach(u => {
+            const row = document.createElement('div');
+            row.className = 'history-item';
+            const main = document.createElement('div');
+            main.className = 'main';
+            const t = document.createElement('div');
+            t.className = 't';
+            t.textContent = u.display_name || u.username;
+            const sub = document.createElement('div');
+            sub.className = 's';
+            sub.textContent = `${u.username} · ${u.role === 'manager' ? 'مدير' : 'مطّلع'}${u.disabled ? ' · معطّل' : ''}`;
+            main.append(t, sub);
+            row.appendChild(main);
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'icon-btn';
+            btn.setAttribute('aria-label', 'إجراءات ' + u.username);
+            btn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-more"/></svg>';
+            btn.addEventListener('click', () => openUserActionsSheet(u.id));
+            row.appendChild(btn);
+            box.appendChild(row);
+        });
+    }
+
+    function generateCloudPassword() {
+        const alphabet = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+        const bytes = new Uint32Array(12);
+        crypto.getRandomValues(bytes);
+        return Array.from(bytes, b => alphabet[b % alphabet.length]).join('');
+    }
+
+    function fillGeneratedPassword(inputId) {
+        const el = document.getElementById(inputId);
+        el.type = 'text';
+        el.value = generateCloudPassword();
+    }
+
+    function sheetError(msg) {
+        const el = document.getElementById('sheet_error');
+        if (el) { el.textContent = msg; el.style.display = msg ? 'block' : 'none'; }
+    }
+
+    // كل ما في النوافذ نصوص ثابتة؛ أي نص من المستخدم يمرّ عبر escapeHtml
+    function openAddUserSheet() {
+        openBottomSheet(`
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:6px;">إضافة مستخدم</strong>
+            <div class="form-group"><label for="au_username">اسم المستخدم (إنجليزي صغير)</label>
+                <input type="text" id="au_username" lang="en" dir="ltr" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="32"></div>
+            <div class="form-group"><label for="au_display">الاسم الظاهر (اختياري)</label>
+                <input type="text" id="au_display" maxlength="60" autocomplete="off"></div>
+            <div class="form-group"><label for="au_password">كلمة المرور (8 أحرف على الأقل)</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="password" id="au_password" lang="en" dir="ltr" autocomplete="new-password" maxlength="72" style="flex:1;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="fillGeneratedPassword('au_password')">توليد</button>
+                </div></div>
+            <div class="form-group"><label for="au_role">الدور</label>
+                <select id="au_role"><option value="viewer">مطّلع — يرى المالية فقط</option><option value="manager">مدير — تعديل كامل وإدارة المستخدمين</option></select></div>
+            <p id="sheet_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button type="button" class="btn btn-primary" id="au_save" onclick="submitAddUser()" style="margin-top:0;">إنشاء</button>
+                <button type="button" class="btn btn-outline" onclick="closeBottomSheet()" style="margin-top:0;">إلغاء</button>
+            </div>`);
+    }
+
+    async function submitAddUser() {
+        const username = document.getElementById('au_username').value.trim().toLowerCase();
+        const password = document.getElementById('au_password').value;
+        const display = document.getElementById('au_display').value.trim();
+        const role = document.getElementById('au_role').value;
+        if (!/^[a-z0-9._-]{3,32}$/.test(username)) { sheetError(cloudMessage('invalid_username')); return; }
+        if (password.length < 8) { sheetError(cloudMessage('weak_password')); return; }
+        const btn = document.getElementById('au_save');
+        btn.disabled = true;
+        const r = await cloudManage('create', { username, password, role, display_name: display });
+        btn.disabled = false;
+        if (!r.ok) { sheetError(cloudMessage(r.error)); return; }
+        closeBottomSheet();
+        await cloudRefreshUsers();
+        // كلمة المرور تُعرض مرة واحدة ليسلّمها المدير للمستخدم (لا تُحفظ في أي مكان)
+        showToast(`✅ تم إنشاء ${username}. كلمة المرور: ${password}`, { duration: 20000 });
+    }
+
+    function openUserActionsSheet(id) {
+        const u = cloudUsers.find(x => x.id === id);
+        if (!u) return;
+        const self = cloudProfile && u.id === cloudProfile.id;
+        const sid = safeJsId(u.id);
+        openBottomSheet(`
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:4px;">${escapeHtml(u.display_name || u.username)}</strong>
+            <p class="section-note">${escapeHtml(u.username)} · ${u.role === 'manager' ? 'مدير' : 'مطّلع'}${u.disabled ? ' · معطّل' : ''}${self ? ' · حسابك' : ''}</p>
+            <p id="sheet_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
+            <button type="button" class="btn btn-outline" onclick="openResetPasswordSheet('${sid}')" style="margin-top:0;">إعادة تعيين كلمة المرور</button>
+            ${self ? '' : `
+            <button type="button" class="btn btn-outline" onclick="cloudUserAction('${sid}', 'set_role', { role: '${u.role === 'manager' ? 'viewer' : 'manager'}' })">${u.role === 'manager' ? 'تحويله إلى مطّلع' : 'ترقيته إلى مدير'}</button>
+            <button type="button" class="btn btn-outline" onclick="cloudUserAction('${sid}', 'set_disabled', { disabled: ${u.disabled ? 'false' : 'true'} })">${u.disabled ? 'تفعيل الحساب' : 'تعطيل الحساب'}</button>
+            <button type="button" class="btn btn-danger" onclick="cloudDeleteUser('${sid}')">حذف الحساب</button>`}
+            <button type="button" class="btn btn-outline" onclick="closeBottomSheet()">إغلاق</button>`);
+    }
+
+    async function cloudUserAction(id, action, payload) {
+        const r = await cloudManage(action, Object.assign({ user_id: id }, payload));
+        if (!r.ok) { sheetError(cloudMessage(r.error)); return; }
+        closeBottomSheet();
+        await cloudRefreshUsers();
+        showToast('✅ تم التنفيذ.');
+    }
+
+    async function cloudDeleteUser(id) {
+        const u = cloudUsers.find(x => x.id === id);
+        if (!u || !confirm(`حذف حساب ${u.username} نهائيًا؟ لا يمكن التراجع.`)) return;
+        await cloudUserAction(id, 'delete', {});
+    }
+
+    function openResetPasswordSheet(id) {
+        const u = cloudUsers.find(x => x.id === id);
+        if (!u) return;
+        openBottomSheet(`
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:6px;">كلمة مرور جديدة: ${escapeHtml(u.username)}</strong>
+            <div class="form-group"><label for="rp_password">كلمة المرور (8 أحرف على الأقل)</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="password" id="rp_password" lang="en" dir="ltr" autocomplete="new-password" maxlength="72" style="flex:1;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="fillGeneratedPassword('rp_password')">توليد</button>
+                </div></div>
+            <p id="sheet_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button type="button" class="btn btn-primary" onclick="submitResetPassword('${safeJsId(u.id)}')" style="margin-top:0;">حفظ</button>
+                <button type="button" class="btn btn-outline" onclick="closeBottomSheet()" style="margin-top:0;">إلغاء</button>
+            </div>`);
+    }
+
+    async function submitResetPassword(id) {
+        const password = document.getElementById('rp_password').value;
+        if (password.length < 8) { sheetError(cloudMessage('weak_password')); return; }
+        const r = await cloudManage('set_password', { user_id: id, password });
+        if (!r.ok) { sheetError(cloudMessage(r.error)); return; }
+        closeBottomSheet();
+        showToast(`✅ تم تغيير كلمة المرور. الجديدة: ${password}`, { duration: 20000 });
+    }
+
+    // تغيير كلمة مرور المستخدم لنفسه (أي دور)
+    function openCloudPasswordSheet() {
+        openBottomSheet(`
+            <strong style="font-size:16px; color:var(--text-color); display:block; margin-bottom:6px;">تغيير كلمة المرور</strong>
+            <div class="form-group"><label for="cp_new">كلمة المرور الجديدة (8 أحرف على الأقل)</label>
+                <input type="password" id="cp_new" lang="en" dir="ltr" autocomplete="new-password" maxlength="72"></div>
+            <div class="form-group"><label for="cp_confirm">أعد كتابتها</label>
+                <input type="password" id="cp_confirm" lang="en" dir="ltr" autocomplete="new-password" maxlength="72"></div>
+            <p id="sheet_error" class="section-note" role="alert" style="display:none; color:var(--danger-soft-text); font-weight:700;"></p>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button type="button" class="btn btn-primary" onclick="submitCloudPassword()" style="margin-top:0;">حفظ</button>
+                <button type="button" class="btn btn-outline" onclick="closeBottomSheet()" style="margin-top:0;">إلغاء</button>
+            </div>`);
+    }
+
+    async function submitCloudPassword() {
+        const a = document.getElementById('cp_new').value, b = document.getElementById('cp_confirm').value;
+        if (a.length < 8) { sheetError(cloudMessage('weak_password')); return; }
+        if (a !== b) { sheetError('كلمتا المرور غير متطابقتين.'); return; }
+        const r = await cloudRequest('/auth/v1/user', { method: 'PUT', body: { password: a } });
+        if (!r.ok) {
+            const code = (r.data && (r.data.error_code || r.data.code)) || (r.status === 0 ? 'network' : 'update_failed');
+            sheetError(cloudMessage(typeof code === 'string' ? code : 'update_failed'));
+            return;
+        }
+        closeBottomSheet();
+        showToast('✅ تم تغيير كلمة المرور.');
+    }
+
+    // عند فتح التطبيق: استعادة الجلسة المحفوظة (العرض فورًا من النسخة المخزنة، ثم التحقق من الخادم)
+    async function cloudInit() {
+        try {
+            cloudSession = JSON.parse(localStorage.getItem(CLOUD.sessionKey) || 'null');
+            cloudProfile = JSON.parse(localStorage.getItem(CLOUD.profileKey) || 'null');
+        } catch (e) { cloudSession = null; cloudProfile = null; }
+        if (!cloudSession || !cloudSession.refresh_token || !cloudProfile) { cloudClearSession(); renderCloudAccount(); cloudGateCheck(); return; }
+        renderCloudAccount();
+        const p = await cloudLoadProfile();
+        if (!p.ok && p.error !== 'network') { cloudClearSession(); }
+        renderCloudAccount();
+        cloudGateCheck();
+        if (cloudProfile && cloudProfile.role === 'manager') cloudRefreshUsers();
+        cloudPollTick(true);
+    }
+
     // ===== نظام التبويبات الأربعة (Bottom Navigation) =====
     const TAB_IDS = ['dashboard', 'quick', 'history', 'reports', 'settings'];
 
     function switchTab(tabName) {
+        if (tabName === 'quick' && document.body.classList.contains('viewer-mode')) tabName = 'dashboard';
         TAB_IDS.forEach(name => {
             const section = document.getElementById(`tab_${name}`);
             const btn = document.getElementById(`navbtn_${name}`);
@@ -1262,7 +2369,7 @@
         const month = MONTHS_ORDER[now.getMonth()], y = now.getFullYear();
         const rec = getHistoryRecordFor(month, y);
         const count = getApartmentCount();
-        const paid = rec ? (rec.apts || []).filter(v => Number(v) > 0).length : 0;
+        const paid = rec ? ((rec.apts && rec.apts.length) ? rec.apts.filter(v => Number(v) > 0).length : (Number(rec.paidCount) || 0)) : 0;
         document.getElementById('home_month_title').innerText = `تحصيل ${month}`;
         const status = document.getElementById('home_month_status');
         status.innerText = rec ? 'معتمد' : 'غير مسجّل';
@@ -1331,9 +2438,10 @@
         window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
-    function wizardNext() {
+    async function wizardNext() {
         if (wizardStep === 4) {
-            calculateAndSaveBudget();
+            const saved = await calculateAndSaveBudget();
+            if (saved === false) return;
             wizardStep = 1;
             switchTab('dashboard');
             return;
@@ -1633,6 +2741,7 @@
         const defaultFeeEl = document.getElementById('default_apt_fee');
         const defaultAptFee = defaultFeeEl ? defaultFeeEl.value : '';
         localStorage.setItem('fixed_building_settings', JSON.stringify({ guard, elevatorAnnual, managerName, propertyName, defaultAptFee }));
+        cloudQueueSettings();
     }
 
     // راتب الحارس أصبح في تبويب الإعدادات (guard_salary_settings)، والحقل الأصلي (guard_salary)
@@ -1668,6 +2777,7 @@
         let pct = parseFloat(el.value);
         if (!isFinite(pct)) return; // يترك القيمة الفعلية كما هي أثناء الكتابة، الفحص النهائي في getEmergencyReserveRatio()
         localStorage.setItem('emergency_reserve_ratio_pct', String(pct));
+        cloudQueueSettings();
     }
 
     function applyFixedSettings() {
@@ -1743,6 +2853,7 @@
                 amountEl.value = openingBalance;
                 yearEl.value = new Date().getFullYear();
                 localStorage.setItem('opening_balance', JSON.stringify({ amount: openingBalance, year: new Date().getFullYear() }));
+                cloudQueueSettings();
                 if (typeof renderOpeningBalanceStatus === 'function') renderOpeningBalanceStatus();
             }
         }
@@ -2383,7 +3494,13 @@
     }
 
     // الدالة الرئيسية المدمجة (حساب + حفظ تلقائي)
-    function calculateAndSaveBudget() {
+    async function calculateAndSaveBudget() {
+        if (cloudEditBlocked()) return false;
+        if (!cloudLock()) return false;
+        try { return await calculateAndSaveBudgetInner(); } finally { cloudUnlock(); }
+    }
+
+    async function calculateAndSaveBudgetInner() {
         const currentMonth = document.getElementById('budget_month').value;
         const currentYear = parseInt(document.getElementById('budget_year').value) || new Date().getFullYear();
 
@@ -2455,9 +3572,12 @@
                 const pct = Number(existing && existing.reserveRatioPct);
                 return isValidReservePct(pct) ? pct : getEmergencyReserveRatio() * 100;
             })(),
-            savedAt: Date.now()
+            savedAt: Date.now(),
+            // تاريخ آخر تعديل في السحابة (لكشف التعارض مع مدير آخر)
+            _updatedAt: (() => { const e = getHistoryRecordFor(currentMonth, currentYear); return e && e._updatedAt ? e._updatedAt : undefined; })()
         };
 
+        const cloudSnapshot = cloudWriteOn() ? cloudSnap(['property_history']) : null;
         let history = readHistory();
         // تصفية السجل لمنع تكرار نفس الشهر بنفس السنة، واستبداله بالتقرير الجديد المحدث
         history = history.filter(item => !(item.month === currentMonth && (item.year || new Date().getFullYear()) === currentYear));
@@ -2478,6 +3598,20 @@
             record.withdrew = true;
             localStorage.setItem('property_history', JSON.stringify(history));
         }
+
+        // الحفظ في السحابة قبل إعلان النجاح؛ عند الفشل يُتراجع عن الحفظ المحلي
+        if (cloudSnapshot) {
+            const saved = await cloudSaveMonth(record);
+            if (!saved.ok && !saved.partial) {
+                cloudRestore(cloudSnapshot);
+                cloudRefreshViews();
+                await cloudWriteFailed(saved.error);
+                return false;
+            }
+            record._updatedAt = saved.updatedAt;
+            localStorage.setItem('property_history', JSON.stringify(history));
+            if (!saved.ok) showToast('⚠️ حُفظ الشهر لكن تفاصيل الشقق لم تصل للسحابة — اعتمد الشهر مرة أخرى.', { duration: 8000 });
+        }
         const surplusBox = document.getElementById('box_surplus');
         const withdrawalNote = document.getElementById('withdrawal_note');
         surplusBox.classList.toggle('risk', reserveDraw > 0);
@@ -2489,6 +3623,7 @@
         setLoadedMonthContext(currentMonth, currentYear);
         checkBackupReminder(); // تذكير ذكي: أفضل توقيت لتذكير المستخدم بالنسخ الاحتياطي هو مباشرة بعد اعتماد بيانات جديدة
         checkEmergencyFundThreshold(); // رصيد الصندوق تغيّر بعد هذا الاعتماد، لازم يُعاد فحصه فورًا
+        return true;
     }
 
     function getSelectedYear() {
@@ -2514,6 +3649,7 @@
         } else {
             localStorage.setItem('opening_balance', JSON.stringify({ amount, year }));
         }
+        cloudQueueSettings();
 
         renderOpeningBalanceStatus();
 
@@ -2808,10 +3944,18 @@
         updateSuggestedEmergencyLimit();
     }
 
-    function deleteElevatorPayment(id) {
+    async function deleteElevatorPayment(id) {
+        if (cloudEditBlocked()) return;
         const payments = getElevatorPayments();
         const removed = payments.find(p => p.id === id);
         if (!removed) return;
+        if (cloudWriteOn() && removed._updatedAt) {
+            if (!cloudLock()) return;
+            try {
+                const r = await cloudDeletePayment(id, removed._updatedAt);
+                if (!r.ok) { await cloudWriteFailed(r.error); return; }
+            } finally { cloudUnlock(); }
+        }
         localStorage.setItem('elevator_payments', JSON.stringify(payments.filter(p => p.id !== id)));
         renderElevatorPaymentsLog();
         updateAnnualSurplus(readHistory());
@@ -2820,9 +3964,18 @@
         showToast('تم حذف الدفعة وتحديث الأرقام المرتبطة.', {
             actionLabel: 'تراجع',
             duration: 8000,
-            onAction: () => {
-                const current = getElevatorPayments().filter(p => p.id !== id);
-                current.push(removed);
+            onAction: async () => {
+                let back = removed;
+                if (cloudWriteOn()) {
+                    if (!cloudLock()) return;
+                    try {
+                        const r = await cloudInsertPayment(removed);
+                        if (!r.ok) { await cloudWriteFailed(r.error); return; }
+                        back = r.payment;
+                    } finally { cloudUnlock(); }
+                }
+                const current = getElevatorPayments().filter(p => p.id !== id && p.id !== back.id);
+                current.push(back);
                 localStorage.setItem('elevator_payments', JSON.stringify(current));
                 renderElevatorPaymentsLog();
                 updateAnnualSurplus(readHistory());
@@ -2854,7 +4007,8 @@
         `);
     }
 
-    function saveEditElevatorPayment(id) {
+    async function saveEditElevatorPayment(id) {
+        if (cloudEditBlocked()) return;
         const payments = getElevatorPayments();
         const p = payments.find(x => x.id === id);
         if (!p) { alert('تعذر إيجاد هذه الدفعة.'); closeBottomSheet(); return; }
@@ -2870,9 +4024,20 @@
         const newTimestamp = new Date(newDateStr + 'T00:00:00').getTime();
         if (isNaN(newTimestamp)) { alert('تاريخ غير صحيح.'); return; }
 
-        p.amount = newAmount;
-        p.timestamp = newTimestamp;
-        p.year = new Date(newTimestamp).getFullYear();
+        let updated = Object.assign({}, p, { amount: newAmount, timestamp: newTimestamp, year: new Date(newTimestamp).getFullYear() });
+        if (cloudWriteOn() && p._updatedAt) {
+            if (!cloudLock()) return;
+            try {
+                const r = await cloudUpdatePayment(updated);
+                if (!r.ok) {
+                    if (r.error === 'conflict') closeBottomSheet();
+                    await cloudWriteFailed(r.error);
+                    return;
+                }
+                updated = Object.assign({}, updated, r.payment);
+            } finally { cloudUnlock(); }
+        }
+        payments[payments.findIndex(x => x.id === id)] = updated;
         localStorage.setItem('elevator_payments', JSON.stringify(payments));
 
         closeBottomSheet();
@@ -2882,7 +4047,8 @@
         alert(`✅ تم تحديث الدفعة: ${newAmount.toFixed(2)} ر.س بتاريخ ${newDateStr}، وتحديث كل الأرقام المرتبطة.`);
     }
 
-    function markElevatorPaid() {
+    async function markElevatorPaid() {
+        if (cloudEditBlocked()) return;
         const accumulatedAmount = getElevatorCumulativeNow();
 
         if (accumulatedAmount <= 0) {
@@ -2892,11 +4058,20 @@
 
         if (confirm(`هل تم دفع مبلغ ${accumulatedAmount.toFixed(2)} ر.س فعلياً لصيانة المصعد؟ سيتم خصمه من إجمالي الفائض السنوي.`)) {
             const paymentYear = new Date().getFullYear();
-            const payments = getElevatorPayments();
-            payments.push({
+            let payment = {
                 id: Date.now() + '_' + Math.random().toString(36).slice(2, 8),
                 amount: accumulatedAmount, timestamp: Date.now(), year: paymentYear
-            });
+            };
+            if (cloudWriteOn()) {
+                if (!cloudLock()) return;
+                try {
+                    const r = await cloudInsertPayment(payment);
+                    if (!r.ok) { await cloudWriteFailed(r.error); return; }
+                    payment = r.payment;
+                } finally { cloudUnlock(); }
+            }
+            const payments = getElevatorPayments();
+            payments.push(payment);
             localStorage.setItem('elevator_payments', JSON.stringify(payments));
 
             const history = readHistory();
@@ -3223,6 +4398,7 @@
         if (!el) return;
         const val = parseFloat(el.value);
         localStorage.setItem('emergency_fund_min_threshold', isFinite(val) ? String(val) : '0');
+        cloudQueueSettings();
         checkEmergencyFundThreshold();
     }
 
@@ -3269,7 +4445,8 @@
         return { kept, removedCount };
     }
 
-    function cleanupDuplicateElevatorPayments() {
+    async function cleanupDuplicateElevatorPayments() {
+        if (cloudEditBlocked()) return;
         const { kept, removedCount } = detectDuplicateElevatorPayments();
 
         if (removedCount === 0) {
@@ -3278,6 +4455,17 @@
         }
         if (!confirm(`تم العثور على ${removedCount} دفعة مكررة (نفس المبلغ ونفس التاريخ). سيتم حذفها والإبقاء على نسخة واحدة فقط من كل دفعة. هل تريد المتابعة؟`)) return;
 
+        if (cloudWriteOn()) {
+            const keptIds = new Set(kept.map(k => k.id));
+            if (!cloudLock()) return;
+            try {
+                for (const p of readPayments().filter(x => !keptIds.has(x.id))) {
+                    if (!p._updatedAt) continue;
+                    const r = await cloudDeletePayment(p.id, p._updatedAt);
+                    if (!r.ok) { await cloudResync(); await cloudWriteFailed(r.error); return; }
+                }
+            } finally { cloudUnlock(); }
+        }
         localStorage.setItem('elevator_payments', JSON.stringify(kept));
         renderElevatorPaymentsLog();
         const history = readHistory();
@@ -3311,6 +4499,11 @@
     function importAllData(event) {
         const file = event.target.files[0];
         if (!file) return;
+        if (cloudWriteOn()) {
+            showToast('⚠️ استعادة نسخة احتياطية غير متاحة أثناء ربط العمارة بالسحابة، لحماية بيانات الجميع.', { duration: 8000 });
+            event.target.value = '';
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -3495,6 +4688,7 @@
     }
 
     function clearHistory() {
+        if (cloudWriteOn()) { showToast('⚠️ خاصية مسح السجل كاملًا غير متاحة أثناء ربط العمارة بالسحابة، لحماية بيانات الجميع.', { duration: 8000 }); return; }
         if (confirm("هل أنت متأكد تماماً من حذف كافة التقارير الشهرية المؤرشفة، بالإضافة إلى سجل دفعات المصعد وعداد التراكم والرصيد الافتتاحي، وإعادة كل الحقول (الشقق والفواتير والالتزامات) لقيمها الافتراضية؟ سيتم تصفير كل شيء بلا استثناء. لا يمكن التراجع عن هذا الإجراء.")) {
             localStorage.removeItem('property_history');
             localStorage.removeItem('elevator_payments');
@@ -3508,10 +4702,19 @@
         }
     }
 
-    function deleteMonthRecord(month, year) {
+    async function deleteMonthRecord(month, year) {
+        if (cloudEditBlocked()) return;
         const history = readHistory();
         const record = history.find(r => r.month === month && (r.year || new Date().getFullYear()) === year);
         if (!record) { alert('تعذر إيجاد بيانات هذا الشهر.'); return; }
+
+        if (cloudWriteOn() && record._updatedAt) {
+            if (!cloudLock()) return;
+            try {
+                const r = await cloudDeleteMonth(month, year, record._updatedAt);
+                if (!r.ok) { await cloudWriteFailed(r.error); return; }
+            } finally { cloudUnlock(); }
+        }
 
         // حذف فوري مع زر "تراجع" لمدة 8 ثوانٍ، بدل تأكيدين متتاليين قبل الحذف
         const updatedHistory = history.filter(r => !(r.month === month && (r.year || new Date().getFullYear()) === year));
@@ -3521,9 +4724,19 @@
         showToast(`تم حذف شهر ${month} ${year} من السجل.`, {
             actionLabel: 'تراجع',
             duration: 8000,
-            onAction: () => {
+            onAction: async () => {
+                const restored = Object.assign({}, record);
+                if (cloudWriteOn()) {
+                    delete restored._updatedAt;
+                    if (!cloudLock()) return;
+                    try {
+                        const r = await cloudSaveMonth(restored);
+                        if (!r.ok && !r.partial) { await cloudWriteFailed(r.error); return; }
+                        restored._updatedAt = r.updatedAt;
+                    } finally { cloudUnlock(); }
+                }
                 const current = readHistory().filter(r => !(r.month === month && (r.year || new Date().getFullYear()) === year));
-                current.push(record);
+                current.push(restored);
                 localStorage.setItem('property_history', JSON.stringify(current));
                 refreshAfterHistoryChange();
                 showToast(`✅ تمت استعادة شهر ${month} ${year}.`);
@@ -4577,6 +5790,9 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
         
         // تحديث واجهة PIN في الإعدادات
         refreshPinUI();
+
+        // الحساب السحابي (اختياري في هذه المرحلة)
+        cloudInit();
     }
 
     function updateElevatorLiveDisplay() {
@@ -5085,23 +6301,39 @@ ${yearOtherItemsList.length ? `\n2.١) بيان تفصيلي كامل بجميع
 <!-- ========== تسجيل Service Worker (يعمل بدون إنترنت + يحدّث تلقائياً) ========== -->
 <script>
     if ('serviceWorker' in navigator) {
+        // نسخة جديدة فُعّلت أثناء فتح التطبيق: نُظهر شريط تحديث بدل إعادة التحميل التلقائي،
+        // حتى لا يضيع ما يكتبه المستخدم في المنتصف
+        const hadController = !!navigator.serviceWorker.controller;
+        function showUpdateBanner() {
+            if (document.getElementById('app_update_banner')) return;
+            const bar = document.createElement('div');
+            bar.id = 'app_update_banner';
+            bar.setAttribute('role', 'status');
+            bar.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:100000; display:flex; gap:10px; align-items:center; justify-content:center; padding:10px 14px; background:var(--secondary-color); color:#fff; font-size:14px; font-weight:600;';
+            const msg = document.createElement('span');
+            msg.textContent = 'يتوفر إصدار أحدث من التطبيق.';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = 'تحديث الآن';
+            btn.style.cssText = 'border:0; border-radius:8px; padding:6px 12px; font-weight:700; cursor:pointer; background:#fff; color:#1a1a1a;';
+            btn.addEventListener('click', () => window.location.reload());
+            const later = document.createElement('button');
+            later.type = 'button';
+            later.textContent = 'لاحقًا';
+            later.style.cssText = 'border:0; background:transparent; color:#fff; text-decoration:underline; cursor:pointer;';
+            later.addEventListener('click', () => bar.remove());
+            bar.append(msg, btn, later);
+            document.body.appendChild(bar);
+        }
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then((reg) => {
-                // إذا توفر إصدار جديد من sw.js، فعّله فوراً بدل الانتظار
-                reg.addEventListener('updatefound', () => {
-                    const newWorker = reg.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'activated') {
-                            // نسخة جديدة فُعّلت — أعد تحميل الصفحة مرة واحدة لضمان أحدث محتوى
-                            if (!sessionStorage.getItem('jiwar_sw_reloaded')) {
-                                sessionStorage.setItem('jiwar_sw_reloaded', '1');
-                                window.location.reload();
-                            }
-                        }
-                    });
-                });
+                // فحص دوري وعند العودة للتطبيق: هل نُشر sw.js جديد؟
+                const check = () => { try { reg.update(); } catch (e) {} };
+                setInterval(check, 30 * 60 * 1000);
+                document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
             }).catch(() => {});
         });
+        navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) showUpdateBanner(); });
     }
 </script>
 <!-- ============================================================================ -->
